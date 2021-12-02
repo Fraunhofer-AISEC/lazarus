@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infoList vendor="NXP">
+<info name="LPC55S69" chip="LPC55S69" >
+<chip>
+<name>LPC55S69</name>
+<family>LPC55xx</family>
+<vendor>NXP</vendor>
+<memory can_program="true" id="Flash" is_ro="true" size="608" type="Flash"/>
+<memory id="RAM" size="304" type="RAM"/>
+<memoryInstance derived_from="Flash" driver="LPC55xx_S.cfx" id="DICEPP_CODE" location="0x10000000" size="0x8000"/>
+<memoryInstance derived_from="Flash" driver="LPC55xx_S.cfx" id="DICEPP_DATA" location="0x10008000" size="0x800"/>
+<memoryInstance derived_from="Flash" driver="LPC55xx_S.cfx" id="LZ_CORE_IRQ" location="0x1000F800" size="0x800"/>
+<memoryInstance derived_from="Flash" driver="LPC55xx_S.cfx" id="LZ_CORE_HDR" location="0x10010000" size="0x800"/>
+<memoryInstance derived_from="Flash" driver="LPC55xx_S.cfx" id="LZ_CORE_CODE" location="0x10010800" size="0x17400"/>
+<memoryInstance derived_from="Flash" driver="LPC55xx_S.cfx" id="SG_veneer_table" location="0x10027c00" size="0x400"/>
+<memoryInstance derived_from="Flash" driver="LPC55xx_S.cfx" id="CP_HDR" location="0x10028000" size="0x800"/>
+<memoryInstance derived_from="Flash" driver="LPC55xx_S.cfx" id="CP_CODE" location="0x10028800" size="0xF800"/>
+<memoryInstance derived_from="Flash" driver="LPC55xx.cfx" id="UD_HDR" location="0x00038000" size="0x800"/>
+<memoryInstance derived_from="Flash" driver="LPC55xx.cfx" id="UD_CODE" location="0x00038800" size="0xF800"/>
+<memoryInstance derived_from="Flash" driver="LPC55xx.cfx" id="APP_HDR" location="0x00048000" size="0x800"/>
+<memoryInstance derived_from="Flash" driver="LPC55xx.cfx" id="APP_CODE" location="0x00048800" size="0x27800"/>
+<memoryInstance derived_from="Flash" driver="LPC55xx.cfx" id="LZ_DATA_STORE" location="0x00070000" size="0x2000"/>
+<memoryInstance derived_from="Flash" driver="LPC55xx.cfx" id="STAGING_AREA" location="0x00072000" size="0x28000"/>
+<memoryInstance derived_from="RAM" id="SRAM" location="0x30000000" size="0x8000"/>
+</chip>
+<processor>
+<name gcc_name="cortex-m33">Cortex-M33</name>
+<family>Cortex-M</family>
+</processor>
+<processor>
+<name gcc_name="cortex-m33-nodsp">Cortex-M33 (No DSP)</name>
+<family>Cortex-M</family>
+</processor>
+</info>
+</infoList>
+

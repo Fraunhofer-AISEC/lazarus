@@ -1,0 +1,10 @@
+set remotetimeout 100000
+set mem inaccessible-by-default off
+set arm force-mode thumb
+
+target extended-remote | crt_emu_cm_redlink -g -mi -p LPC55S69 --flash-driver-reset SYSRESETREQ --bootromstall 0x0 -x . --flash-dir /usr/local/mcuxpressoide/ide/binaries/Flash
+
+mon ondisconnect cont
+
+dump binary memory trust_anchors.bin 0x70000 0x72000
+q

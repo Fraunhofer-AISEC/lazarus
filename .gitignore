@@ -6,6 +6,7 @@
 *.ko
 *.obj
 *.elf
+*.axf
 
 # Linker output
 *.ilk
@@ -51,8 +52,15 @@ Mkfile.old
 dkms.conf
 
 # Custom
+XDG_CACHE_HOME/
+*.pyc
+*.cpython-36.pyc
+__pycache__/
 .vscode/
+**.code-workspace
 **/build_no
 **/__pycache__
 lz_hub/certificates
-*/build/
+**/build/
+.db
+**/.settings/

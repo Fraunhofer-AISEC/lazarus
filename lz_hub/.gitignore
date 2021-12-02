@@ -1,0 +1,16 @@
+XDG_CACHE_HOME/
+__pycache__/
+*.d
+*.o
+*.zip
+*.swd
+*.axf
+*.pyc
+*.cpython-36.pyc
+/*.cpython-36.pyc
+/*.pyc
+/wifi_credentials
+/trust_anchors_signed.bin
+/trust_anchors.bin
+/wifi_credentials_aisec
+/lz_hubs.db
