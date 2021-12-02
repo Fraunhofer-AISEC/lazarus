@@ -18,7 +18,6 @@
 
 # Libraries
 *.lib
-*.a
 *.la
 *.lo
 
@@ -51,9 +50,9 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+# Custom
 .vscode/
-lz_dicepp LinkServer Debug.launch
-build_no
+**/build_no
 **/__pycache__
 lz_hub/certificates
 */build/
