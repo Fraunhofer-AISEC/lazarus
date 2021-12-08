@@ -17,10 +17,12 @@
  * limitations under the License.
  */
 
-#ifndef LZ_AWDT_H_
-#define LZ_AWDT_H_
+#ifndef LZ_UPDATE_H_
+#define LZ_UPDATE_H_
 
-LZ_RESULT lz_awdt_get_nonce_nse(uint8_t *nonce);
-LZ_RESULT lz_awdt_put_ticket_nse(lz_auth_hdr_t *ticket, uint32_t time_ms);
+LZ_RESULT lz_apply_updates(void);
+LZ_RESULT lz_update_img_meta_data(void);
+LZ_RESULT lz_std_updates_pending(void);
+LZ_RESULT lz_verified_core_update_pending(void);
 
-#endif /* LZ_AWDT_H_ */
+#endif /* LZ_UPDATE_H_ */

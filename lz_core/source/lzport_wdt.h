@@ -17,10 +17,11 @@
  * limitations under the License.
  */
 
-#ifndef LZ_AWDT_H_
-#define LZ_AWDT_H_
+#ifndef lzport_LPC55S69_lzport_WDT_lzport_WDT_H_
+#define lzport_LPC55S69_lzport_WDT_lzport_WDT_H_
 
-LZ_RESULT lz_awdt_get_nonce_nse(uint8_t *nonce);
-LZ_RESULT lz_awdt_put_ticket_nse(lz_auth_hdr_t *ticket, uint32_t time_ms);
+bool lzport_last_reset_awdt(void);
+void lzport_wdt_init(uint32_t timeout_s);
+void lzport_wdt_reload(uint32_t timeout_s);
 
-#endif /* LZ_AWDT_H_ */
+#endif /* lzport_LPC55S69_lzport_WDT_lzport_WDT_H_ */

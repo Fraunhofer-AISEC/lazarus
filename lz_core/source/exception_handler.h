@@ -17,10 +17,17 @@
  * limitations under the License.
  */
 
-#ifndef LZ_AWDT_H_
-#define LZ_AWDT_H_
+#ifndef EXCEPTION_HANDLER_H_
+#define EXCEPTION_HANDLER_H_
 
-LZ_RESULT lz_awdt_get_nonce_nse(uint8_t *nonce);
-LZ_RESULT lz_awdt_put_ticket_nse(lz_auth_hdr_t *ticket, uint32_t time_ms);
+#define SVC_WDG_IRQ_DISABLE 1
+#define SVC_WDG_IRQ_ENABLE 2
+#define SVC_SYSTEM_RESET 3
+#define SVC_PREPARE_SLEEP 4
 
-#endif /* LZ_AWDT_H_ */
+#define svc_disable_wdg_irq() __asm volatile("svc %0 \n" ::"i"(SVC_WDG_IRQ_DISABLE) : "memory")
+#define svc_enable_wdg_irq() __asm volatile("svc %0 \n" ::"i"(SVC_WDG_IRQ_ENABLE) : "memory")
+#define svc_reset_system() __asm volatile("svc %0 \n" ::"i"(SVC_SYSTEM_RESET) : "memory")
+#define svc_prepare_sleep() __asm volatile("svc %0 \n" ::"i"(SVC_PREPARE_SLEEP) : "memory")
+
+#endif /* EXCEPTION_HANDLER_H_ */

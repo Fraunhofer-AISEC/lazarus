@@ -17,10 +17,14 @@
  * limitations under the License.
  */
 
-#ifndef LZ_AWDT_H_
-#define LZ_AWDT_H_
+#ifndef LZPORT_LPC55S69_LZPORT_THROTTLE_TIMER_H_
+#define LZPORT_LPC55S69_LZPORT_THROTTLE_TIMER_H_
 
-LZ_RESULT lz_awdt_get_nonce_nse(uint8_t *nonce);
-LZ_RESULT lz_awdt_put_ticket_nse(lz_auth_hdr_t *ticket, uint32_t time_ms);
+#include "stdint.h"
+#include <stdbool.h>
 
-#endif /* LZ_AWDT_H_ */
+void lzport_throttle_timer_init();
+void lzport_throttle_timer_start();
+bool lzport_throttle_timer_is_active();
+
+#endif

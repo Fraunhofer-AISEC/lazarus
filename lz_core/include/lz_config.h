@@ -17,10 +17,22 @@
  * limitations under the License.
  */
 
-#ifndef LZ_AWDT_H_
-#define LZ_AWDT_H_
+#ifndef LZ_CONFIG_H
+#define LZ_CONFIG_H
 
-LZ_RESULT lz_awdt_get_nonce_nse(uint8_t *nonce);
-LZ_RESULT lz_awdt_put_ticket_nse(lz_auth_hdr_t *ticket, uint32_t time_ms);
+// Indicate that this binary is lz_core in common files
+#define LZ_CORE
 
-#endif /* LZ_AWDT_H_ */
+// Do not edit! These are just the debug output levels
+#define DBG_NONE (0x0U)
+#define DBG_ERR (0x1U)
+#define DBG_WARN (0x2U)
+#define DBG_INFO (0x4U)
+#define DBG_VERB (0x8U)
+#define DBG_NW (0x10U)
+#define DBG_AWDT (0x20U)
+
+// Set the desired debug output here (The definitions from above can be OR'ed)
+#define LZ_DBG_LEVEL (DBG_ERR | DBG_WARN | DBG_INFO)
+
+#endif /* LZ_CONFIG_H */

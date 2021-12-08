@@ -60,7 +60,6 @@ __pycache__/
 **.code-workspace
 **/build_no
 **/__pycache__
-lz_hub/certificates
 **/build/
 .db
 **/.settings/

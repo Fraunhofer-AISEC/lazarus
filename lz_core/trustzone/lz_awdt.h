@@ -20,7 +20,11 @@
 #ifndef LZ_AWDT_H_
 #define LZ_AWDT_H_
 
-LZ_RESULT lz_awdt_get_nonce_nse(uint8_t *nonce);
-LZ_RESULT lz_awdt_put_ticket_nse(lz_auth_hdr_t *ticket, uint32_t time_ms);
+//
+// Note: AWDT handler functions (NSE entry points) are located in lz_common/lz_trustzone_handler/
+//
+
+LZ_RESULT lz_awdt_init(uint32_t time_s);
+bool lz_awdt_last_reset_awdt(void);
 
 #endif /* LZ_AWDT_H_ */
