@@ -897,11 +897,11 @@ LZ_RESULT lz_core_verify_image(const lz_img_hdr_t *image_hdr, const uint8_t *ima
 	// Compare it with the digest stored in the header
 	if (memcmp(digest, image_hdr->hdr.content.digest, sizeof(digest)) != 0) {
 		dbgprint(DBG_ERR,
-				 "ERROR: Next layer digest mismatch. layer %s, size %d, version %d, "
+				 "ERROR: Next layer digest mismatch. Layer %s, size %d, version %d, "
 				 "issue time %s\n",
 				 image_hdr->hdr.content.name, image_hdr->hdr.content.size,
 				 image_hdr->hdr.content.version,
-				 asctime(gmtime((time_t *)&(image_meta->last_issue_time))));
+				 asctime(gmtime((time_t *)&(image_hdr->hdr.content.issue_time))));
 		dbgprint_data((uint8_t *)image_hdr->hdr.content.digest, SHA256_DIGEST_LENGTH, "Digest");
 		return LZ_ERROR;
 	}

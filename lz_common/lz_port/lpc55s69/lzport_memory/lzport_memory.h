@@ -17,8 +17,8 @@
  * limitations under the License.
  */
 
-#ifndef lzport_LPC55S69_lzport_MEMORY_H_
-#define lzport_LPC55S69_lzport_MEMORY_H_
+#ifndef LZPORT_MEMORY_H_
+#define LZPORT_MEMORY_H_
 
 // Attention
 // If something is changed here, it also has to be changed in the linker script
@@ -89,4 +89,4 @@
 
 void lzport_asm_zero_ram(uint32_t start, uint32_t size);
 
-#endif /* lzport_LPC55S69_lzport_MEMORY_H_ */
+#endif /* LZPORT_MEMORY_H_ */

@@ -6,9 +6,9 @@
   - [Build](#build)
   - [Hardware Setup](#hardware-setup)
   - [Network Setup](#network-setup)
-  - [Certificate Creation](#certificate-creation)
   - [Provisioning](#provisioning)
   - [Server Start](#server-start)
+  - [Certificate Creation](#certificate-creation)
 
 This project is not maintained. It has been published as part of the following AsiaCCS '20
 conference paper:
@@ -123,18 +123,6 @@ port="65433"
 ```
 ```ip``` and ```port``` must be configured to the server where the Lazarus backend runs.
 
-## Certificate Creation
-For a minimal demonstrator setup, two certificates must be created: A code signing certificate,
-which is used to sign the binaries, and the hub certificate. The certificates and their respective
-private keys must be ECDSA with curve prime256v1 and hash SHA-256. Switch to the folder
-```lz_hub/certificates``` and create the certificates with the
-following commands:
-
-```sh
-openssl req -x509 -nodes -days 3650 -newkey ec:<(openssl ecparam -name prime256v1) -keyout code_auth_sk.pem -out code_auth_cert.pem
-openssl req -x509 -nodes -days 3650 -newkey ec:<(openssl ecparam -name prime256v1) -keyout hub_sk.pem -out hub_cert.pem
-```
-
 ## Provisioning
 After the board is connected, launch your serial-terminal and select the correct port
 (e.g. ```/dev/ttyACM1```). Then launch the provisioning script ```lz_provision_device.sh```.
@@ -143,10 +131,9 @@ The script has optional parameters:
 - ```-c | --clean``` Does a clean of all projects before building them
 - ```-s | --server-start``` Starts the tcp-server at the end of the provisioning in order to be
 able to perform the complete provisioning
-- ```-e | --erase``` Erases the whole flash before provisioning.
 
 An example use could therefore look as follows:
-```./lz_provision_device.sh -c -e```
+```./lz_provision_device.sh -c -s```
 
 ## Server Start
 The server can be started either via the ```-s|--server-start``` parameter from the provisioning
@@ -154,4 +141,17 @@ script or run standalone:
 
 ```sh
 python3 ./lz_hub.py ./certificates ./wifi_credentials
+```
+
+## Certificate Creation
+
+The repository contains demo certificates in ```lz_hub/certificates```. DO NOT USE THESE IN
+PRODUCTION! New certificates can be created via the following commands. Lazarus DeviceID and
+AliasID certificate parameters must currently be adjusted in the code.
+
+```sh
+mkdir -p lz_hub/certificates
+cd lz_hub/certificates
+openssl req -x509 -nodes -days 3650 -newkey ec:<(openssl ecparam -name prime256v1) -keyout code_auth_sk.pem -out code_auth_cert.pem
+openssl req -x509 -nodes -days 3650 -newkey ec:<(openssl ecparam -name prime256v1) -keyout hub_sk.pem -out hub_cert.pem
 ```
