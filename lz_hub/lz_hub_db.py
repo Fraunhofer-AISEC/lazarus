@@ -1,9 +1,6 @@
 import sqlite3
 import os
 from sqlite3.dbapi2 import Connection
-from OpenSSL import crypto
-import open_ssl_wrapper as osw
-import uuid as u
 
 LZ_HUB_DB_PATH          = './lz_hubs.db'
 TEST_CERTS_PATH         = './unit_test/test_certs/'
