@@ -38,6 +38,15 @@ MCUX_IDE_BIN=/usr/local/mcuxpressoide/ide/binaries
 MCUX_TOOL_LOC=/usr/local/mcuxpressoide/ide/tools/bin
 LAZARUS_LOC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 && pwd)"
 
+# NOTE The non-secure application used for Lazarus can be set here. It must be a Makefile
+# application (will be built with 'make -r -j$(nproc)'), otherwise further changes are required
+APP_NAME=lz_demo_app # The name of the app
+APP_DIR=$LAZARUS_LOC/$APP_NAME # The directory with the Makefile to build the app
+APP_BIN=$APP_DIR/build/${APP_NAME}.bin # The binary to be flashed
+
+APP_SIGNED_BIN=${APP_BIN%.*}_signed.bin # The signed binary, do not change
+
+echo "Provisioning Lazarus with non-secure app $APP_NAME (binary: $APP_BIN, location: $APP_DIR).."
 
 # Check if the workspace exists
 if [ ! -d "$LAZARUS_LOC" ]; then
@@ -91,10 +100,10 @@ if [ $CLEAN_PROJECTS -eq 1 ] ; then
         exit
     fi
 
-    cd $LAZARUS_LOC/lz_demo_app
+    cd $APP_DIR
     make -r -j$CPU_CORES clean
     if [ $EXIT_CODE -ne 0 ] ; then
-        echo "lz_demo_app clean not successful. Exit.."
+        echo "$APP_NAME clean not successful. Exit.."
         exit
     fi
 fi
@@ -132,11 +141,11 @@ if [ $EXIT_CODE -ne 0 ] ; then
 	exit
 fi
 
-cd $LAZARUS_LOC/lz_demo_app
+cd $APP_DIR
 make -r -j$CPU_CORES all
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ] ; then
-    echo "lz_demo_app build not successful. Exit.."
+    echo "$APP_NAME build not successful. Exit.."
 	exit
 fi
 
@@ -173,7 +182,7 @@ if [ $? -ne 0 ] ; then
 	exit
 fi
 
-python3 $LAZARUS_LOC/lz_hub/lz_sign_binary.py $LAZARUS_LOC/lz_demo_app/build/lz_demo_app.bin $LAZARUS_LOC/lz_demo_app/build_no $LAZARUS_LOC/lz_demo_app/build/lz_demo_app_signed.bin $LAZARUS_LOC/lz_hub/certificates/
+python3 $LAZARUS_LOC/lz_hub/lz_sign_binary.py $APP_BIN $APP_DIR/build_no $APP_SIGNED_BIN $LAZARUS_LOC/lz_hub/certificates/
 
 if [ $? -ne 0 ] ; then
     echo "Error in script lz_sign_binary.py. Exit.."
@@ -287,7 +296,7 @@ then
     # ... than lz_udownloader
     $MCUX_IDE_BIN/crt_emu_cm_redlink --flash-load "$LAZARUS_LOC/lz_udownloader/build/lz_udownloader_signed.bin" -p LPC55S69 --load-base=0x38000 $BOOTROMSTALL -x $LAZARUS_LOC/lz_hub --flash-dir $MCUX_FLASH_DIR
 else
-    $MCUX_IDE_BIN/crt_emu_cm_redlink --flash-load "$LAZARUS_LOC/lz_demo_app/build/lz_demo_app_signed.bin" -p LPC55S69 --load-base=0x48000 --bootromstall 0x50000040 -CoreIndex=0 -x $LAZARUS_LOC/lz_hub --flash-dir $MCUX_FLASH_DIR --flash-hashing --PreconnectScript LS_preconnect_LPC55xx.scp
+    $MCUX_IDE_BIN/crt_emu_cm_redlink --flash-load "$APP_SIGNED_BIN" -p LPC55S69 --load-base=0x48000 --bootromstall 0x50000040 -CoreIndex=0 -x $LAZARUS_LOC/lz_hub --flash-dir $MCUX_FLASH_DIR --flash-hashing --PreconnectScript LS_preconnect_LPC55xx.scp
 fi
 EXIT_CODE=$?
 pkill --signal 9 -f .*redlink.*
@@ -296,14 +305,14 @@ pkill --signal 9 -f .*arm-none-eabi-gdb.*
 echo
 echo
 if [ $EXIT_CODE -ne 0 ] ; then
-    echo "Flashing lz_demo_app/lz_udownloader not successful. Exit.."
+    echo "Flashing $APP_NAME/lz_udownloader not successful. Exit.."
     exit
 fi
 
 if [ $REVISION -eq 1 ]
 then
     # ... than lz_demoapp
-    $MCUX_IDE_BIN/crt_emu_cm_redlink --flash-load "$LAZARUS_LOC/lz_demo_app/build/lz_demo_app_signed.bin" -p LPC55S69 --load-base=0x48000 $BOOTROMSTALL -x $LAZARUS_LOC/lz_hub --flash-dir $MCUX_FLASH_DIR
+    $MCUX_IDE_BIN/crt_emu_cm_redlink --flash-load "$APP_SIGNED_BIN" -p LPC55S69 --load-base=0x48000 $BOOTROMSTALL -x $LAZARUS_LOC/lz_hub --flash-dir $MCUX_FLASH_DIR
 else
     $MCUX_IDE_BIN/crt_emu_cm_redlink --flash-load "$LAZARUS_LOC/lz_dicepp/build/lz_dicepp.bin" -p LPC55S69 --load-base=0x10000000 --bootromstall 0x50000040 -CoreIndex=0 -x $LAZARUS_LOC/lz_hub --flash-dir $MCUX_FLASH_DIR --flash-hashing --PreconnectScript LS_preconnect_LPC55xx.scp
 fi
@@ -314,7 +323,7 @@ pkill --signal 9 -f .*arm-none-eabi-gdb.*
 echo
 echo
 if [ $EXIT_CODE -ne 0 ] ; then
-    echo "Flashing lz_dicepp/lz_demo_app not successful. Exit.."
+    echo "Flashing lz_dicepp/$APP_NAME not successful. Exit.."
     exit
 fi
 
