@@ -93,7 +93,8 @@ CFLAGS += -c -fno-common -g3 -ffunction-sections -fdata-sections -ffreestanding 
 CC = arm-none-eabi-gcc
 
 # External libraries
-LIBS = ./libs
+LIBS = ./libs \
+		/usr/local/mcuxpressoide/ide/tools/arm-none-eabi/lib/thumb/v8-m.main+dp/hard
 
 # Linkerflags
 LDFLAGS += -nostdlib -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -lpower_hardabi -T ./linker_script_$(PROJECT_NAME).ld
