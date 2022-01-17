@@ -287,7 +287,7 @@ int lzport_retrieve_uuid(uint8_t uuid[LEN_UUID_V4_BIN])
 		return LZ_ERROR;
 	}
 
-	FFR_Deinit(&g_flash_config);
+	FFR_Lock_All(&g_flash_config);
 
 	return LZ_SUCCESS;
 }

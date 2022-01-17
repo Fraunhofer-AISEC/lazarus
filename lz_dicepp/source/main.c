@@ -22,6 +22,7 @@
 #include "pin_mux.h"
 #include "clock_config.h"
 #include "LPC55S69_cm33_core0.h"
+#include "fsl_power.h"
 
 #include "lz_config.h"
 #include "lz_common/lz_common.h"
@@ -39,12 +40,13 @@ static void dicepp_switch_to_lz_core(void);
 int main(void)
 {
 	// Init board hardware
+	POWER_SetBodVbatLevel(kPOWER_BodVbatLevel1650mv, kPOWER_BodHystLevel50mv, false);
 	BOARD_InitBootPins();
-	BOARD_InitBootClocks();
+	BOARD_BootClockFROHF96M();
 
 	lzport_init_debug();
-	lzport_flash_init();
 	lz_print_img_info("Lazarus DICE++", NULL);
+	lzport_flash_init();
 
 	dicepp_run();
 

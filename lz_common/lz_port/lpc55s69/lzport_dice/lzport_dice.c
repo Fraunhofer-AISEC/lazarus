@@ -34,13 +34,13 @@ void lzport_read_cdi(uint8_t *data, uint32_t len)
 		lz_error_handler();
 	}
 
-#warning Check DICE CDI Derivation
+#warning Check DICE CDI Derivation (DICEpp must be a secure boot image)
 	//	LPC55S6x User manual Revision 1.0 page 1009
 	//  "LPC55S6x (secure part) supports Device Identifier Composition Engine (DICE) to provide
 	//	Composite Device Identifier (CDI). CDI value would be available at SYSCON offset
 	//	0x0900 to 0x091C for consumption after boot completion. It is recommended to overwrite
 	//	these registers once ephemeral key-pairs are generated using this value."
-	//  FIXME However, this does not seem to work on later revisions of the chip and was removed
-	//  from newer revisions of the user manual
-	memcpy(data, (void *)&SYSCON->DICE_REG0, SHA256_DIGEST_LENGTH);
+	//  This only works if DICEpp is an NXP secure boot image
+	//  FIXME SYSCON->DICE_REG0 is not part of SDK 2.11
+	memcpy(data, (void *)&SYSCON->RESERVED_34[240], SHA256_DIGEST_LENGTH);
 }

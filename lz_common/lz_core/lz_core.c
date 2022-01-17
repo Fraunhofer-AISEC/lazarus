@@ -75,7 +75,7 @@ boot_mode_t lz_core_run(void)
 
 	if (initial_boot) {
 		dbgprint(DBG_INFO, "INFO: Initial boot of Lazarus, erase Lazarus Data Store "
-						   "and store static_symm.\n");
+						   "and Staging Area\n");
 
 		// Erase the Lazarus data store and the staging area. This is necessary on the NXP
 		// in order to be able to write to it
