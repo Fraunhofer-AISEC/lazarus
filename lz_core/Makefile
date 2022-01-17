@@ -58,7 +58,7 @@ INCLUDES = ./include \
 				./component/serial_manager \
 				./component/lists \
 				./component/uart \
-				./board/boards
+				./board
 
 # Defines used in that build
 DEFINES = CPU_LPC55S69JBD100 \
@@ -74,7 +74,8 @@ DEFINES = CPU_LPC55S69JBD100 \
 			DEBUG \
 			__MULTICORE_MASTER \
 			MBEDTLS_CONFIG_FILE='"ksdk_mbedtls_config.h"' \
-			__NEWLIB__
+			__NEWLIB__ \
+			SERIAL_PORT_TYPE_UART=1
 
 # MBEDTLS_FREESCALE_HASHCRYPT_SHA1 \
 # MBEDTLS_FREESCALE_HASHCRYPT_SHA256 \
@@ -99,7 +100,7 @@ CC = arm-none-eabi-gcc
 LIBS = ./libs
 
 # Linkerflags
-LDFLAGS += -nostdlib -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -lpower_hardabi -T ./linker_script_$(PROJECT_NAME).ld
+LDFLAGS += -nostdlib -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -T ./linker_script_$(PROJECT_NAME).ld
 LDFLAGS += -Xlinker --gc-sections -Xlinker -print-memory-usage -Xlinker --sort-section=alignment -Xlinker --cref -Xlinker --cmse-implib -Xlinker --out-implib="$(BUILD_DIR)/$(PROJECT_NAME)_CMSE_lib.o" -Xlinker -Map="$(BUILD_DIR)/$(PROJECT_NAME).map" -o "$(BUILD_DIR)/$(PROJECT_NAME).axf"
 
 # Name of the file with a build number

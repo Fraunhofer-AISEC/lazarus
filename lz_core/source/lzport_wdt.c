@@ -91,7 +91,7 @@ void lzport_wdt_init(uint32_t timeout_s)
 	CLOCK_SetClkDiv(kCLOCK_DivWdtClk, 64U, true);
 
 	// The WDT divides the input frequency into it by 4
-	wdt_freq_hz = CLOCK_GetFreq(kCLOCK_WdtClk) / 4;
+	wdt_freq_hz = CLOCK_GetWdtClkFreq() / 4;
 
 	CLOCK_EnableClock(kCLOCK_Wwdt);
 
@@ -129,7 +129,7 @@ void lzport_wdt_init(uint32_t timeout_s)
 	// This WDPROTECT bit can be set once by software and is only cleared by a reset
 	if ((WWDT->MOD & WWDT_MOD_WDPROTECT_MASK) == 0U) {
 		// Set the WDPROTECT bit after the Feed Sequence (0xAA, 0x55) with 3 WDCLK delay
-		uint32_t DelayUs = 3000000UL / CLOCK_GetFreq(kCLOCK_WdtClk) + 1U;
+		uint32_t DelayUs = 3000000UL / CLOCK_GetWdtClkFreq() + 1U;
 		// TODO clean solution. This code waits longer than 3 WDCLK
 		for (uint32_t i = 0; i < DelayUs; i++) {
 			__asm("NOP");
@@ -156,7 +156,7 @@ void lzport_wdt_reload(uint32_t timeout_s)
 			 wwdt_last);
 
 	// The WDT divides the input frequency into it by 4
-	uint32_t wdt_freq_hz = CLOCK_GetFreq(kCLOCK_WdtClk) / 4;
+	wdt_freq_hz = CLOCK_GetWdtClkFreq() / 4;
 
 	// Set new timeout
 	if (wwdt_multiple) {
