@@ -75,7 +75,10 @@ int main(void)
 #endif
 
 	lzport_init_debug();
-	lzport_flash_init();
+	if (!lzport_flash_init()) {
+		dbgprint(DBG_ERR, "Failed to initialize flash\n");
+		lz_error_handler();
+	}
 	lz_print_img_info("Lazarus Core", &lz_core_hdr);
 	lzport_throttle_timer_init();
 	lzport_rng_init();

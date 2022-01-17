@@ -977,7 +977,6 @@
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="device"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="drivers"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
-						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="libs"/>
 						<entry excluding="lz_udownloader|lz_core|lz_cpatcher|lz_port/ESP8266|lz_net|lz_port/lpc55s69/lzport_adc|lz_port/lpc55s69/lzport_throttle_timer|lz_port/lpc55s69/lzport_syscalls|lz_port/lpc55s69/lzport_systick_delay|lz_port/lpc55s69/lzport_wdt|lz_port/ESP|lz_port/lpc55s69/lzport_freertos_delay|re_awdt/re_awdt.c|lz_port/lpc55s69/lzport_wdt/lzport_wdt.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lz_common"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="source"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>

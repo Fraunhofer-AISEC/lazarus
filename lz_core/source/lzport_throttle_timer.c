@@ -25,7 +25,7 @@
 #define CTIMER CTIMER3
 #define CTIMER_CLK kFRO_HF_to_CTIMER3
 #define CTIMER_MAT_OUT kCTIMER_Match_3
-#define CTIMER_CLK_FREQ CLOCK_GetFreq(kCLOCK_CTmier3)
+#define CTIMER_CLK_FREQ CLOCK_GetCTimerClkFreq(3U)
 
 void lzport_throttle_timer_init()
 {

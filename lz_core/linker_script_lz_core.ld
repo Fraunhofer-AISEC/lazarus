@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-INCLUDE "../../lz_common/linker_scripts/linker_script_memory.ld"
+INCLUDE "../lz_common/linker_scripts/linker_script_memory.ld"
 
 GROUP (
   "libgcc.a"
@@ -230,7 +230,7 @@ SECTIONS
     } > SRAM
 
     /* Reserve and place Heap within memory map */
-    _HeapSize = 0x800;
+    _HeapSize = 0x200;
     .heap :  ALIGN(4)
     {
         _pvHeapStart = .;
@@ -239,7 +239,7 @@ SECTIONS
         _pvHeapLimit = .;
     } > SRAM
 
-     _StackSize = 0x800;
+     _StackSize = 0x3000;
      /* Reserve space in memory for Stack */
     .heap2stackfill  :
     {
