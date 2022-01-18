@@ -24,7 +24,6 @@
 #include "lz_common/lz_common.h"
 #include "lz_trustzone_handler/lz_flash_handler.h"
 #include "lzport_debug_output/lzport_debug_output.h"
-#include "lzport_flash/lzport_flash.h"
 #include "lzport_memory/lzport_memory.h"
 
 __attribute__((section(".LZ_DATA_STORE"))) volatile lz_data_store_t lz_data_store;
