@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-INCLUDE "../../lz_common/linker_scripts/linker_script_memory.ld"
+INCLUDE "../lz_common/linker_scripts/linker_script_memory.ld"
 
 GROUP (
   "libgcc.a"
