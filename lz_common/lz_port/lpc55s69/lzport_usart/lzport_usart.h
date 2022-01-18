@@ -17,8 +17,8 @@
  * limitations under the License.
  */
 
-#ifndef RE_USART_H
-#define RE_USART_H
+#ifndef LZ_USART_H
+#define LZ_USART_H
 
 #define ESP_USART USART2
 #define ESP_USART_CLK_SRC kCLOCK_Flexcomm2
@@ -28,7 +28,7 @@
 #define ESP_USART_CLK_FREQ 12000000U
 #define ESP_USART_IRQHandler FLEXCOMM2_IRQHandler
 #define ESP_USART_IRQn FLEXCOMM2_IRQn
-#define ESP_USART_BAUD_RATE 115200U
+#define ESP_USART_BAUD_RATE 9600U
 #define USART_BUFF_SIZE 2000
 
 // Types ===========================================================================================
@@ -55,4 +55,4 @@ void lzport_usart_buffer_read(volatile lzport_usart_fifo_t *buffer, uint8_t *ele
 int lzport_usart_buffer_is_full(volatile lzport_usart_fifo_t *buffer);
 int lzport_usart_buffer_is_empty(volatile lzport_usart_fifo_t *buffer);
 
-#endif /* RE_USART_H */
+#endif /* LZ_USART_H */
