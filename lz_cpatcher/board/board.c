@@ -35,6 +35,9 @@ void BOARD_InitDebugConsole(void)
 
 void BOARD_InitDebugConsole_Core1(void)
 {
+    /* attach 12 MHz clock to FLEXCOMM1 (debug console) */
+    CLOCK_AttachClk(BOARD_DEBUG_UART_CLK_ATTACH_CORE1);
+
     RESET_ClearPeripheralReset(BOARD_DEBUG_UART_RST_CORE1);
 
     uint32_t uartClkSrcFreq = BOARD_DEBUG_UART_CLK_FREQ_CORE1;
