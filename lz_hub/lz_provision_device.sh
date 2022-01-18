@@ -338,8 +338,8 @@ pkill --signal 9 -f .*arm-none-eabi-gdb.*
 
 # Wait until the firmware has completed
 echo
-echo "Waiting for 10s until the firmware has completed..."
-sleep 10s
+echo "Waiting for 5s until the firmware has completed..."
+sleep 5s
 echo "Continuing..."
 
 # Read the Trust Anchors from the flash and store them into a file
