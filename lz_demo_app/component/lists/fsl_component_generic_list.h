@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 NXP
+ * Copyright 2018-2020 NXP
  * All rights reserved.
  *
  *
@@ -9,28 +9,32 @@
 #ifndef _GENERIC_LIST_H_
 #define _GENERIC_LIST_H_
 
+#include "fsl_common.h"
 /*!
  * @addtogroup GenericList
  * @{
  */
 
-/*!*********************************************************************************
-*************************************************************************************
-* Include
-*************************************************************************************
-********************************************************************************** */
+/**********************************************************************************
+ * Include
+ ***********************************************************************************/
 
-/*! *********************************************************************************
-*************************************************************************************
-* Public macro definitions
-*************************************************************************************
-********************************************************************************** */
+/**********************************************************************************
+ * Public macro definitions
+ ***********************************************************************************/
+/*! @brief Definition to determine whether use list light. */
+#ifndef GENERIC_LIST_LIGHT
+#define GENERIC_LIST_LIGHT (1)
+#endif
 
-/*! *********************************************************************************
-*************************************************************************************
-* Public type definitions
-*************************************************************************************
-********************************************************************************** */
+/*! @brief Definition to determine whether enable list duplicated checking. */
+#ifndef GENERIC_LIST_DUPLICATED_CHECKING
+#define GENERIC_LIST_DUPLICATED_CHECKING (0)
+#endif
+
+/**********************************************************************************
+ * Public type definitions
+ ***********************************************************************************/
 /*! @brief The list status */
 typedef enum _list_status
 {
@@ -39,33 +43,39 @@ typedef enum _list_status
     kLIST_Full           = MAKE_STATUS(kStatusGroup_LIST, 2), /*!< FULL */
     kLIST_Empty          = MAKE_STATUS(kStatusGroup_LIST, 3), /*!< Empty */
     kLIST_OrphanElement  = MAKE_STATUS(kStatusGroup_LIST, 4), /*!< Orphan Element */
+    kLIST_NotSupport     = MAKE_STATUS(kStatusGroup_LIST, 5), /*!< Not Support  */
 } list_status_t;
 
 /*! @brief The list structure*/
-typedef struct list_tag
+typedef struct list_label
 {
     struct list_element_tag *head; /*!< list head */
     struct list_element_tag *tail; /*!< list tail */
     uint16_t size;                 /*!< list size */
     uint16_t max;                  /*!< list max number of elements */
-} list_t, *list_handle_t;
-
+} list_label_t, *list_handle_t;
+#if (defined(GENERIC_LIST_LIGHT) && (GENERIC_LIST_LIGHT > 0U))
+/*! @brief The list element*/
+typedef struct list_element_tag
+{
+    struct list_element_tag *next; /*!< next list element   */
+    struct list_label *list;       /*!< pointer to the list */
+} list_element_t, *list_element_handle_t;
+#else
 /*! @brief The list element*/
 typedef struct list_element_tag
 {
     struct list_element_tag *next; /*!< next list element   */
     struct list_element_tag *prev; /*!< previous list element */
-    struct list_tag *list;         /*!< pointer to the list */
+    struct list_label *list;       /*!< pointer to the list */
 } list_element_t, *list_element_handle_t;
-
-/*! *********************************************************************************
-*************************************************************************************
-* Public prototypes
-*************************************************************************************
-********************************************************************************** */
-/*******************************************************************************
+#endif
+/**********************************************************************************
+ * Public prototypes
+ ***********************************************************************************/
+/**********************************************************************************
  * API
- ******************************************************************************/
+ **********************************************************************************/
 
 #if defined(__cplusplus)
 extern "C" {

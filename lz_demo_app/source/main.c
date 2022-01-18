@@ -32,7 +32,6 @@
 #include "lz_common/lz_common.h"
 #include "lzport_debug_output/lzport_debug_output.h"
 #include "lzport_memory/lzport_memory.h"
-#include "lzport_flash/lzport_flash.h"
 #include "lzport_usart/lzport_usart.h"
 #include "lzport_rng/lzport_rng.h"
 #include "lzport_gpio/lzport_gpio.h"
