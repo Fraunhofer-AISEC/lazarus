@@ -19,7 +19,7 @@
 					<folderInfo id="com.crt.advproject.config.exe.debug.408453926." name="/" resourcePath="">
 						<toolChain id="com.crt.advproject.toolchain.exe.debug.616758477" name="NXP MCU Tools" superClass="com.crt.advproject.toolchain.exe.debug">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="com.crt.advproject.platform.exe.debug.400695394" name="ARM-based MCU (Debug)" superClass="com.crt.advproject.platform.exe.debug"/>
-							<builder buildPath="${workspace_loc:/lz_demo_app}/Debug" id="com.crt.advproject.builder.exe.debug.192771276" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="com.crt.advproject.builder.exe.debug"/>
+							<builder buildPath="${workspace_loc:/lz_demo_app}" command="make" id="com.crt.advproject.builder.exe.debug.192771276" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="com.crt.advproject.builder.exe.debug"/>
 							<tool id="com.crt.advproject.cpp.exe.debug.1679486904" name="MCU C++ Compiler" superClass="com.crt.advproject.cpp.exe.debug">
 								<option id="com.crt.advproject.cpp.hdrlib.995861048" name="Library headers" superClass="com.crt.advproject.cpp.hdrlib" useByScannerDiscovery="false"/>
 								<option id="com.crt.advproject.cpp.fpu.1256627930" name="Floating point" superClass="com.crt.advproject.cpp.fpu" useByScannerDiscovery="true" value="com.crt.advproject.cpp.fpu.fpv5sp.hard" valueType="enumerated"/>
@@ -324,21 +324,6 @@
 								<option id="com.crt.advproject.debugger.security.nonsecureimageenable.1880324282" name="Enable pre-programming of Non-Secure Image" superClass="com.crt.advproject.debugger.security.nonsecureimageenable"/>
 								<option id="com.crt.advproject.debugger.security.nonsecureimage.1742002444" name="Non-Secure Project" superClass="com.crt.advproject.debugger.security.nonsecureimage"/>
 							</tool>
-						</toolChain>
-					</folderInfo>
-					<folderInfo id="com.crt.advproject.config.exe.debug.408453926.1936180678" name="/" resourcePath="lz_common">
-						<toolChain id="com.crt.advproject.toolchain.exe.debug.1087519709" name="NXP MCU Tools" superClass="com.crt.advproject.toolchain.exe.debug" unusedChildren="">
-							<tool id="com.crt.advproject.cpp.exe.debug.225180570" name="MCU C++ Compiler" superClass="com.crt.advproject.cpp.exe.debug.1679486904"/>
-							<tool id="com.crt.advproject.gcc.exe.debug.344325774" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.debug.1596525369">
-								<inputType id="com.crt.advproject.compiler.input.2078663618" superClass="com.crt.advproject.compiler.input"/>
-							</tool>
-							<tool id="com.crt.advproject.gas.exe.debug.1496318516" name="MCU Assembler" superClass="com.crt.advproject.gas.exe.debug.1772707703">
-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1820768286" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
-								<inputType id="com.crt.advproject.assembler.input.707166139" name="Additional Assembly Source Files" superClass="com.crt.advproject.assembler.input"/>
-							</tool>
-							<tool id="com.crt.advproject.link.cpp.exe.debug.1422949168" name="MCU C++ Linker" superClass="com.crt.advproject.link.cpp.exe.debug.1201771854"/>
-							<tool id="com.crt.advproject.link.exe.debug.1824201646" name="MCU Linker" superClass="com.crt.advproject.link.exe.debug.627628837"/>
-							<tool id="com.crt.advproject.tool.debug.debug.1375112552" name="MCU Debugger" superClass="com.crt.advproject.tool.debug.debug.1653949477"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
@@ -746,4 +731,12 @@
 &lt;/TargetConfig&gt;</projectStorage>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/lz_demo_app"/>
+		</configuration>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/lz_demo_app"/>
+		</configuration>
+	</storageModule>
 </cproject>

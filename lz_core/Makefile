@@ -52,7 +52,7 @@ INCLUDES = ./include \
 				../lz_common/lz_crypto \
 				./drivers \
 				./CMSIS \
-				./device  \
+				./device \
 				./source \
 				./utilities \
 				./component/serial_manager \
