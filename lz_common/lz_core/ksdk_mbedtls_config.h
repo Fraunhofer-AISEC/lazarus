@@ -179,17 +179,17 @@
 
 /* Enable CASPER use in library if there is CASPER on chip. */
 #if defined(FSL_FEATURE_SOC_CASPER_COUNT) && (FSL_FEATURE_SOC_CASPER_COUNT > 0)
-//#include "fsl_casper.h"
+#include "fsl_casper.h"
 //
-//#define CASPER_INSTANCE CASPER        /* CASPER base register.*/
-//#define MBEDTLS_FREESCALE_CASPER_PKHA /* Enable use of CASPER PKHA.*/
-//#define FREESCALE_PKHA_INT_MAX_BYTES (512)
+#define CASPER_INSTANCE CASPER        /* CASPER base register.*/
+#define MBEDTLS_FREESCALE_CASPER_PKHA /* Enable use of CASPER PKHA.*/
+#define FREESCALE_PKHA_INT_MAX_BYTES (512)
 //
-//#define MBEDTLS_ECP_MUL_COMB_ALT /* Alternate implementation of ecp_mul_comb() */
-//#define MBEDTLS_ECP_MULADD_ALT /* Alternate implementation of mbedtls_ecp_muladd() */
-//#define MBEDTLS_MCUX_CASPER_ECC /* CASPER implementation */
+#define MBEDTLS_ECP_MUL_COMB_ALT /* Alternate implementation of ecp_mul_comb() */
+#define MBEDTLS_ECP_MULADD_ALT /* Alternate implementation of mbedtls_ecp_muladd() */
+#define MBEDTLS_MCUX_CASPER_ECC /* CASPER implementation */
 //
-//#define MBEDTLS_ECP_DP_SECP256R1_ENABLED /* Enable ECP_DP_SECP256R1 curve */
+#define MBEDTLS_ECP_DP_SECP256R1_ENABLED /* Enable ECP_DP_SECP256R1 curve */
 //#define MBEDTLS_ECP_DP_SECP384R1_ENABLED /* Enable ECP_DP_SECP384R1 curve */
 //#define MBEDTLS_ECP_DP_SECP521R1_ENABLED /* Enable ECP_DP_SECP521R1 curve */
 
@@ -207,7 +207,7 @@
 #endif
 
 /* Define ALT functions. */
-//#define MBEDTLS_ECP_ALT
+#define MBEDTLS_ECP_ALT
 
 #if defined(MBEDTLS_FREESCALE_MMCAU_DES) || defined(MBEDTLS_FREESCALE_LTC_DES) || defined(MBEDTLS_FREESCALE_CAAM_DES) || defined(MBEDTLS_FREESCALE_CAU3_DES)
 #define MBEDTLS_DES_ALT

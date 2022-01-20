@@ -34,6 +34,7 @@ SRC_DIRS := ./source \
 			../lz_common/lz_common \
 			../lz_common/lz_crypto \
 			../lz_common/mbedtls/library \
+			../lz_common/mbedtls/port \
 			../lz_common/lz_port/lpc55s69/lzport_debug_output \
 			../lz_common/lz_port/lpc55s69/lzport_flash \
 			../lz_common/lz_port/lpc55s69/lzport_rng
