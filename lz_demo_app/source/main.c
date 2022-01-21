@@ -46,7 +46,6 @@
 #if (1 == FREERTOS_BENCHMARK_ACTIVE)
 #include "benchmark.h"
 #endif
-unsigned char memory_buf[12 * 1024];
 
 void SystemInit(void)
 {
@@ -56,8 +55,6 @@ void SystemInit(void)
 
 int main(void)
 {
-	mbedtls_memory_buffer_alloc_init(memory_buf, sizeof(memory_buf));
-
 	// Init board hardware.
 	BOARD_InitBootPins();
 	// Clocks are already configured, but variable must be set

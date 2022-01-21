@@ -46,11 +46,8 @@
 typedef void (*funcptr_s_t)(void);
 typedef void (*funcptr_ns_t)(void) __attribute__((cmse_nonsecure_call));
 
-unsigned char memory_buf[17 * 1024];
-
 static boot_mode_t lz_core_run(void);
 static void switch_to_next_layer(boot_mode_t boot_mode);
-// static void mbedtls_memory_buffer_alloc_init(unsigned char *buf, size_t len);
 
 // Already performed in lz_dicepp
 void SystemInit(void)
@@ -62,8 +59,6 @@ void SystemInit(void)
  */
 int main(void)
 {
-	mbedtls_memory_buffer_alloc_init(memory_buf, sizeof(memory_buf));
-
 	/* Init board hardware. */
 	BOARD_InitBootPins();
 	// Clock config was already done, but SystemCoreClock variable must be set

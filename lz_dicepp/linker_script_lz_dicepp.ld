@@ -168,7 +168,7 @@ SECTIONS
         _end_noinit = .;
     } > SRAM
 
-    _HeapSize = 0x200;
+    _HeapSize = 0x4000;
     .heap :  ALIGN(4)
     {
         _pvHeapStart = .;
@@ -177,7 +177,7 @@ SECTIONS
         _pvHeapLimit = .;
     } > SRAM
 
-     _StackSize = 0x4000;
+     _StackSize = 0x3000;
     .heap2stackfill  :
     {
         . += _StackSize;
