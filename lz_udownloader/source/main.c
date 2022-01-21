@@ -36,7 +36,6 @@
 #include "lz_net/lz_net.h"
 #include "lz_trustzone_handler/lz_power_handler.h"
 #include "lz_udownloader.h"
-unsigned char memory_buf1[12 * 1024];
 
 void SystemInit(void)
 {
@@ -46,8 +45,6 @@ void SystemInit(void)
 
 int main(void)
 {
-	mbedtls_memory_buffer_alloc_init(memory_buf1, sizeof(memory_buf1));
-
 	// Init board hardware.
 	BOARD_InitBootPins();
 	BOARD_InitBootPeripherals();
