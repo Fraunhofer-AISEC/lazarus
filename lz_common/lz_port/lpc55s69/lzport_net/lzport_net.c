@@ -161,16 +161,16 @@ LZ_RESULT lzport_socket_open(uint32_t handle, const char *host_name, uint32_t de
 		lzport_gpio_toggle_trace();
 #endif
 
-		if (result == LZ_ERROR_ESP_ALREADY_CONN) {
+		if (result == LZ_ERROR_WIFI_ALREADY_CONNECTED) {
 			dbgprint(DBG_WARN, "WARN: Socket is already open\n");
 			return LZ_SUCCESS;
-		} else if (result == LZ_ERROR_ESP_BUSY) {
+		} else if (result == LZ_ERROR_WIFI_BUSY) {
 			dbgprint(DBG_WARN, "WARN: Failed to open socket, ESP busy. Wait until finished..\n");
 			if (esp8266_receive(rxbuf, sizeof(rxbuf), response_ok, remaining_time_ms) !=
 				LZ_SUCCESS) {
 				dbgprint(DBG_WARN, "WARN: ESP did not finish until timeout\n");
 			}
-		} else if (result == LZ_ERROR_ESP_ERROR) {
+		} else if (result == LZ_ERROR_WIFI) {
 			if (esp8266_receive(rxbuf, sizeof(rxbuf), response_closed, remaining_time_ms) ==
 				LZ_SUCCESS) {
 				dbgprint(DBG_WARN, "WARN: Failed to open socket. ESP returned %s\n", rxbuf);
@@ -356,14 +356,14 @@ static LZ_RESULT esp8266_receive(char *buf, uint32_t buf_size, const char *termi
 		} else if ((received_len >= strlen(response_already_connected)) &&
 				   strstr(buf, response_already_connected)) {
 			dbgprint(DBG_WARN, "WARN: ESP responded with already connected\n");
-			return LZ_ERROR_ESP_ALREADY_CONN;
+			return LZ_ERROR_WIFI_ALREADY_CONNECTED;
 		} else if ((received_len >= strlen(response_err)) && strstr(buf, response_err)) {
 			dbgprint(DBG_WARN, "WARN: ESP responded with ERROR\n");
-			return LZ_ERROR_ESP_ERROR;
+			return LZ_ERROR_WIFI;
 		} else if (((received_len >= strlen(response_busy_p)) && strstr(buf, response_busy_p)) ||
 				   ((received_len >= strlen(response_busy_s)) && strstr(buf, response_busy_s))) {
 			dbgprint(DBG_WARN, "WARN: ESP responded with BUSY\n");
-			return LZ_ERROR_ESP_BUSY;
+			return LZ_ERROR_WIFI_BUSY;
 		}
 
 		if (received_len >= buf_size) {
@@ -440,14 +440,14 @@ static LZ_RESULT esp8266_receive(char *buf, uint32_t buf_size, const char *termi
 		} else if ((received_len >= strlen(response_already_connected)) &&
 				   strstr(buf, response_already_connected)) {
 			dbgprint(DBG_WARN, "WARN: ESP responded with already connected\n");
-			return LZ_ERROR_ESP_ALREADY_CONN;
+			return LZ_ERROR_WIFI_ALREADY_CONNECTED;
 		} else if ((received_len >= strlen(response_err)) && strstr(buf, response_err)) {
 			dbgprint(DBG_WARN, "WARN: ESP responded with ERROR\n");
-			return LZ_ERROR_ESP_ERROR;
+			return LZ_ERROR_WIFI;
 		} else if (((received_len >= strlen(response_busy_p)) && strstr(buf, response_busy_p)) ||
 				   ((received_len >= strlen(response_busy_s)) && strstr(buf, response_busy_s))) {
 			dbgprint(DBG_WARN, "WARN: ESP responded with BUSY\n");
-			return LZ_ERROR_ESP_BUSY;
+			return LZ_ERROR_WIFI_BUSY;
 		}
 		if (received_len >= buf_size) {
 			dbgprint(DBG_WARN, "WARN: specified receive buffer full\n");

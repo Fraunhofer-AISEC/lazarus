@@ -55,6 +55,7 @@ void SystemInit(void)
 
 int main(void)
 {
+
 	// Init board hardware.
 	BOARD_InitBootPins();
 	// Clocks are already configured, but variable must be set
