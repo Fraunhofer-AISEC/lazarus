@@ -205,7 +205,7 @@ def handle_authenticated_reqest(conn, data, hub_cb):
     # Handle request according to type
     if ((element_type == ELEMENT_TYPE.APP_UPDATE) or
         (element_type == ELEMENT_TYPE.UD_UPDATE) or
-        (element_type == ELEMENT_TYPE.UM_UPDATE) or
+        (element_type == ELEMENT_TYPE.CP_UPDATE) or
         (element_type == ELEMENT_TYPE.LZ_CORE_UPDATE)):
 
         payload = get_update_file(element_type)

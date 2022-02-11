@@ -45,7 +45,7 @@ def get_fw_file_name(element_type):
         return LZ_FILE
     elif element_type == ELEMENT_TYPE.UD_UPDATE:
         return UD_FILE
-    elif element_type == ELEMENT_TYPE.UM_UPDATE:
+    elif element_type == ELEMENT_TYPE.CP_UPDATE:
         return CP_FILE
     elif element_type == ELEMENT_TYPE.APP_UPDATE:
         return FW_FILE
@@ -57,7 +57,7 @@ def get_fw_file_name_unsigned(element_type):
         return LZ_FILE_UNSIGNED
     elif element_type == ELEMENT_TYPE.UD_UPDATE:
         return UD_FILE_UNSIGNED
-    elif element_type == ELEMENT_TYPE.UM_UPDATE:
+    elif element_type == ELEMENT_TYPE.CP_UPDATE:
         return CP_FILE_UNSIGNED
     elif element_type == ELEMENT_TYPE.APP_UPDATE:
         return FW_FILE_UNSIGNED
