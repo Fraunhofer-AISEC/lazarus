@@ -824,7 +824,7 @@ LZ_RESULT lz_verify_staging_header(const lz_auth_hdr_t *staging_element_hdr, uin
 		(staging_element_hdr->content.type == LZ_UDOWNLOADER_UPDATE) ||
 		(staging_element_hdr->content.type == LZ_CPATCHER_UPDATE) ||
 		(staging_element_hdr->content.type == APP_UPDATE) ||
-		(staging_element_hdr->content.type == CERTS_UPDATE) ||
+		(staging_element_hdr->content.type == DEVICE_ID_REASSOC_RES) ||
 		(staging_element_hdr->content.type == CONFIG_UPDATE)) {
 		return LZ_SUCCESS;
 	}

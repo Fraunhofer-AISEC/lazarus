@@ -43,7 +43,7 @@ LZ_RESULT lz_std_updates_pending(void)
 	if ((lz_has_staging_elem_type(LZ_UDOWNLOADER_UPDATE) == LZ_SUCCESS) ||
 		(lz_has_staging_elem_type(LZ_CPATCHER_UPDATE) == LZ_SUCCESS) ||
 		(lz_has_staging_elem_type(APP_UPDATE) == LZ_SUCCESS) ||
-		(lz_has_staging_elem_type(CERTS_UPDATE) == LZ_SUCCESS) ||
+		(lz_has_staging_elem_type(DEVICE_ID_REASSOC_RES) == LZ_SUCCESS) ||
 		(lz_has_staging_elem_type(CONFIG_UPDATE) == LZ_SUCCESS)) {
 		return LZ_SUCCESS;
 	}
@@ -211,7 +211,7 @@ static LZ_RESULT lz_apply_single_update(lz_auth_hdr_t *staging_elem_hdr)
 		(staging_elem_hdr->content.type == LZ_CPATCHER_UPDATE) ||
 		(staging_elem_hdr->content.type == APP_UPDATE)) {
 		return lz_apply_img_update(staging_elem_hdr);
-	} else if (staging_elem_hdr->content.type == CERTS_UPDATE) {
+	} else if (staging_elem_hdr->content.type == DEVICE_ID_REASSOC_RES) {
 		return lz_apply_certs_update(staging_elem_hdr);
 	} else if (staging_elem_hdr->content.type == CONFIG_UPDATE) {
 		return lz_apply_config_update(staging_elem_hdr);

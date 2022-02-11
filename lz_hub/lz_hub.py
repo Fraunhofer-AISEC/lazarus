@@ -340,7 +340,7 @@ def handle_device_id_reassociation(conn, data, hub_cb):
         print("Unable to pack trust anchors to raw-data: %s. Exit.." %str(e))
         return 0
 
-    send_element(conn, MAGICVAL, nonce, ELEMENT_TYPE.CERTS_UPDATE, uuid, payload, hub_cb)
+    send_element(conn, MAGICVAL, nonce, ELEMENT_TYPE.DEVICE_ID_REASSOC_RES, uuid, payload, hub_cb)
 
 
 def get_deferral_time(time_ms):

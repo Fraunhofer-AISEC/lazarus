@@ -72,11 +72,10 @@
 	GEN_HDR_TYPE(LZ_UDOWNLOADER_UPDATE)                                                            \
 	GEN_HDR_TYPE(LZ_CPATCHER_UPDATE)                                                               \
 	GEN_HDR_TYPE(APP_UPDATE)                                                                       \
-	GEN_HDR_TYPE(CERTS_UPDATE)                                                                     \
 	GEN_HDR_TYPE(CONFIG_UPDATE)                                                                    \
 	GEN_HDR_TYPE(ALIAS_ID)                                                                         \
 	GEN_HDR_TYPE(DEVICE_ID_REASSOC_REQ)                                                            \
-	GEN_HDR_TYPE(CERTS_UPDATE_REQ)                                                                 \
+	GEN_HDR_TYPE(DEVICE_ID_REASSOC_RES)                                                            \
 	GEN_HDR_TYPE(BOOT_TICKET)                                                                      \
 	GEN_HDR_TYPE(DEFERRAL_TICKET)                                                                  \
 	GEN_HDR_TYPE(CMD)                                                                              \
