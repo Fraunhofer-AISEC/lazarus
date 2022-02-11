@@ -28,7 +28,7 @@
 #define ESP_USART_CLK_FREQ 12000000U
 #define ESP_USART_IRQHandler FLEXCOMM2_IRQHandler
 #define ESP_USART_IRQn FLEXCOMM2_IRQn
-#define ESP_USART_BAUD_RATE 9600U
+#define ESP_USART_BAUD_RATE 115200U
 #define USART_BUFF_SIZE 2000
 
 // Types ===========================================================================================
