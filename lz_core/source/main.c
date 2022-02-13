@@ -64,11 +64,6 @@ int main(void)
 	// Clock config was already done, but SystemCoreClock variable must be set
 	SystemCoreClock = BOARD_BOOTCLOCKFROHF96M_CORE_CLOCK;
 
-	// Toggle trace to indicate component has started
-#if (1 == RE_DBG_TRACE_BOOT_ACTIVE)
-	lzport_gpio_toggle_trace();
-#endif
-
 	lzport_init_debug();
 	if (!lzport_flash_init()) {
 		dbgprint(DBG_ERR, "Failed to initialize flash\n");

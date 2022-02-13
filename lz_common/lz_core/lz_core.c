@@ -371,7 +371,7 @@ LZ_RESULT lz_core_wipe_static_symm(void)
 	memcpy((void *)&config_data_cpy, (void *)&lz_data_store.config_data, sizeof(config_data_cpy));
 
 	// Zero static_symm
-	memset(&config_data_cpy.static_symm_info.static_symm, 0x0,
+	secure_zero_memory(&config_data_cpy.static_symm_info.static_symm,
 		   sizeof(config_data_cpy.static_symm_info.static_symm));
 
 	config_data_cpy.static_symm_info.magic = LZ_MAGIC;
@@ -608,7 +608,7 @@ LZ_RESULT lz_core_provide_params_ram(boot_mode_t boot_mode, uint8_t *digest, boo
 
 	// At this point, Lazarus Core doesn't need its boot parameters anymore, so zero out the area
 	// and then write next layer's parameter
-	memset((void *)&lz_img_boot_params, 0x00, sizeof(lz_img_boot_params));
+	secure_zero_memory((void *)&lz_img_boot_params, sizeof(lz_img_boot_params));
 	memcpy((void *)&lz_img_boot_params.info, &img_boot_params_info_cpy,
 		   sizeof(lz_img_boot_params.info));
 
