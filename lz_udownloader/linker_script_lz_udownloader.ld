@@ -28,7 +28,6 @@ INCLUDE "../lz_common/linker_scripts/linker_script_memory.ld"
 
 MEMORY
 {
-  /* Define each memory region */
   UD_HDR (rx) : ORIGIN = _LZ_UDOWNLOADER_HEADER_START, LENGTH = _LZ_UDOWNLOADER_HEADER_SIZE
   UD_CODE (rx) : ORIGIN = _LZ_UDOWNLOADER_CODE_START, LENGTH = _LZ_UDOWNLOADER_CODE_SIZE /* 62K bytes (alias Flash) */
   APP_HDR (rx) : ORIGIN = _APP_HEADER_START, LENGTH = _APP_HEADER_SIZE /* 2K bytes (alias Flash2) */
@@ -39,38 +38,10 @@ MEMORY
   SRAM2 (rwx) : ORIGIN = _LZ_SRAM_PARAMS_START, LENGTH = _LZ_SRAM_PARAMS_SIZE
 }
 
-  /* Define a symbol for the top of each memory region */
-  __base_UD_CODE = _LZ_UDOWNLOADER_CODE_START  ; /* UD_CODE */
-  __base_Flash = _LZ_UDOWNLOADER_CODE_START ; /* Flash */
-  __top_UD_CODE = _LZ_UDOWNLOADER_CODE_START + _LZ_UDOWNLOADER_CODE_SIZE ; /* 62K bytes */
-  __top_Flash = _LZ_UDOWNLOADER_CODE_START + _LZ_UDOWNLOADER_CODE_SIZE ; /* 62K bytes */
-  __base_APP_HDR = _APP_HEADER_START  ; /* APP_HDR */
-  __base_Flash2 = _APP_HEADER_START ; /* Flash2 */
-  __top_APP_HDR = _APP_HEADER_START + _APP_HEADER_SIZE ; /* 2K bytes */
-  __top_Flash2 = _APP_HEADER_START + _APP_HEADER_SIZE ; /* 2K bytes */
-  __base_APP_CODE = _APP_CODE_START  ; /* APP_CODE */
-  __base_Flash3 = _APP_CODE_START ; /* Flash3 */
-  __top_APP_CODE = _APP_CODE_START + _APP_CODE_SIZE ; /* 158K bytes */
-  __top_Flash3 = _APP_CODE_START + _APP_CODE_SIZE ; /* 158K bytes */
-  __base_LZ_DATA_STORE = _LZ_DATA_STORAGE_START  ; /* LZ_DATA_STORE */
-  __base_Flash4 = _LZ_DATA_STORAGE_START ; /* Flash4 */
-  __top_LZ_DATA_STORE = _LZ_DATA_STORAGE_START + _LZ_DATA_STORAGE_SIZE ; /* 8K bytes */
-  __top_Flash4 = _LZ_DATA_STORAGE_START + _LZ_DATA_STORAGE_SIZE ; /* 8K bytes */
-  __base_STAGING_AREA = _LZ_STAGING_AREA_START  ; /* STAGING_AREA */
-  __base_Flash5 = _LZ_STAGING_AREA_START ; /* Flash5 */
-  __top_STAGING_AREA = _LZ_STAGING_AREA_START + _LZ_STAGING_AREA_SIZE ; /* 160K bytes */
-  __top_Flash5 = _LZ_STAGING_AREA_START + _LZ_STAGING_AREA_SIZE ; /* 160K bytes */
-  __base_SRAM = _LZ_SRAM_NON_SECURE_START  ; /* SRAM */
-  __base_RAM = _LZ_SRAM_NON_SECURE_START ; /* RAM */
-  __top_SRAM = _LZ_SRAM_NON_SECURE_START + _LZ_SRAM_NON_SECURE_SIZE ; /* 216K bytes */
-  __top_RAM = _LZ_SRAM_NON_SECURE_START + _LZ_SRAM_NON_SECURE_SIZE ; /* 216K bytes */
-
-
 ENTRY(ResetISR)
 
 SECTIONS
 {
-    /* ============================ Start custom section ========================================= */
     .ud_hdr (NOLOAD):
     {
     	. = ALIGN(4);
@@ -205,7 +176,7 @@ SECTIONS
     } > SRAM
 
     /* Reserve and place Heap within memory map */
-    _HeapSize = 0x4000;
+    _HeapSize = _HEAP_SIZE_LZ_UDOWNLOADER;
     .heap :  ALIGN(4)
     {
         _pvHeapStart = .;
@@ -214,7 +185,7 @@ SECTIONS
         _pvHeapLimit = .;
     } > SRAM
 
-     _StackSize = 0x3000;
+     _StackSize = _STACK_SIZE_LZ_UDOWNLOADER;
      /* Reserve space in memory for Stack */
     .heap2stackfill  :
     {

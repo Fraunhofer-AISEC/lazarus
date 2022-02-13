@@ -26,10 +26,8 @@ GROUP (
   "libcr_newlib_nohost.a"
 )
 
-
 MEMORY
 {
-  /* Define each memory region */
   APP_HDR (rx) : ORIGIN = _APP_HEADER_START, LENGTH = _APP_HEADER_SIZE
   APP_CODE (rx) : ORIGIN = _APP_CODE_START, LENGTH = _APP_CODE_SIZE /* 158K bytes (alias Flash) */
   LZ_DATA_STORE (rx) : ORIGIN = _LZ_DATA_STORAGE_START, LENGTH = _LZ_DATA_STORAGE_SIZE /* 8K bytes (alias Flash4) */
@@ -37,16 +35,6 @@ MEMORY
   SRAM (rwx) : ORIGIN = _LZ_SRAM_NON_SECURE_START, LENGTH =  _LZ_SRAM_NON_SECURE_SIZE /* 216K bytes (alias RAM) */
   SRAM2 (rwx) : ORIGIN = _LZ_SRAM_PARAMS_START, LENGTH = _LZ_SRAM_PARAMS_SIZE
 }
-
-  /* Define a symbol for the top of each memory region */
-  __base_APP_CODE = _APP_CODE_START  ; /* APP_CODE */
-  __base_Flash = _APP_CODE_START ; /* Flash */
-  __top_APP_CODE = _APP_CODE_START + _APP_CODE_SIZE ; /* 158K bytes */
-  __top_Flash = _APP_CODE_START + _APP_CODE_SIZE ; /* 158K bytes */
-  __base_SRAM = _LZ_SRAM_NON_SECURE_START  ; /* SRAM */
-  __base_RAM = _LZ_SRAM_NON_SECURE_START ; /* RAM */
-  __top_SRAM = _LZ_SRAM_NON_SECURE_START + _LZ_SRAM_NON_SECURE_SIZE ; /* 216K bytes */
-  __top_RAM = _LZ_SRAM_NON_SECURE_START + _LZ_SRAM_NON_SECURE_SIZE ; /* 216K bytes */
 
 ENTRY(ResetISR)
 
@@ -170,7 +158,7 @@ SECTIONS
     } > SRAM
 
     /* Reserve and place Heap within memory map */
-    _HeapSize = 0x4000;
+    _HeapSize = _HEAP_SIZE_DEMO_APP;
     .heap :  ALIGN(4)
     {
         _pvHeapStart = .;
@@ -179,7 +167,7 @@ SECTIONS
         _pvHeapLimit = .;
     } > SRAM
 
-     _StackSize = 0x3000;
+     _StackSize = _STACK_SIZE_DEMO_APP;
      /* Reserve space in memory for Stack */
     .heap2stackfill  :
     {

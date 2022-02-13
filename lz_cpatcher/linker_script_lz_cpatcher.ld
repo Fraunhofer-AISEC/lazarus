@@ -28,53 +28,17 @@ GROUP (
 
 MEMORY
 {
-  /* Define each memory region */
-  UP_HDR (rx) : ORIGIN = _LZ_CPATCHER_HEADER_START, LENGTH = _LZ_CPATCHER_HEADER_SIZE
-  UP_CODE (rx) : ORIGIN = _LZ_CPATCHER_CODE_START, LENGTH = _LZ_CPATCHER_CODE_SIZE /* 62K bytes (alias Flash) */
-  UD_HDR (rx) : ORIGIN = _LZ_UDOWNLOADER_HEADER_START, LENGTH = _LZ_UDOWNLOADER_HEADER_SIZE /* 2K bytes (alias Flash2) */
-  UD_CODE (rx) : ORIGIN = _LZ_UDOWNLOADER_CODE_START, LENGTH = _LZ_UDOWNLOADER_CODE_SIZE /* 62K bytes (alias Flash3) */
-  APP_HDR (rx) : ORIGIN = _APP_HEADER_START, LENGTH = _APP_HEADER_SIZE /* 2K bytes (alias Flash4) */
-  APP_CODE (rx) : ORIGIN = _APP_CODE_START, LENGTH = _APP_CODE_SIZE /* 158K bytes (alias Flash5) */
-  LZ_DATA_STORE (rx) : ORIGIN = _LZ_DATA_STORAGE_START, LENGTH = _LZ_DATA_STORAGE_SIZE /* 8K bytes (alias Flash6) */
-  STAGING_AREA (rx) : ORIGIN = _LZ_STAGING_AREA_START, LENGTH = _LZ_STAGING_AREA_SIZE /* 160K bytes (alias Flash7) */
-  SRAM (rwx) : ORIGIN = _LZ_SRAM_SECURE_START, LENGTH = _LZ_SRAM_SECURE_SIZE /* 32K bytes (alias RAM) */
-  SRAM2 (rwx) : ORIGIN = _LZ_SRAM_PARAMS_START, LENGTH = _LZ_SRAM_PARAMS_SIZE
+  CP_HDR (rw) : ORIGIN = _LZ_CPATCHER_HEADER_START, LENGTH = _LZ_CPATCHER_HEADER_SIZE
+  CP_CODE (rx) : ORIGIN = _LZ_CPATCHER_CODE_START, LENGTH = _LZ_CPATCHER_CODE_SIZE
+  UD_HDR (rw) : ORIGIN = _LZ_UDOWNLOADER_HEADER_START, LENGTH = _LZ_UDOWNLOADER_HEADER_SIZE
+  UD_CODE (rx) : ORIGIN = _LZ_UDOWNLOADER_CODE_START, LENGTH = _LZ_UDOWNLOADER_CODE_SIZE
+  APP_HDR (rw) : ORIGIN = _APP_HEADER_START, LENGTH = _APP_HEADER_SIZE
+  APP_CODE (rx) : ORIGIN = _APP_CODE_START, LENGTH = _APP_CODE_SIZE
+  LZ_DATA_STORE (rw) : ORIGIN = _LZ_DATA_STORAGE_START, LENGTH = _LZ_DATA_STORAGE_SIZE
+  STAGING_AREA (rw) : ORIGIN = _LZ_STAGING_AREA_START, LENGTH = _LZ_STAGING_AREA_SIZE
+  SRAM (rw) : ORIGIN = _LZ_SRAM_SECURE_START, LENGTH = _LZ_SRAM_SECURE_SIZE
+  SRAM2 (rw) : ORIGIN = _LZ_SRAM_PARAMS_START, LENGTH = _LZ_SRAM_PARAMS_SIZE
 }
-
-  /* Define a symbol for the top of each memory region */
-  __base_UP_CODE = _LZ_CPATCHER_CODE_START  ; /* UP_CODE */
-  __base_Flash = _LZ_CPATCHER_CODE_START ; /* Flash */
-  __top_UP_CODE = _LZ_CPATCHER_CODE_START + _LZ_CPATCHER_CODE_SIZE ; /* 62K bytes */
-  __top_Flash = _LZ_CPATCHER_CODE_START + _LZ_CPATCHER_CODE_SIZE ; /* 62K bytes */
-  __base_UD_HDR = _LZ_UDOWNLOADER_HEADER_START  ; /* UD_HDR */
-  __base_Flash2 = _LZ_UDOWNLOADER_HEADER_START ; /* Flash2 */
-  __top_UD_HDR = _LZ_UDOWNLOADER_HEADER_START + _LZ_UDOWNLOADER_HEADER_SIZE ; /* 2K bytes */
-  __top_Flash2 = _LZ_UDOWNLOADER_HEADER_START + _LZ_UDOWNLOADER_HEADER_SIZE ; /* 2K bytes */
-  __base_UD_CODE = _LZ_UDOWNLOADER_CODE_START  ; /* UD_CODE */
-  __base_Flash3 = _LZ_UDOWNLOADER_CODE_START ; /* Flash3 */
-  __top_UD_CODE = _LZ_UDOWNLOADER_CODE_START + _LZ_UDOWNLOADER_CODE_SIZE ; /* 62K bytes */
-  __top_Flash3 = _LZ_UDOWNLOADER_CODE_START + _LZ_UDOWNLOADER_CODE_SIZE ; /* 62K bytes */
-  __base_APP_HDR = _APP_HEADER_START  ; /* APP_HDR */
-  __base_Flash4 = _APP_HEADER_START ; /* Flash4 */
-  __top_APP_HDR = _APP_HEADER_START + _APP_HEADER_SIZE ; /* 2K bytes */
-  __top_Flash4 = _APP_HEADER_START + _APP_HEADER_SIZE ; /* 2K bytes */
-  __base_APP_CODE = _APP_CODE_START  ; /* APP_CODE */
-  __base_Flash5 = _APP_CODE_START ; /* Flash5 */
-  __top_APP_CODE = _APP_CODE_START + _APP_CODE_SIZE ; /* 158K bytes */
-  __top_Flash5 = _APP_CODE_START + _APP_CODE_SIZE ; /* 158K bytes */
-  __base_LZ_DATA_STORE = _LZ_DATA_STORAGE_START  ; /* LZ_DATA_STORE */
-  __base_Flash6 = _LZ_DATA_STORAGE_START ; /* Flash6 */
-  __top_LZ_DATA_STORE = _LZ_DATA_STORAGE_START + _LZ_DATA_STORAGE_SIZE ; /* 8K bytes */
-  __top_Flash6 = _LZ_DATA_STORAGE_START + _LZ_DATA_STORAGE_SIZE ; /* 8K bytes */
-  __base_STAGING_AREA = _LZ_STAGING_AREA_START  ; /* STAGING_AREA */
-  __base_Flash7 = _LZ_STAGING_AREA_START ; /* Flash7 */
-  __top_STAGING_AREA = _LZ_STAGING_AREA_START + _LZ_STAGING_AREA_SIZE ; /* 160K bytes */
-  __top_Flash7 = _LZ_STAGING_AREA_START + _LZ_STAGING_AREA_SIZE ; /* 160K bytes */
-  __base_SRAM = _LZ_SRAM_SECURE_START  ; /* SRAM */
-  __base_RAM = _LZ_SRAM_SECURE_START ; /* RAM */
-  __top_SRAM = _LZ_SRAM_SECURE_START + _LZ_SRAM_SECURE_SIZE ; /* 32K bytes */
-  __top_RAM = _LZ_SRAM_SECURE_START + _LZ_SRAM_SECURE_SIZE ; /* 32K bytes */
-
 
 ENTRY(ResetISR)
 
@@ -103,14 +67,14 @@ SECTIONS
 
         *(.after_vectors*)
 
-    } > UP_CODE
+    } > CP_CODE
 
     .text : ALIGN(4)
     {
        *(.text*)
        *(.rodata .rodata.* .constdata .constdata.*)
        . = ALIGN(4);
-    } > UP_CODE
+    } > CP_CODE
     /*
      * for exception handling/unwind - some Newlib functions (in common
      * with C++ and STDC++) use this.
@@ -118,14 +82,14 @@ SECTIONS
     .ARM.extab : ALIGN(4)
     {
         *(.ARM.extab* .gnu.linkonce.armextab.*)
-    } > UP_CODE
+    } > CP_CODE
 
     __exidx_start = .;
 
     .ARM.exidx : ALIGN(4)
     {
         *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-    } > UP_CODE
+    } > CP_CODE
     __exidx_end = .;
 
     /* Section for TrustZone Secure Gateway veneers */
@@ -136,7 +100,7 @@ SECTIONS
         *(.gnu.sgstubs*)
         . = ALIGN(32);
         _end_sg = .;
-    } > UP_CODE
+    } > CP_CODE
 
     _etext = .;
 
@@ -159,7 +123,7 @@ SECTIONS
        *(.data*)
        . = ALIGN(4) ;
        _edata = . ;
-    } > SRAM AT>UP_CODE
+    } > SRAM AT>CP_CODE
 
     /* MAIN BSS SECTION */
     .bss :
@@ -184,7 +148,7 @@ SECTIONS
     } > SRAM
 
     /* Reserve and place Heap within memory map */
-    _HeapSize = 0x4000;
+    _HeapSize = _HEAP_SIZE_LZ_CPATCHER;
     .heap :  ALIGN(4)
     {
         _pvHeapStart = .;
@@ -193,7 +157,7 @@ SECTIONS
         _pvHeapLimit = .;
     } > SRAM
 
-     _StackSize = 0x3000;
+     _StackSize = _STACK_SIZE_LZ_CPATCHER;
      /* Reserve space in memory for Stack */
     .heap2stackfill  :
     {
@@ -207,21 +171,20 @@ SECTIONS
         _vStackTop = . + _StackSize;
     } > SRAM
 
-    /* ============================ Start custom section ========================================= */
 	/*.fill :
     {
         FILL(0xFF)
-        . = ORIGIN(UP_CODE) + LENGTH(UP_CODE) - 1;
+        . = ORIGIN(CP_CODE) + LENGTH(CP_CODE) - 1;
         BYTE(0xFF);
-    } > UP_CODE*/
+    } > CP_CODE*/
 
-    .up_hdr (NOLOAD):
+    .CP_HDR (NOLOAD):
     {
     	. = ALIGN(4);
-    	KEEP(*(.UP_HDR))
-    	*(.UP_HDR*)
+    	KEEP(*(.CP_HDR))
+    	*(.CP_HDR*)
     	. = ALIGN(4);
-    } >UP_HDR
+    } >CP_HDR
 
   .ud_hdr (NOLOAD):
   {
@@ -280,7 +243,6 @@ SECTIONS
     *(.RAM_DATA.Certs)
     . = ALIGN(4);
   } >SRAM2
-  /* ================================ end custom defined regions ================================ */
 
     /* ## Create checksum value (used in startup) ## */
     PROVIDE(__valid_user_code_checksum = 0 -
