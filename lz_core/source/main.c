@@ -46,7 +46,6 @@
 typedef void (*funcptr_s_t)(void);
 typedef void (*funcptr_ns_t)(void) __attribute__((cmse_nonsecure_call));
 
-static boot_mode_t lz_core_run(void);
 static void switch_to_next_layer(boot_mode_t boot_mode);
 
 // Already performed in lz_dicepp

@@ -326,12 +326,28 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<folderInfo id="com.crt.advproject.config.exe.debug.1085733320.1299043543" name="/" resourcePath="include">
+						<toolChain id="com.crt.advproject.toolchain.exe.debug.1822577382" name="NXP MCU Tools" superClass="com.crt.advproject.toolchain.exe.debug" unusedChildren="">
+							<tool id="com.crt.advproject.cpp.exe.debug.9359896" name="MCU C++ Compiler" superClass="com.crt.advproject.cpp.exe.debug.229815406"/>
+							<tool id="com.crt.advproject.gcc.exe.debug.1479400483" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.debug.1043827681">
+								<inputType id="com.crt.advproject.compiler.input.1274194867" superClass="com.crt.advproject.compiler.input"/>
+							</tool>
+							<tool id="com.crt.advproject.gas.exe.debug.2080810482" name="MCU Assembler" superClass="com.crt.advproject.gas.exe.debug.1787963655">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.13052957" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+								<inputType id="com.crt.advproject.assembler.input.237961096" name="Additional Assembly Source Files" superClass="com.crt.advproject.assembler.input"/>
+							</tool>
+							<tool id="com.crt.advproject.link.cpp.exe.debug.1028530011" name="MCU C++ Linker" superClass="com.crt.advproject.link.cpp.exe.debug.1640921965"/>
+							<tool id="com.crt.advproject.link.exe.debug.562223188" name="MCU Linker" superClass="com.crt.advproject.link.exe.debug.1226606763"/>
+							<tool id="com.crt.advproject.tool.debug.debug.157437097" name="MCU Debugger" superClass="com.crt.advproject.tool.debug.debug.1339417954"/>
+						</toolChain>
+					</folderInfo>
 					<sourceEntries>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="CMSIS"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="board"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="component"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="device"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="drivers"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lz_common"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="source"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
@@ -737,17 +753,23 @@
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="com.crt.advproject.config.exe.debug.378696041;com.crt.advproject.config.exe.debug.378696041.;com.crt.advproject.gas.exe.debug.1364715154;com.crt.advproject.assembler.input.1787607603">
+		<scannerConfigBuildInfo instanceId="com.crt.advproject.config.exe.release.1358547574;com.crt.advproject.config.exe.release.1358547574.;com.crt.advproject.gas.exe.release.2041865529;com.crt.advproject.assembler.input.1987451746">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="com.crt.advproject.config.exe.release.1358547574;com.crt.advproject.config.exe.release.1358547574.;com.crt.advproject.gas.exe.release.2041865529;com.crt.advproject.assembler.input.1987451746">
+		<scannerConfigBuildInfo instanceId="com.crt.advproject.config.exe.release.1358547574;com.crt.advproject.config.exe.release.1358547574.;com.crt.advproject.gcc.exe.release.2066200286;com.crt.advproject.compiler.input.729928747">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.crt.advproject.config.exe.debug.378696041;com.crt.advproject.config.exe.debug.378696041.;com.crt.advproject.gas.exe.debug.1364715154;com.crt.advproject.assembler.input.1787607603">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="com.crt.advproject.config.exe.debug.378696041;com.crt.advproject.config.exe.debug.378696041.;com.crt.advproject.gcc.exe.debug.2124260732;com.crt.advproject.compiler.input.627251352">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="com.crt.advproject.config.exe.release.1358547574;com.crt.advproject.config.exe.release.1358547574.;com.crt.advproject.gcc.exe.release.2066200286;com.crt.advproject.compiler.input.729928747">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="com.crt.advproject.config.exe.debug.1085733320;com.crt.advproject.config.exe.debug.1085733320.;com.crt.advproject.gcc.exe.debug.1043827681;com.crt.advproject.compiler.input.523695311">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.crt.advproject.GCCManagedMakePerProjectProfile"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.crt.advproject.config.exe.debug.1085733320;com.crt.advproject.config.exe.debug.1085733320.;com.crt.advproject.gas.exe.debug.1787963655;com.crt.advproject.assembler.input.1887334970">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.crt.advproject.GCCManagedMakePerProjectProfile"/>
 		</scannerConfigBuildInfo>
 	</storageModule>
 </cproject>

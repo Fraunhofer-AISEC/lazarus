@@ -23,9 +23,11 @@
 #include "lz_crypto/lz_ecc.h"
 #include "lz_crypto/lz_ecdsa.h"
 
+boot_mode_t lz_core_run(void);
+
 LZ_RESULT lz_core_create_device_id_csr(bool first_boot, lz_ecc_keypair *lz_keypair);
 
-LZ_RESULT lz_core_provide_params_ram(boot_mode_t boot_mode, uint8_t *digest, bool lz_core_updated,
+LZ_RESULT lz_core_provide_params_ram(boot_mode_t boot_mode, bool lz_core_updated,
 									 bool firmware_update_necessary,
 									 lz_ecc_keypair *lz_alias_id_keypair,
 									 lz_ecc_keypair *lz_dev_id_keypair);

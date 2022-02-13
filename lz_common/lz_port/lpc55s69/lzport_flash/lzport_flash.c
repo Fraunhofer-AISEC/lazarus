@@ -166,7 +166,7 @@ bool lzport_flash_program_page(uint32_t start, uint8_t *buf)
 	uint32_t flash_start = start & ~SECURE_BIT_MASK;
 
 	// Parameter check: Page-alignment and within flash bounds
-	if (!((flash_start >= FLASH_BASE_ADDR) && (flash_start < (FLASH_BASE_ADDR + FLASH_SIZE)) &&
+	if (!((flash_start < (FLASH_BASE_ADDR + FLASH_SIZE)) &&
 		  (flash_start % FLASH_PAGE_SIZE) == 0)) {
 		dbgprint(DBG_ERR,
 				 "ERROR: Failed to flash page. Address 0x%x outside of flash memory range"
@@ -213,8 +213,7 @@ bool lzport_flash_erase_page(uint32_t start)
 	}
 
 	// Parameter check: Page-alignment and within flash bounds
-	if (!((start >= FLASH_BASE_ADDR) && (start < (FLASH_BASE_ADDR + FLASH_SIZE)) &&
-		  (start % FLASH_PAGE_SIZE) == 0)) {
+	if (!((start < (FLASH_BASE_ADDR + FLASH_SIZE)) && (start % FLASH_PAGE_SIZE) == 0)) {
 		dbgprint(DBG_ERR,
 				 "ERROR: Failed to erase page: address 0x%x outside of flash memory "
 				 "range or not pagewise aligned\n",
@@ -260,8 +259,7 @@ bool lzport_flash_read(uint32_t addr, uint8_t *buffer, uint32_t size)
 
 	dbgprint(DBG_VERB, "INFO: FLASH - Reading from flash\n");
 
-	if (!(((uint32_t)flash_addr >= FLASH_BASE_ADDR) &&
-		  ((uint32_t)flash_addr < (FLASH_BASE_ADDR + FLASH_SIZE)))) {
+	if (flash_addr >= (FLASH_BASE_ADDR + FLASH_SIZE)) {
 		dbgprint(DBG_ERR,
 				 "ERROR: Failed to read flash: address range 0x%x-0x%x is outside of "
 				 "flash memory region\n",

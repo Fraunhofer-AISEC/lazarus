@@ -49,7 +49,7 @@ int lz_x509_dn_to_string(const lz_x509_dn_info *info, char *buf, size_t buf_size
 		return -1;
 	}
 	int n = snprintf(buf, buf_size, "CN=%s,O=%s,C=%s", info->common_name, info->org, info->country);
-	if (n >= buf_size) {
+	if ((n >= (int)buf_size) || n < 0) {
 		dbgprint(DBG_INFO, "ERROR: Could not successfully write to buffer.\n");
 		return -1;
 	}

@@ -218,7 +218,7 @@ boot_mode_t lz_core_run(void)
 	}
 
 	// Create the boot parameters for the next layer depending on the boot mode
-	if (lz_core_provide_params_ram(boot_mode, digest, lz_core_updated, firmware_update_necessary,
+	if (lz_core_provide_params_ram(boot_mode, lz_core_updated, firmware_update_necessary,
 								   &lz_alias_id_keypair, &lz_dev_id_keypair) != LZ_SUCCESS) {
 		dbgprint(DBG_ERR, "PANIC: Could not create boot parameters for next layer.\n");
 		lz_error_handler();
@@ -393,6 +393,11 @@ LZ_RESULT lz_core_derive_dev_auth(uint8_t *dev_auth, uint32_t dev_auth_length,
 {
 	uint8_t digest_dev_auth[MAX_PUB_ECP_PEM_BYTES + LEN_UUID_V4_BIN];
 
+	if (dev_auth_length < SHA256_DIGEST_LENGTH) {
+		dbgprint(DBG_ERR, "ERROR: Provided dev_auth too small\n");
+		return LZ_ERROR;
+	}
+
 	// Setting everything to 0
 	memset(digest_dev_auth, 0, sizeof(digest_dev_auth));
 
@@ -540,7 +545,7 @@ LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, lz_ecc_keypair *alias
 }
 
 // This function provides all required boot parameters for the next layer as fixed structures at fixed locations in RAM.
-LZ_RESULT lz_core_provide_params_ram(boot_mode_t boot_mode, uint8_t *digest, bool lz_core_updated,
+LZ_RESULT lz_core_provide_params_ram(boot_mode_t boot_mode, bool lz_core_updated,
 									 bool firmware_update_necessary,
 									 lz_ecc_keypair *lz_alias_id_keypair,
 									 lz_ecc_keypair *lz_dev_id_keypair)

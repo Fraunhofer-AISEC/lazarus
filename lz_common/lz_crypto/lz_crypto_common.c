@@ -22,5 +22,6 @@
 
 int lz_rand(void *rng_state, unsigned char *output, size_t len)
 {
+	(void)rng_state;
 	return lzport_rng_get_random_data(output, len);
 }
