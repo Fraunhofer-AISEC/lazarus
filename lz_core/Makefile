@@ -37,7 +37,8 @@ SRC_DIRS := ./source \
 			../lz_common/mbedtls/port \
 			../lz_common/lz_port/lpc55s69/lzport_debug_output \
 			../lz_common/lz_port/lpc55s69/lzport_flash \
-			../lz_common/lz_port/lpc55s69/lzport_rng
+			../lz_common/lz_port/lpc55s69/lzport_rng \
+			../lz_common/lz_port/lpc55s69/lzport_power \
 
 EXCLUDE_DIRS :=
 
@@ -52,6 +53,7 @@ INCLUDES = ./include \
 				../lz_common/lz_port/lpc55s69/lzport_flash \
 				../lz_common/lz_port/lpc55s69/lzport_memory \
 				../lz_common/lz_port/lpc55s69/lzport_rng \
+				../lz_common/lz_port/lpc55s69/lzport_power \
 				../lz_common/mbedtls/include \
 				../lz_common/mbedtls/port/ksdk \
 				../lz_common/mbedtls/library \
