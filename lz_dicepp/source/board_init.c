@@ -27,28 +27,22 @@
 #include "lz_config.h"
 #include "lz_common.h"
 #include "lzport_memory.h"
-#include "lzport_flash.h"
 #include "lzport_debug_output.h"
 #include "dicepp.h"
 #include "trustzone_config.h"
 
 typedef void (*funcptr_s_t)(void);
 
-static void dicepp_switch_to_lz_core(void);
-
-int main(void)
+void lzport_dicepp_board_init(void)
 {
 	// Init board hardware
 	POWER_SetBodVbatLevel(kPOWER_BodVbatLevel1650mv, kPOWER_BodHystLevel50mv, false);
 	BOARD_InitBootPins();
 	BOARD_BootClockFROHF96M();
+}
 
-	lzport_init_debug();
-	lz_print_img_info("Lazarus DICE++", NULL);
-	lzport_flash_init();
-
-	dicepp_run();
-
+void lzport_init_tee(void)
+{
 	// The uC starts in secure mode with all memory being secure. Before we switch to lz_core, we
 	// have to configure the TrustZone and Secure AHB Controller in order to allow non-secure
 	// software to run in non-secure areas
@@ -61,17 +55,9 @@ int main(void)
 	init_secure_ahb_controller();
 	print_secure_ahb_controller_status();
 #endif
-
-	dicepp_switch_to_lz_core();
-
-	/* Enter an infinite loop, should never be reached */
-	while (1) {
-		__asm volatile("nop");
-	}
-	return 0;
 }
 
-void dicepp_switch_to_lz_core(void)
+void lzport_dicepp_switch_to_lz_core(void)
 {
 	funcptr_s_t lz_core = (funcptr_s_t)(*((uint32_t *)((LZ_CORE_CODE_START) + 4U)));
 
