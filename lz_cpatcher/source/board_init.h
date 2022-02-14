@@ -17,23 +17,4 @@
  * limitations under the License.
  */
 
-#include "board.h"
-#include "peripherals.h"
-#include "pin_mux.h"
-#include "clock_config.h"
-#include "LPC55S69_cm33_core0.h"
-
-// typedef for non-secure callback functions
-typedef void (*funcptr_ns)(void) __attribute__((cmse_nonsecure_call));
-
-void lzport_cpatcher_init_board (void)
-{
-	// Init board hardware.
-	BOARD_InitBootPins();
-	// Clock config was already done, but SystemCoreClock variable must be set
-	SystemCoreClock = BOARD_BOOTCLOCKFROHF96M_CORE_CLOCK;
-}
-
-void SystemInit(void)
-{
-}
+#pragma once
