@@ -17,25 +17,6 @@
  * limitations under the License.
  */
 
-#include <stdio.h>
-#include "board.h"
-#include "peripherals.h"
-#include "pin_mux.h"
-#include "clock_config.h"
-#include "LPC55S69_cm33_core0.h"
-#include "lzport_memory.h"
+#pragma once
 
-void SystemInit(void)
-{
-	// Set vector table offset register
-	SCB->VTOR = LZ_APP_CODE_START;
-}
-
-void lzport_demo_app_init_board()
-{
-    // Init board hardware.
-	BOARD_InitBootPins();
-	// Clocks are already configured, but variable must be set
-	SystemCoreClock = BOARD_BOOTCLOCKFROHF96M_CORE_CLOCK;
-
-}
+void lzport_demo_app_init_board();
