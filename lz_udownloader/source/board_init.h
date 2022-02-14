@@ -1,5 +1,5 @@
 /*
- * Copyright(c) 2021 Fraunhofer AISEC
+ * Copyright(c) 2022 Fraunhofer AISEC
  * Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V.
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -17,26 +17,6 @@
  * limitations under the License.
  */
 
-#include <stdio.h>
-#include "board.h"
-#include "peripherals.h"
-#include "pin_mux.h"
-#include "clock_config.h"
-#include "LPC55S69_cm33_core0.h"
+#pragma once
 
-#include "lzport_memory.h"
-
-void SystemInit(void)
-{
-	// Set vector table offset register
-	SCB->VTOR = LZ_UD_CODE_START;
-}
-
-void lzport_udownloader_init_board()
-{
-	// Init board hardware.
-	BOARD_InitBootPins();
-	BOARD_InitBootPeripherals();
-	// Clocks are already configured, but variable must be set
-	SystemCoreClock = BOARD_BOOTCLOCKFROHF96M_CORE_CLOCK;
-}
+void lzport_udownloader_init_board();

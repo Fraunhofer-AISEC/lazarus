@@ -24,6 +24,7 @@
 #include "lzport_debug_output.h"
 #include "lzport_memory.h"
 #include "lzport_net.h"
+#include "lzport_gpio.h"
 #include "lz_flash_handler.h"
 #include "lz_net.h"
 #include "lz_sha256.h"

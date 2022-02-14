@@ -29,6 +29,7 @@
 /* Only include the debug console if needed */
 #if (LZ_DBG_LEVEL > DBG_NONE)
 #include "fsl_debug_console.h"
+#include "board.h"
 #endif
 
 /* PRINTF is the LPC55S69 version of printf. Provide your own version here if necessary */
