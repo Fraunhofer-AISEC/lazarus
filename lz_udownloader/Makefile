@@ -22,56 +22,56 @@ PROJECT_NAME = lz_udownloader
 BUILD_DIR := ./build
 
 # All source directories
-SRC_DIRS := ./source \
-			./device \
-			./drivers \
-			./startup \
-			./board \
-			./component \
-			./utilities \
-			../lz_common/$(PROJECT_NAME) \
+SRC_DIRS := ./ \
+			../thirdparty/lpc55s69_sdk/device \
+			../thirdparty/lpc55s69_sdk/drivers \
+			../thirdparty/lpc55s69_sdk/component \
+			../thirdparty/lpc55s69_sdk/utilities \
+			../thirdparty/mbedtls/library \
 			../lz_common/lz_common \
-			../lz_common/lz_net \
 			../lz_common/lz_crypto \
-			../lz_common/mbedtls/library \
-			../lz_common/lz_port/lpc55s69/lzport_debug_output \
-			../lz_common/lz_port/lpc55s69/lzport_usart \
-			../lz_common/lz_port/lpc55s69/lzport_net \
-			../lz_common/lz_port/lpc55s69/lzport_systick_delay \
-			../lz_common/lz_port/lpc55s69/lzport_gpio \
-			../lz_common/lz_port/lpc55s69/lzport_rng \
-			../lz_common/lz_port/lpc55s69/lzport_syscalls
+			../lz_common/lz_net \
+			../port/lpc55s69/lz_udownloader/board_init \
+			../port/lpc55s69/peripherals/lzport_gpio \
+			../port/lpc55s69/peripherals/lzport_debug_output \
+			../port/lpc55s69/peripherals/lzport_flash \
+			../port/lpc55s69/peripherals/lzport_memory \
+			../port/lpc55s69/peripherals/lzport_rng \
+			../port/lpc55s69/peripherals/lzport_usart \
+			../port/lpc55s69/peripherals/lzport_net \
+			../port/lpc55s69/peripherals/lzport_systick_delay \
+			../port/lpc55s69/peripherals/lzport_syscalls \
+
+
 
 EXCLUDE_DIRS :=
 
 # All include directories
-INCLUDES = ./include \
-				./trustzone \
-				../lz_common/$(PROJECT_NAME) \
-				../lz_common/lz_common \
-				../lz_common/lz_trustzone_handler \
-				../lz_common/lz_net \
-				../lz_common/lz_port/lpc55s69/lzport_debug_output \
-				../lz_common/lz_port/lpc55s69/lzport_usart \
-				../lz_common/lz_port/lpc55s69/lzport_net \
-				../lz_common/lz_port/lpc55s69/lzport_systick_delay \
-				../lz_common/lz_port/lpc55s69/lzport_gpio \
-				../lz_common/lz_port/lpc55s69/lzport_rng \
-				../lz_common/lz_port/lpc55s69/lzport_syscalls \
-				../lz_common/lz_port/lpc55s69/lzport_memory \
-				../lz_common/lz_crypto \
-				../lz_common/mbedtls/include \
-				../lz_common/mbedtls/port/ksdk \
-				../lz_common/mbedtls/library \
-				./drivers \
-				./CMSIS \
-				./device  \
-				./source \
-				./utilities \
-				./component/serial_manager \
-				./component/lists \
-				./component/uart \
-				./board
+INCLUDES = 	./ \
+			../lz_common \
+			../lz_common/lz_common \
+			../lz_common/lz_crypto \
+			../lz_common/lz_net \
+			../lz_common/lz_trustzone_handler \
+			../thirdparty/mbedtls/include \
+			../thirdparty/mbedtls/port/ksdk \
+			../thirdparty/mbedtls/library \
+			../thirdparty/lpc55s69_sdk/drivers \
+			../thirdparty/CMSIS \
+			../thirdparty/lpc55s69_sdk/device \
+			../thirdparty/lpc55s69_sdk/utilities \
+			../thirdparty/lpc55s69_sdk/component/serial_manager \
+			../thirdparty/lpc55s69_sdk/component/lists \
+			../thirdparty/lpc55s69_sdk/component/uart \
+			../port/lpc55s69/peripherals/lzport_memory \
+			../port/lpc55s69/peripherals/lzport_debug_output \
+			../port/lpc55s69/peripherals/lzport_rng \
+			../port/lpc55s69/peripherals/lzport_gpio \
+			../port/lpc55s69/peripherals/lzport_net \
+			../port/lpc55s69/peripherals/lzport_systick_delay \
+			../port/lpc55s69/peripherals/lzport_usart \
+			../port/lpc55s69/lz_udownloader/board_init \
+
 
 # Defines used in that build
 DEFINES = CPU_LPC55S69JBD100 \
@@ -143,10 +143,6 @@ INCLUDE-DIRS = $(addprefix -I,$(INCLUDES))
 
 # Default target
 all: post-build
-
-# This would add all source directories to the build. Might be a lot of clutter
-# INC_DIRS := $(shell find $(SRC_DIRS) -type d)
-# INCLUDES += $(addprefix -I,$(INC_DIRS))
 
 compile: $(OBJ-FILES)
 

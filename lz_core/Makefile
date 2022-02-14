@@ -22,51 +22,47 @@ PROJECT_NAME = lz_core
 BUILD_DIR := ./build
 
 # All source directories
-SRC_DIRS := ./source \
-			./device \
-			./drivers \
-			./startup \
-			./trustzone \
-			./board \
-			./component \
-			./utilities \
-			../lz_common/$(PROJECT_NAME) \
+SRC_DIRS := ./ \
+			../thirdparty/lpc55s69_sdk/device \
+			../thirdparty/lpc55s69_sdk/drivers \
+			../thirdparty/lpc55s69_sdk/component \
+			../thirdparty/lpc55s69_sdk/utilities \
+			../thirdparty/mbedtls/library \
+			../thirdparty/mbedtls/port \
+			../port/lpc55s69/peripherals/lzport_debug_output \
+			../port/lpc55s69/peripherals/lzport_flash \
+			../port/lpc55s69/peripherals/lzport_rng \
+			../port/lpc55s69/peripherals/lzport_power \
+			../port/lpc55s69/lz_core/board_init \
 			../lz_common/lz_common \
 			../lz_common/lz_crypto \
-			../lz_common/mbedtls/library \
-			../lz_common/mbedtls/port \
-			../lz_common/lz_port/lpc55s69/lzport_debug_output \
-			../lz_common/lz_port/lpc55s69/lzport_flash \
-			../lz_common/lz_port/lpc55s69/lzport_rng \
-			../lz_common/lz_port/lpc55s69/lzport_power \
 
 EXCLUDE_DIRS :=
 
 # All include directories
-INCLUDES = ./include \
-				./trustzone \
-				../lz_common \
-				../lz_common/$(PROJECT_NAME) \
-				../lz_common/lz_common \
-				../lz_common/lz_trustzone_handler \
-				../lz_common/lz_port/lpc55s69/lzport_debug_output \
-				../lz_common/lz_port/lpc55s69/lzport_flash \
-				../lz_common/lz_port/lpc55s69/lzport_memory \
-				../lz_common/lz_port/lpc55s69/lzport_rng \
-				../lz_common/lz_port/lpc55s69/lzport_power \
-				../lz_common/mbedtls/include \
-				../lz_common/mbedtls/port/ksdk \
-				../lz_common/mbedtls/library \
-				../lz_common/lz_crypto \
-				./drivers \
-				./CMSIS \
-				./device \
-				./source \
-				./utilities \
-				./component/serial_manager \
-				./component/lists \
-				./component/uart \
-				./board
+INCLUDES = ./ \
+			./trustzone \
+			../lz_common/lz_common \
+			../lz_common/lz_port/lpc55s69 \
+			../lz_common/lz_crypto \
+			../lz_common/lz_trustzone_handler \
+			../port/lpc55s69/peripherals/lzport_debug_output \
+			../port/lpc55s69/peripherals/lzport_flash \
+			../port/lpc55s69/peripherals/lzport_rng \
+			../port/lpc55s69/peripherals/lzport_memory \
+			../port/lpc55s69/peripherals/lzport_gpio \
+			../port/lpc55s69/peripherals/lzport_power \
+			../port/lpc55s69/lz_core/board_init \
+			../thirdparty/mbedtls/include \
+			../thirdparty/mbedtls/port/ksdk \
+			../thirdparty/mbedtls/library \
+			../thirdparty/lpc55s69_sdk/drivers \
+			../thirdparty/CMSIS \
+			../thirdparty/lpc55s69_sdk/device \
+			../thirdparty/lpc55s69_sdk/utilities \
+			../thirdparty/lpc55s69_sdk/component/serial_manager \
+			../thirdparty/lpc55s69_sdk/component/lists \
+			../thirdparty/lpc55s69_sdk/component/uart \
 
 # Defines used in that build
 DEFINES = CPU_LPC55S69JBD100 \
@@ -83,12 +79,10 @@ DEFINES = CPU_LPC55S69JBD100 \
 			__MULTICORE_MASTER \
 			MBEDTLS_CONFIG_FILE='"ksdk_mbedtls_config.h"' \
 			__NEWLIB__ \
-			SERIAL_PORT_TYPE_UART=1
+			SERIAL_PORT_TYPE_UART=1 \
+			FREESCALE_KSDK_BM \
+			ARM_MATH_CM33 \
 
-# MBEDTLS_FREESCALE_HASHCRYPT_SHA1 \
-# MBEDTLS_FREESCALE_HASHCRYPT_SHA256 \
-# FREESCALE_KSDK_BM \
-# ARM_MATH_CM33 \
 # Optimization
 CFLAGS = -O1
 

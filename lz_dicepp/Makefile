@@ -22,50 +22,46 @@ PROJECT_NAME = lz_dicepp
 BUILD_DIR := ./build
 
 # All source directories
-SRC_DIRS := ./source \
-			./device \
-			./drivers \
-			./startup \
-			./trustzone \
-			./board \
-			./component \
-			./utilities \
-			../lz_common/$(PROJECT_NAME) \
+SRC_DIRS := ./ \
+			../thirdparty/lpc55s69_sdk/device \
+			../thirdparty/lpc55s69_sdk/drivers \
+			../thirdparty/lpc55s69_sdk/component \
+			../thirdparty/lpc55s69_sdk/utilities \
+			../thirdparty/mbedtls/library \
 			../lz_common/lz_common \
 			../lz_common/lz_crypto \
-			../lz_common/mbedtls/library \
-			../lz_common/lz_port/lpc55s69/lzport_debug_output \
-			../lz_common/lz_port/lpc55s69/lzport_dice \
-			../lz_common/lz_port/lpc55s69/lzport_flash \
-			../lz_common/lz_port/lpc55s69/lzport_memory \
-			../lz_common/lz_port/lpc55s69/lzport_rng \
+			../port/lpc55s69/lz_dicepp/board_init \
+			../port/lpc55s69/peripherals/lzport_debug_output \
+			../port/lpc55s69/peripherals/lzport_flash \
+			../port/lpc55s69/peripherals/lzport_memory \
+			../port/lpc55s69/peripherals/lzport_rng \
+			../port/lpc55s69/peripherals/lzport_dice \
+			../port/lpc55s69/peripherals/lzport_trustzone \
 
 EXCLUDE_DIRS :=
 
 # All include directories
-INCLUDES = 	./include \
-			./trustzone \
+INCLUDES = 	./ \
+			../port/lpc55s69/lz_dicepp/board_init \
+			../port/lpc55s69/peripherals/lzport_debug_output \
+			../port/lpc55s69/peripherals/lzport_flash \
+			../port/lpc55s69/peripherals/lzport_memory \
+			../port/lpc55s69/peripherals/lzport_rng \
+			../port/lpc55s69/peripherals/lzport_dice \
+			../port/lpc55s69/peripherals/lzport_trustzone \
 			../lz_common \
-			../lz_common/$(PROJECT_NAME) \
 			../lz_common/lz_common \
-			../lz_common/mbedtls/include \
-			../lz_common/mbedtls/port/ksdk \
 			../lz_common/lz_crypto \
 			../lz_common/lz_trustzone_handler \
-			../lz_common/lz_port/lpc55s69/lzport_dice \
-			../lz_common/lz_port/lpc55s69/lzport_flash \
-			../lz_common/lz_port/lpc55s69/lzport_memory \
-			../lz_common/lz_port/lpc55s69/lzport_rng \
-			../lz_common/lz_port/lpc55s69/lzport_debug_output \
-			./drivers \
-			./CMSIS \
-			./device  \
-			./source \
-			./utilities \
-			./component/serial_manager \
-			./component/lists \
-			./component/uart \
-			./board
+			../thirdparty/mbedtls/include \
+			../thirdparty/mbedtls/port/ksdk \
+			../thirdparty/lpc55s69_sdk/drivers \
+			../thirdparty/CMSIS \
+			../thirdparty/lpc55s69_sdk/device \
+			../thirdparty/lpc55s69_sdk/utilities \
+			../thirdparty/lpc55s69_sdk/component/serial_manager \
+			../thirdparty/lpc55s69_sdk/component/lists \
+			../thirdparty/lpc55s69_sdk/component/uart \
 
 # Defines used in that build
 DEFINES = CPU_LPC55S69JBD100 \

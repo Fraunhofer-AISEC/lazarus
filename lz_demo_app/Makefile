@@ -22,61 +22,58 @@ PROJECT_NAME = lz_demo_app
 BUILD_DIR := ./build
 
 # All source directories
-SRC_DIRS := ./source \
-			./device \
-			./drivers \
-			./startup \
-			./board \
-			./component \
-			./utilities \
-			./freertos \
-			../lz_common/$(PROJECT_NAME) \
+SRC_DIRS := ./ \
+			../thirdparty/lpc55s69_sdk/device \
+			../thirdparty/lpc55s69_sdk/drivers \
+			../thirdparty/lpc55s69_sdk/component \
+			../thirdparty/lpc55s69_sdk/utilities \
+			../thirdparty/mbedtls/library \
+			../thirdparty/freertos \
 			../lz_common/lz_common \
 			../lz_common/lz_crypto \
-			../lz_common/mbedtls/library \
 			../lz_common/lz_net \
 			../lz_common/lz_trustzone_handler \
-			../lz_common/lz_port/lpc55s69/lzport_debug_output \
-			../lz_common/lz_port/lpc55s69/lzport_usart \
-			../lz_common/lz_port/lpc55s69/lzport_net \
-			../lz_common/lz_port/lpc55s69/lzport_gpio \
-			../lz_common/lz_port/lpc55s69/lzport_rng \
-			../lz_common/lz_port/lpc55s69/lzport_syscalls
+			../port/lpc55s69/peripherals/lzport_gpio \
+			../port/lpc55s69/peripherals/lzport_debug_output \
+			../port/lpc55s69/peripherals/lzport_flash \
+			../port/lpc55s69/peripherals/lzport_memory \
+			../port/lpc55s69/peripherals/lzport_rng \
+			../port/lpc55s69/peripherals/lzport_usart \
+			../port/lpc55s69/peripherals/lzport_net \
+			../port/lpc55s69/peripherals/lzport_syscalls \
+			../port/lpc55s69/lz_demo_app/board_init \
 
-EXCLUDE_DIRS := ../lz_common/lz_port/lpc55s69/lzport_systick_delay
+EXCLUDE_DIRS :=
 
 # All include directories
-INCLUDES = ./include \
+INCLUDES = 		./ \
+				../port/lpc55s69/peripherals/lzport_gpio \
+				../port/lpc55s69/peripherals/lzport_debug_output \
+				../port/lpc55s69/peripherals/lzport_flash \
+				../port/lpc55s69/peripherals/lzport_memory \
+				../port/lpc55s69/peripherals/lzport_rng \
+				../port/lpc55s69/peripherals/lzport_usart \
+				../port/lpc55s69/peripherals/lzport_net \
+				../port/lpc55s69/peripherals/lzport_syscalls \
+				../port/lpc55s69/lz_demo_app/board_init \
 				../lz_common/lz_common \
-				../lz_common/$(PROJECT_NAME) \
-				../lz_common/lz_net \
-				../lz_common/lz_trustzone_handler \
-				../lz_common/lz_port/lpc55s69/lzport_debug_output \
-				../lz_common/lz_port/lpc55s69/lzport_usart \
-				../lz_common/lz_port/lpc55s69/lzport_net \
-				../lz_common/lz_port/lpc55s69/lzport_gpio \
-				../lz_common/lz_port/lpc55s69/lzport_rng \
-				../lz_common/lz_port/lpc55s69/lzport_syscalls \
-				../lz_common/lz_port/lpc55s69/lzport_memory \
 				../lz_common/lz_crypto \
-				../lz_common/mbedtls/include \
-				../lz_common/mbedtls/port/ksdk \
-				./drivers \
-				./CMSIS \
-				./device  \
-				./include \
-				./source \
-				./utilities \
-				./component/serial_manager \
-				./component/lists \
-				./component/uart \
-				./freertos/include \
-				./freertos/portable/GCC/ARM_CM33_NTZ/non_secure \
-				./BME280_driver \
-				./BME280_driver \
-				./trace/config \
-				./trace/include \
-				./board
+				../lz_common/lz_trustzone_handler \
+				../lz_common/lz_net \
+				../thirdparty/mbedtls/include \
+				../thirdparty/mbedtls/port/ksdk \
+				../thirdparty/mbedtls/library \
+				../thirdparty/lpc55s69_sdk/drivers \
+				../thirdparty/CMSIS \
+				../thirdparty/lpc55s69_sdk/device \
+				../thirdparty/lpc55s69_sdk/utilities \
+				../thirdparty/lpc55s69_sdk/component/serial_manager \
+				../thirdparty/lpc55s69_sdk/component/lists \
+				../thirdparty/lpc55s69_sdk/component/uart \
+				../thirdparty/freertos/include \
+				../thirdparty/freertos/portable/GCC/ARM_CM33_NTZ/non_secure \
+				../thirdparty/BME280_driver \
+				../thirdparty/BME280_driver \
 
 # Defines used in that build
 DEFINES = CPU_LPC55S69JBD100 \

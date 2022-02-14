@@ -22,41 +22,36 @@ PROJECT_NAME = lz_cpatcher
 BUILD_DIR := ./build
 
 # All source directories
-SRC_DIRS := ./source \
-			./device \
-			./drivers \
-			./startup \
-			./board \
-			./component \
-			./utilities \
-			../lz_common/$(PROJECT_NAME) \
+SRC_DIRS := ./ \
+			../thirdparty/lpc55s69_sdk/device \
+			../thirdparty/lpc55s69_sdk/drivers \
+			../thirdparty/lpc55s69_sdk/component \
+			../thirdparty/lpc55s69_sdk/utilities \
 			../lz_common/lz_common \
-			../lz_common/lz_port/lpc55s69/lzport_debug_output \
-			../lz_common/lz_port/lpc55s69/lzport_flash \
+			../port/lpc55s69/peripherals/lzport_debug_output \
+			../port/lpc55s69/peripherals/lzport_flash \
+			../port/lpc55s69/lz_cpatcher/board_init \
 
 EXCLUDE_DIRS :=
 
 # All include directories
-INCLUDES = 	./include \
-			./trustzone \
+INCLUDES = 	./ \
 			../lz_common \
 			../lz_common/lz_common \
-			../lz_common/lz_trustzone_handler \
-			../lz_common/$(PROJECT_NAME) \
 			../lz_common/lz_crypto \
-			../lz_common/lz_port/lpc55s69/lzport_memory \
-			../lz_common/lz_port/lpc55s69/lzport_debug_output \
-			../lz_common/lz_port/lpc55s69/lzport_rng \
-			../lz_common/lz_port/lpc55s69/lzport_flash \
-			./drivers \
-			./CMSIS \
-			./device  \
-			./source \
-			./utilities \
-			./component/serial_manager \
-			./component/lists \
-			./component/uart \
-			./board
+			../lz_common/lz_trustzone_handler \
+			../port/lpc55s69/peripherals/lzport_debug_output \
+			../port/lpc55s69/peripherals/lzport_flash \
+			../port/lpc55s69/peripherals/lzport_memory \
+			../port/lpc55s69/peripherals/lzport_rng \
+			../port/lpc55s69/lz_cpatcher/board_init \
+			../thirdparty/lpc55s69_sdk/drivers \
+			../thirdparty/CMSIS \
+			../thirdparty/lpc55s69_sdk/device \
+			../thirdparty/lpc55s69_sdk/utilities \
+			../thirdparty/lpc55s69_sdk/component/serial_manager \
+			../thirdparty/lpc55s69_sdk/component/lists \
+			../thirdparty/lpc55s69_sdk/component/uart \
 
 # Defines used in that build
 DEFINES = CPU_LPC55S69JBD100 \
