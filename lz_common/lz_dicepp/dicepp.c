@@ -18,15 +18,15 @@
  */
 
 #include "fsl_common.h"
-#include "lz_crypto/lz_hmac.h"
-#include "lz_crypto/lz_sha256.h"
+#include "lz_hmac.h"
+#include "lz_sha256.h"
 
 #include "lz_config.h"
-#include "lzport_debug_output/lzport_debug_output.h"
-#include "lzport_dice/lzport_dice.h"
-#include "lzport_rng/lzport_rng.h"
-#include "lz_common/lz_common.h"
-#include "lzport_flash/lzport_flash.h"
+#include "lzport_debug_output.h"
+#include "lzport_dice.h"
+#include "lzport_rng.h"
+#include "lz_common.h"
+#include "lzport_flash.h"
 #include "dicepp.h"
 
 // Flash and RAM data structures according to the linker script. See notes on structure definitions in .h file

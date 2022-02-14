@@ -20,8 +20,8 @@
 #ifndef LZ_CRYPTO_COMMON_H_
 #define LZ_CRYPTO_COMMON_H_
 
-#include "lzport_debug_output/lzport_debug_output.h"
-#include "lzport_rng/lzport_rng.h"
+#include "lzport_debug_output.h"
+#include "lzport_rng.h"
 
 #ifdef MBEDTLS_CONFIG_FILE
 #include "mbedtls/memory_buffer_alloc.h"

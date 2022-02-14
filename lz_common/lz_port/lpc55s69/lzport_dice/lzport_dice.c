@@ -20,11 +20,10 @@
 #include "stdint.h"
 #include "stdbool.h"
 #include "stddef.h"
-#include "lzport_debug_output/lzport_debug_output.h"
-#include "lzport_memory/lzport_memory.h"
-#include "lzport_dice/lzport_dice.h"
-#include "lzport_debug_output/lzport_debug_output.h"
-#include "lz_common/lz_common.h"
+#include "lzport_debug_output.h"
+#include "lzport_memory.h"
+#include "lzport_dice.h"
+#include "lz_common.h"
 
 void lzport_read_cdi(uint8_t *data, uint32_t len)
 {

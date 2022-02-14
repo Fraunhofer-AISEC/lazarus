@@ -18,10 +18,10 @@
  */
 
 #include "lz_config.h"
-#include "lz_common/lz_common.h"
-#include "lzport_debug_output/lzport_debug_output.h"
-#include "lzport_memory/lzport_memory.h"
-#include "lz_net/lz_net.h"
+#include "lz_common.h"
+#include "lzport_debug_output.h"
+#include "lzport_memory.h"
+#include "lz_net.h"
 #include "lz_udownloader.h"
 
 void lz_udownloader_run(void)

@@ -21,10 +21,10 @@
 #define LZ_COMMON_H_
 
 #include <time.h>
-#include "lz_common/lz_error.h"
-#include "lzport_memory/lzport_memory.h"
+#include "lz_error.h"
+#include "lzport_memory.h"
 
-#include "lz_crypto/lz_crypto_common.h"
+#include "lz_crypto_common.h"
 
 /*******************************************
  * Definitions

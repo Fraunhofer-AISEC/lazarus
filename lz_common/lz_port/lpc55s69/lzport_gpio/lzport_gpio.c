@@ -20,7 +20,7 @@
 #include "board.h"
 #include "fsl_gpio.h"
 #include "pin_mux.h"
-#include "lzport_gpio/lzport_gpio.h"
+#include "lzport_gpio.h"
 
 #define GPIO_LED_BLUE_PORT 1U
 #define GPIO_LED_RED_PORT 1U

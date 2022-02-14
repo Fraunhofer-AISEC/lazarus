@@ -28,7 +28,7 @@
 
 #include <stdint.h>
 
-#include "lz_crypto/lz_ecdsa.h"
+#include "lz_ecdsa.h"
 #include "mbedtls/x509_crt.h"
 #include "mbedtls/x509_csr.h"
 #include "mbedtls/hkdf.h"

@@ -24,7 +24,7 @@
 #ifdef MBEDTLS_MD_C
 
 #include "lz_hmac.h"
-#include "lz_common/lz_common.h"
+#include "lz_common.h"
 #include "mbedtls/md.h"
 
 int lz_hmac_sha256(uint8_t *result, const void *data, size_t dataSize, const uint8_t *key,

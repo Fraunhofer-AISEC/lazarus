@@ -25,8 +25,8 @@
 #include "LPC55S69_cm33_core0.h"
 
 #include "lz_config.h"
-#include "lzport_debug_output/lzport_debug_output.h"
-#include "lzport_memory/lzport_memory.h"
+#include "lzport_debug_output.h"
+#include "lzport_memory.h"
 
 #define AHB_LAYERS_COUNT 19U
 

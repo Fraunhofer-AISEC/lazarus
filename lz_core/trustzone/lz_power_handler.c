@@ -18,13 +18,10 @@
  */
 
 #include "arm_cmse.h"
-#include "lzport_debug_output/lzport_debug_output.h"
+#include "lzport_debug_output.h"
 #include "pin_mux.h"
 #include "fsl_device_registers.h"
 #include "fsl_power.h"
-
-#include "lzport_memory/lzport_memory.h"
-#include "lz_trustzone_handler/lz_flash_handler.h"
 #include "exception_handler.h"
 
 #define FRO1M_BIT (1 << 4)

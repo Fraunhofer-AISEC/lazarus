@@ -20,7 +20,7 @@
 #ifndef lzport_lzport_RNG_H_
 #define lzport_lzport_RNG_H_
 
-#include "lz_common/lz_error.h"
+#include "lz_error.h"
 
 void lzport_rng_init(void);
 void lzport_rng_deinit(void);

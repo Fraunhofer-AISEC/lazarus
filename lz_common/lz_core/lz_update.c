@@ -20,10 +20,10 @@
 #include <time.h>
 #include <stdio.h>
 #include "fsl_common.h"
-#include "lz_common/lz_common.h"
-#include "lzport_flash/lzport_flash.h"
-#include "lzport_memory/lzport_memory.h"
-#include "lzport_debug_output/lzport_debug_output.h"
+#include "lz_common.h"
+#include "lzport_flash.h"
+#include "lzport_memory.h"
+#include "lzport_debug_output.h"
 #include "lz_core.h"
 
 static bool lz_staging_hdr_is_img_update(lz_auth_hdr_t *staging_elem_hdr);

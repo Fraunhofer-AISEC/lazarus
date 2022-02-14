@@ -25,11 +25,10 @@
 #include "fsl_power.h"
 
 #include "lz_config.h"
-#include "lz_common/lz_common.h"
-#include "lzport_memory/lzport_memory.h"
-#include "lzport_flash/lzport_flash.h"
-#include "lzport_gpio/lzport_gpio.h"
-#include "lzport_debug_output/lzport_debug_output.h"
+#include "lz_common.h"
+#include "lzport_memory.h"
+#include "lzport_flash.h"
+#include "lzport_debug_output.h"
 #include "dicepp.h"
 #include "trustzone_config.h"
 

@@ -40,8 +40,14 @@ EXCLUDE_DIRS :=
 INCLUDES = 	./include \
 			./trustzone \
 			../lz_common \
+			../lz_common/lz_common \
+			../lz_common/lz_trustzone_handler \
 			../lz_common/$(PROJECT_NAME) \
-			../lz_common/lz_port/lpc55s69 \
+			../lz_common/lz_crypto \
+			../lz_common/lz_port/lpc55s69/lzport_memory \
+			../lz_common/lz_port/lpc55s69/lzport_debug_output \
+			../lz_common/lz_port/lpc55s69/lzport_rng \
+			../lz_common/lz_port/lpc55s69/lzport_flash \
 			./drivers \
 			./CMSIS \
 			./device  \

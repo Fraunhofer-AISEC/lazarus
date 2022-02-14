@@ -21,17 +21,17 @@
 #include <stdio.h>
 #include "fsl_common.h"
 
-#include "lz_common/lz_common.h"
+#include "lz_common.h"
 #include "mbedtls/ecdsa.h"
-#include "lz_crypto/lz_ecc.h"
-#include "lz_crypto/lz_hmac.h"
-#include "lz_crypto/lz_ecdsa.h"
-#include "lz_crypto/lz_x509.h"
-#include "lz_crypto/lz_sha256.h"
+#include "lz_ecc.h"
+#include "lz_hmac.h"
+#include "lz_ecdsa.h"
+#include "lz_x509.h"
+#include "lz_sha256.h"
 
-#include "lzport_flash/lzport_flash.h"
-#include "lzport_memory/lzport_memory.h"
-#include "lzport_debug_output/lzport_debug_output.h"
+#include "lzport_flash.h"
+#include "lzport_memory.h"
+#include "lzport_debug_output.h"
 
 #include "lz_core.h"
 #include "lz_update.h"

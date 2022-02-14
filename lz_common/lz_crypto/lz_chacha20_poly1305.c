@@ -22,7 +22,7 @@
 #include MBEDTLS_CONFIG_FILE
 
 #include <stdint.h>
-#include "lzport_debug_output/lzport_debug_output.h"
+#include "lzport_debug_output.h"
 #include "mbedtls/chachapoly.h"
 #include "lz_chacha20_poly1305.h"
 

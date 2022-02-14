@@ -25,12 +25,9 @@
 #include "LPC55S69_cm33_core0.h"
 
 #include "lz_config.h"
-#include "lz_common/lz_common.h"
-#include "lzport_debug_output/lzport_debug_output.h"
-#include "lzport_memory/lzport_memory.h"
-#include "lzport_flash/lzport_flash.h"
-#include "lzport_rng/lzport_rng.h"
-#include "lzport_gpio/lzport_gpio.h"
+#include "lz_common.h"
+#include "lzport_debug_output.h"
+#include "lzport_flash.h"
 #include "exception_handler.h"
 
 static LZ_RESULT lz_apply_core_update(void);

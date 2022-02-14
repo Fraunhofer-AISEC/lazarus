@@ -20,9 +20,9 @@
 #include "fsl_common.h"
 #include "fsl_rng.h"
 #include "lz_config.h"
-#include "lzport_debug_output/lzport_debug_output.h"
-#include "lzport_rng/lzport_rng.h"
-#include "lz_trustzone_handler/lz_power_handler.h"
+#include "lzport_debug_output.h"
+#include "lzport_rng.h"
+#include "lz_power_handler.h"
 
 static status_t get_random_data(void *data, size_t size);
 

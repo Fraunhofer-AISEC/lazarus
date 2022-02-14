@@ -47,9 +47,18 @@ EXCLUDE_DIRS :=
 # All include directories
 INCLUDES = ./include \
 				./trustzone \
-				../lz_common \
 				../lz_common/$(PROJECT_NAME) \
-				../lz_common/lz_port/lpc55s69 \
+				../lz_common/lz_common \
+				../lz_common/lz_trustzone_handler \
+				../lz_common/lz_net \
+				../lz_common/lz_port/lpc55s69/lzport_debug_output \
+				../lz_common/lz_port/lpc55s69/lzport_usart \
+				../lz_common/lz_port/lpc55s69/lzport_net \
+				../lz_common/lz_port/lpc55s69/lzport_systick_delay \
+				../lz_common/lz_port/lpc55s69/lzport_gpio \
+				../lz_common/lz_port/lpc55s69/lzport_rng \
+				../lz_common/lz_port/lpc55s69/lzport_syscalls \
+				../lz_common/lz_port/lpc55s69/lzport_memory \
 				../lz_common/lz_crypto \
 				../lz_common/mbedtls/include \
 				../lz_common/mbedtls/port/ksdk \

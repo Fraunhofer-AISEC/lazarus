@@ -25,8 +25,8 @@
 #include <sys/errno.h>
 
 #include "lz_config.h"
-#include "lzport_usart/lzport_usart.h"
-#include "lzport_debug_output/lzport_debug_output.h"
+#include "lzport_usart.h"
+#include "lzport_debug_output.h"
 
 /* Variables */
 #undef errno

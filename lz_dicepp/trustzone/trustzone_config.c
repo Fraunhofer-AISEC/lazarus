@@ -20,8 +20,8 @@
 #include "stdint.h"
 #include "stdbool.h"
 #include "LPC55S69_cm33_core0.h"
-#include "lzport_debug_output/lzport_debug_output.h"
-#include "lzport_memory/lzport_memory.h"
+#include "lzport_debug_output.h"
+#include "lzport_memory.h"
 
 #define FLASH_START 0x10000000
 #define FLASH_REGION_SIZE 0x8000 // 32 kB

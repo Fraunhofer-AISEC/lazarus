@@ -48,9 +48,15 @@ INCLUDES = 	./include \
 			../lz_common \
 			../lz_common/$(PROJECT_NAME) \
 			../lz_common/lz_common \
-			../lz_common/lz_port/lpc55s69 \
 			../lz_common/mbedtls/include \
 			../lz_common/mbedtls/port/ksdk \
+			../lz_common/lz_crypto \
+			../lz_common/lz_trustzone_handler \
+			../lz_common/lz_port/lpc55s69/lzport_dice \
+			../lz_common/lz_port/lpc55s69/lzport_flash \
+			../lz_common/lz_port/lpc55s69/lzport_memory \
+			../lz_common/lz_port/lpc55s69/lzport_rng \
+			../lz_common/lz_port/lpc55s69/lzport_debug_output \
 			./drivers \
 			./CMSIS \
 			./device  \

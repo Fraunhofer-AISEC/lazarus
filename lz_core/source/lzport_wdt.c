@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-#include "lzport_debug_output/lzport_debug_output.h"
+#include "lzport_debug_output.h"
 #include "board.h"
 #include <stdbool.h>
 #include "lzport_wdt.h"

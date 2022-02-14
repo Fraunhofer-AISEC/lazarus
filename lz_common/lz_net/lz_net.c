@@ -20,18 +20,15 @@
 #include "stdint.h"
 
 #include "lz_config.h"
-#include "lz_common/lz_common.h"
-#include "lzport_debug_output/lzport_debug_output.h"
-#include "lzport_memory/lzport_memory.h"
-#include "lzport_debug_output/lzport_debug_output.h"
-#include "lzport_gpio/lzport_gpio.h"
-#include "lzport_net/lzport_net.h"
-#include "lz_trustzone_handler/lz_flash_handler.h"
-#include "lz_trustzone_handler/lz_flash_handler.h"
-#include "lz_net/lz_net.h"
-#include "lz_crypto/lz_sha256.h"
-#include "lz_crypto/lz_ecdsa.h"
-#include "lz_trustzone_handler/lz_awdt_handler.h"
+#include "lz_common.h"
+#include "lzport_debug_output.h"
+#include "lzport_memory.h"
+#include "lzport_net.h"
+#include "lz_flash_handler.h"
+#include "lz_net.h"
+#include "lz_sha256.h"
+#include "lz_ecdsa.h"
+#include "lz_awdt_handler.h"
 
 #define TIMEOUT_SOCKET_OPEN_MS 5000
 #define TIMEOUT_RECEIVE_FW_MS 20000

@@ -22,19 +22,18 @@
 #include "stdio.h"
 
 #include "lz_config.h"
-#include "lz_common/lz_error.h"
-#include "lzport_systick_delay/lzport_systick_delay.h"
-#include "lzport_debug_output/lzport_debug_output.h"
-#include "lzport_usart/lzport_usart.h"
+#include "lz_error.h"
+#include "lzport_debug_output.h"
+#include "lzport_usart.h"
 #if (1 == FREERTOS_AVAILABLE)
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #else
-#include "lzport_systick_delay/lzport_systick_delay.h"
+#include "lzport_systick_delay.h"
 #endif
 
-#include "lzport_net/lzport_net.h"
+#include "lzport_net.h"
 
 #define ESP8266_STD_TIMEOUT_MS 2000
 #define TIMEOUT_TCP_MS 10000

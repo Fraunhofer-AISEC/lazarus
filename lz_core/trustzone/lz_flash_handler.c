@@ -20,11 +20,9 @@
 #include "stdint.h"
 #include "arm_cmse.h"
 #include "fsl_common.h"
-#include "lz_common/lz_common.h"
-#include "lzport_debug_output/lzport_debug_output.h"
-#include "lzport_flash/lzport_flash.h"
-#include "lzport_memory/lzport_memory.h"
-#include "lz_trustzone_handler/lz_flash_handler.h"
+#include "lz_common.h"
+#include "lzport_debug_output.h"
+#include "lzport_flash.h"
 #include "lzport_throttle_timer.h"
 
 #define PAGE_SIZE_BYTE 512

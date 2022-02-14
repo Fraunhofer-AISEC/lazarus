@@ -20,7 +20,7 @@
 #ifndef LZPORT_NET_H_
 #define LZPORT_NET_H_
 
-#include "lz_common/lz_error.h"
+#include "lz_error.h"
 
 LZ_RESULT lzport_net_init(uint8_t *ip, uint8_t *mac, char *ssid, char *pwd);
 

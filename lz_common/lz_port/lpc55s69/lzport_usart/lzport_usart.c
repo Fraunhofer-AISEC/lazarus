@@ -21,13 +21,13 @@
 #include "fsl_usart.h"
 
 #include "lz_config.h"
-#include "lzport_usart/lzport_usart.h"
-#include "lzport_debug_output/lzport_debug_output.h"
+#include "lzport_usart.h"
+#include "lzport_debug_output.h"
 
 #if (1 == FREERTOS_AVAILABLE)
 #include "FreeRTOS.h"
 #include "task.h"
-#include "lzport_net/lzport_net.h"
+#include "lzport_net.h"
 #endif
 
 volatile FILE *net_fd = NULL;

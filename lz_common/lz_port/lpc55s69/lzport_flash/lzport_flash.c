@@ -21,10 +21,10 @@
 #include "fsl_iap.h"
 #include "fsl_iap_ffr.h"
 
-#include "lz_common/lz_error.h"
-#include "lz_common/lz_common.h"
-#include "lzport_flash/lzport_flash.h"
-#include "lzport_debug_output/lzport_debug_output.h"
+#include "lz_error.h"
+#include "lz_common.h"
+#include "lzport_flash.h"
+#include "lzport_debug_output.h"
 
 #define SECURE_BIT_MASK 0x10000000
 #define min(x, y) ((x) < (y) ? (x) : (y))

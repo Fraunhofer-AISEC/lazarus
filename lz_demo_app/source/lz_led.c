@@ -24,8 +24,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "lz_config.h"
-#include "lzport_gpio/lzport_gpio.h"
-#include "lzport_debug_output/lzport_debug_output.h"
+#include "lzport_gpio.h"
+#include "lzport_debug_output.h"
 #include "lz_awdt.h"
 #include "lz_led.h"
 

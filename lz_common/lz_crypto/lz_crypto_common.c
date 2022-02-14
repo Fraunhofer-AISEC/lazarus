@@ -18,7 +18,7 @@
  */
 
 #include "lz_crypto_common.h"
-#include "lzport_rng/lzport_rng.h"
+#include "lzport_rng.h"
 
 int lz_rand(void *rng_state, unsigned char *output, size_t len)
 {
