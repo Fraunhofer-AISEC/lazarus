@@ -63,3 +63,4 @@ __pycache__/
 **/build/
 .db
 **/.settings/
+*.launch

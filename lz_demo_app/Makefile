@@ -41,6 +41,7 @@ SRC_DIRS := ./ \
 			../port/lpc55s69/peripherals/lzport_usart \
 			../port/lpc55s69/peripherals/lzport_net \
 			../port/lpc55s69/peripherals/lzport_syscalls \
+			../port/lpc55s69/peripherals/lzport_spi \
 			../port/lpc55s69/lz_demo_app/board_init \
 
 EXCLUDE_DIRS :=
@@ -55,6 +56,7 @@ INCLUDES = 		./ \
 				../port/lpc55s69/peripherals/lzport_usart \
 				../port/lpc55s69/peripherals/lzport_net \
 				../port/lpc55s69/peripherals/lzport_syscalls \
+				../port/lpc55s69/peripherals/lzport_spi \
 				../port/lpc55s69/lz_demo_app/board_init \
 				../lz_common/lz_common \
 				../lz_common/lz_crypto \
