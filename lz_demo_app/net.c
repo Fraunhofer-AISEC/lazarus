@@ -20,7 +20,6 @@
 #include "stdint.h"
 #include "stdbool.h"
 #include "stdio.h"
-#include "fsl_common.h"
 
 #include "FreeRTOS.h"
 #include "task.h"

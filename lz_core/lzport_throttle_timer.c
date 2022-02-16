@@ -19,7 +19,6 @@
 
 #include "stdint.h"
 #include <stdbool.h>
-#include "fsl_common.h"
 #include "fsl_ctimer.h"
 
 #define CTIMER CTIMER3

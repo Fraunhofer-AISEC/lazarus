@@ -23,7 +23,6 @@
 #error "Compile with --cmse"
 #endif
 
-#include "fsl_device_registers.h"
 #include "lzport_debug_output.h"
 #include "arm_cmse.h"
 #include "board.h"

@@ -19,7 +19,6 @@
 
 #include <time.h>
 #include <stdio.h>
-#include "fsl_common.h"
 #include "lz_common.h"
 #include "lzport_flash.h"
 #include "lzport_memory.h"

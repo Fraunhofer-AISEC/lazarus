@@ -17,13 +17,7 @@
  * limitations under the License.
  */
 
-#include <stdio.h>
-#include "board.h"
-#include "peripherals.h"
-#include "pin_mux.h"
-#include "clock_config.h"
-#include "LPC55S69_cm33_core0.h"
-
+#include <stdint.h>
 #include "lz_config.h"
 #include "lz_common.h"
 #include "lzport_debug_output.h"

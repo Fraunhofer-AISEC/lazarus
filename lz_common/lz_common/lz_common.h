@@ -21,6 +21,7 @@
 #define LZ_COMMON_H_
 
 #include <time.h>
+#include <stdint.h>
 #include "lz_error.h"
 #include "lzport_memory.h"
 

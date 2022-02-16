@@ -19,7 +19,6 @@
 
 #include "arm_cmse.h"
 #include "lzport_debug_output.h"
-#include "pin_mux.h"
 
 #include "lzport_memory.h"
 #include "lzport_rng.h"

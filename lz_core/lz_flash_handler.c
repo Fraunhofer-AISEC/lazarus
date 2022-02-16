@@ -19,7 +19,6 @@
 
 #include "stdint.h"
 #include "arm_cmse.h"
-#include "fsl_common.h"
 #include "lz_common.h"
 #include "lzport_debug_output.h"
 #include "lzport_flash.h"

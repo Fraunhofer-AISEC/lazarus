@@ -24,7 +24,6 @@
 #endif
 
 #include <stdio.h>
-#include "fsl_device_registers.h"
 #include "lz_config.h"
 #include "lzport_debug_output.h"
 #include "arm_cmse.h"

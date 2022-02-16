@@ -17,10 +17,7 @@
  * limitations under the License.
  */
 
-#include "fsl_common.h"
-
 #include "lz_config.h"
-#include "lz_error.h"
 #include "lz_common.h"
 #include "lzport_debug_output.h"
 #include "lzport_dice.h"
