@@ -33,6 +33,8 @@ SRC_DIRS := ./ \
 			../port/lpc55s69/peripherals/lzport_flash \
 			../port/lpc55s69/peripherals/lzport_rng \
 			../port/lpc55s69/peripherals/lzport_power \
+			../port/lpc55s69/peripherals/lzport_throttle_timer \
+			../port/lpc55s69/peripherals/lzport_wdt \
 			../port/lpc55s69/lz_core/board_init \
 			../lz_common/lz_common \
 			../lz_common/lz_crypto \
@@ -52,6 +54,8 @@ INCLUDES = ./ \
 			../port/lpc55s69/peripherals/lzport_memory \
 			../port/lpc55s69/peripherals/lzport_gpio \
 			../port/lpc55s69/peripherals/lzport_power \
+			../port/lpc55s69/peripherals/lzport_throttle_timer \
+			../port/lpc55s69/peripherals/lzport_wdt \
 			../port/lpc55s69/lz_core/board_init \
 			../thirdparty/mbedtls/include \
 			../thirdparty/mbedtls/port/ksdk \
