@@ -48,11 +48,12 @@ do
     esac
 done
 
-cd $ROOT_DIR/..
+cd $ROOT_DIR
+
 FILES_UNSTAGED=$(git diff --name-only -- '*.c' '*.h' | tr '\n' ' ')
 FILES_STAGED=$(git diff --name-only --cached -- '*.c' '*.h' | tr '\n' ' ')
 FILES_NEW=$(git ls-files --others --exclude-standard -- '*.c' '*.h')
-FILES_ALL=$(find $ROOT_DIR -type f -regextype sed -regex ".*\(\.c\|\.h\)")
+FILES_ALL=$(find $ROOT_DIR -path $ROOT_DIR/thirdparty -prune -o -type f -regextype sed -regex ".*\(\.c\|\.h\)")
 FILES=
 
 if [ $ALL -eq 1 ]
@@ -89,7 +90,7 @@ then
         echo "No files to be formatted"
     fi
 else
-   clang-format -i $VERBOSE -style=file $FILES
+    clang-format -i $VERBOSE -style=file $FILES
 fi
 
 
