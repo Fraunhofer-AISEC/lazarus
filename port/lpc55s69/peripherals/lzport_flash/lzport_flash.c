@@ -166,8 +166,7 @@ bool lzport_flash_program_page(uint32_t start, uint8_t *buf)
 	uint32_t flash_start = start & ~SECURE_BIT_MASK;
 
 	// Parameter check: Page-alignment and within flash bounds
-	if (!((flash_start < (FLASH_BASE_ADDR + FLASH_SIZE)) &&
-		  (flash_start % FLASH_PAGE_SIZE) == 0)) {
+	if (!((flash_start < (FLASH_BASE_ADDR + FLASH_SIZE)) && (flash_start % FLASH_PAGE_SIZE) == 0)) {
 		dbgprint(DBG_ERR,
 				 "ERROR: Failed to flash page. Address 0x%x outside of flash memory range"
 				 "\n",

@@ -289,7 +289,7 @@ LZ_RESULT lzport_socket_receive(uint32_t handle, uint8_t *data, uint32_t len_exp
 
 	dbgprint(DBG_NW, "INFO: ESP8266 - Receiving %d bytes\n", *len_rec);
 
-	if (esp8266_receive_data((char*)data, *len_rec, remaining_time_ms) != LZ_SUCCESS) {
+	if (esp8266_receive_data((char *)data, *len_rec, remaining_time_ms) != LZ_SUCCESS) {
 		dbgprint(DBG_NW, "ERROR: ESP8266 - Failed to receive data from\n");
 		return LZ_ERROR;
 	}
@@ -470,7 +470,7 @@ static LZ_RESULT esp8266_receive_data(char *buf, uint32_t buf_size, uint32_t tim
 
 	while (deadline >= lzport_get_tick_ms()) {
 		if (!lzport_usart_buffer_is_empty(&lzport_usart_rx_fifo_esp)) {
-			lzport_usart_buffer_read(&lzport_usart_rx_fifo_esp, (uint8_t*)&buf[received_len]);
+			lzport_usart_buffer_read(&lzport_usart_rx_fifo_esp, (uint8_t *)&buf[received_len]);
 			dbgprint(DBG_NW, "%c", buf[received_len]);
 			received_len++;
 		}

@@ -76,7 +76,7 @@ static void NVIC_init(void) {
  **********************************************************************************************************************/
 void BOARD_InitPeripherals_cm33_core0(void)
 {
-  /* Initialize components */
+	/* Initialize components */
 }
 
 /***********************************************************************************************************************
@@ -84,5 +84,5 @@ void BOARD_InitPeripherals_cm33_core0(void)
  **********************************************************************************************************************/
 void BOARD_InitBootPeripherals(void)
 {
-  BOARD_InitPeripherals_cm33_core0();
+	BOARD_InitPeripherals_cm33_core0();
 }

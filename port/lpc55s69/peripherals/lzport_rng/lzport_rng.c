@@ -29,33 +29,33 @@ static status_t get_random_data(void *data, size_t size);
 // Taken from fsl_rng.c Copyright NXP, SPDX-License-Identifier: BSD-3-Clause
 static void rng_accumulateEntropy(RNG_Type *base)
 {
-    uint32_t minChiSq;
-    uint32_t maxChiSq;
+	uint32_t minChiSq;
+	uint32_t maxChiSq;
 
-    /* Steps to accumulate entropy, more info can be found in LPC55SXX UM*/
+	/* Steps to accumulate entropy, more info can be found in LPC55SXX UM*/
 
-    /* Select fourth clock on which to compute CHI SQUARE statistics*/
-    base->COUNTER_CFG = (base->COUNTER_CFG & ~RNG_COUNTER_CFG_CLOCK_SEL_MASK) | RNG_COUNTER_CFG_CLOCK_SEL(4U);
+	/* Select fourth clock on which to compute CHI SQUARE statistics*/
+	base->COUNTER_CFG =
+		(base->COUNTER_CFG & ~RNG_COUNTER_CFG_CLOCK_SEL_MASK) | RNG_COUNTER_CFG_CLOCK_SEL(4U);
 
-    /* Activate CHI computing */
-    base->ONLINE_TEST_CFG = RNG_ONLINE_TEST_CFG_ACTIVATE(1U);
+	/* Activate CHI computing */
+	base->ONLINE_TEST_CFG = RNG_ONLINE_TEST_CFG_ACTIVATE(1U);
 
-    /* Read min chi squared value, on power on should be higher than max chi squared value */
-    minChiSq = ((base->ONLINE_TEST_VAL & RNG_ONLINE_TEST_VAL_MIN_CHI_SQUARED_MASK) >>
-                RNG_ONLINE_TEST_VAL_MIN_CHI_SQUARED_SHIFT);
+	/* Read min chi squared value, on power on should be higher than max chi squared value */
+	minChiSq = ((base->ONLINE_TEST_VAL & RNG_ONLINE_TEST_VAL_MIN_CHI_SQUARED_MASK) >>
+				RNG_ONLINE_TEST_VAL_MIN_CHI_SQUARED_SHIFT);
 
-    /* Read max chi squared value */
-    maxChiSq = ((base->ONLINE_TEST_VAL & RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_MASK) >>
-                RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_SHIFT);
+	/* Read max chi squared value */
+	maxChiSq = ((base->ONLINE_TEST_VAL & RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_MASK) >>
+				RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_SHIFT);
 
-    /* Wait until minChiSq decreases and become smaller than maxChiSq*/
-    while (minChiSq > (maxChiSq - 1U))
-    {
-        maxChiSq = ((base->ONLINE_TEST_VAL & RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_MASK) >>
-                    RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_SHIFT);
-        minChiSq = ((base->ONLINE_TEST_VAL & RNG_ONLINE_TEST_VAL_MIN_CHI_SQUARED_MASK) >>
-                    RNG_ONLINE_TEST_VAL_MIN_CHI_SQUARED_SHIFT);
-    }
+	/* Wait until minChiSq decreases and become smaller than maxChiSq*/
+	while (minChiSq > (maxChiSq - 1U)) {
+		maxChiSq = ((base->ONLINE_TEST_VAL & RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_MASK) >>
+					RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_SHIFT);
+		minChiSq = ((base->ONLINE_TEST_VAL & RNG_ONLINE_TEST_VAL_MIN_CHI_SQUARED_MASK) >>
+					RNG_ONLINE_TEST_VAL_MIN_CHI_SQUARED_SHIFT);
+	}
 }
 
 /**
@@ -72,41 +72,40 @@ void lzport_rng_init(void)
 	lz_power_init_rng_ring_oscillator_nse();
 #endif
 #if !(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL)
-    CLOCK_EnableClock(kCLOCK_Rng);
+	CLOCK_EnableClock(kCLOCK_Rng);
 #endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
 
 #if !(defined(FSL_SDK_DISABLE_DRIVER_RESET_CONTROL) && FSL_SDK_DISABLE_DRIVER_RESET_CONTROL)
-    /* Reset the module. */
-    RESET_PeripheralReset(kRNG_RST_SHIFT_RSTn);
+	/* Reset the module. */
+	RESET_PeripheralReset(kRNG_RST_SHIFT_RSTn);
 #endif /* FSL_SDK_DISABLE_DRIVER_RESET_CONTROL */
 
-    /* Turn on CHI Squared test */
-    /* Activate CHI computing and wait until min chi squared become smaller than max chi squared */
-    rng_accumulateEntropy(RNG);
+	/* Turn on CHI Squared test */
+	/* Activate CHI computing and wait until min chi squared become smaller than max chi squared */
+	rng_accumulateEntropy(RNG);
 
-    maxChiSq = ((RNG->ONLINE_TEST_VAL & RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_MASK) >>
-                RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_SHIFT);
+	maxChiSq = ((RNG->ONLINE_TEST_VAL & RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_MASK) >>
+				RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_SHIFT);
 
-    /* When maxChiSq is bigger than 4 its assumed there is not enough entropy and previous steps are repeated */
-    /* When maxChiSq is 4 or less initialization is complete and random number can be read*/
-    while (maxChiSq > 4U)
-    {
-        /* Deactivate CHI coputing to reset*/
-        RNG->ONLINE_TEST_CFG = RNG_ONLINE_TEST_CFG_ACTIVATE(0);
+	/* When maxChiSq is bigger than 4 its assumed there is not enough entropy and previous steps are repeated */
+	/* When maxChiSq is 4 or less initialization is complete and random number can be read*/
+	while (maxChiSq > 4U) {
+		/* Deactivate CHI coputing to reset*/
+		RNG->ONLINE_TEST_CFG = RNG_ONLINE_TEST_CFG_ACTIVATE(0);
 
-        /* read Shift4x register, if is less than 7 increment it and then start accumulating entropy again */
-        tmpShift4x = ((RNG->COUNTER_CFG & RNG_COUNTER_CFG_SHIFT4X_MASK) >> RNG_COUNTER_CFG_SHIFT4X_SHIFT);
-        if (tmpShift4x < 7U)
-        {
-            tmpShift4x++;
-            RNG->COUNTER_CFG =
-                (RNG->COUNTER_CFG & ~RNG_COUNTER_CFG_SHIFT4X_MASK) | RNG_COUNTER_CFG_SHIFT4X(tmpShift4x);
-        }
-        rng_accumulateEntropy(RNG);
+		/* read Shift4x register, if is less than 7 increment it and then start accumulating entropy again */
+		tmpShift4x =
+			((RNG->COUNTER_CFG & RNG_COUNTER_CFG_SHIFT4X_MASK) >> RNG_COUNTER_CFG_SHIFT4X_SHIFT);
+		if (tmpShift4x < 7U) {
+			tmpShift4x++;
+			RNG->COUNTER_CFG = (RNG->COUNTER_CFG & ~RNG_COUNTER_CFG_SHIFT4X_MASK) |
+							   RNG_COUNTER_CFG_SHIFT4X(tmpShift4x);
+		}
+		rng_accumulateEntropy(RNG);
 
-        maxChiSq = ((RNG->ONLINE_TEST_VAL & RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_MASK) >>
-                    RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_SHIFT);
-    }
+		maxChiSq = ((RNG->ONLINE_TEST_VAL & RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_MASK) >>
+					RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_SHIFT);
+	}
 
 	dbgprint(DBG_VERB, "INFO: RNG initialization successful\n");
 }
@@ -123,12 +122,12 @@ void lzport_rng_deinit(void)
 	lz_power_deinit_rng_ring_oscillator_nse();
 #endif
 #if !(defined(FSL_SDK_DISABLE_DRIVER_RESET_CONTROL) && FSL_SDK_DISABLE_DRIVER_RESET_CONTROL)
-    /* Reset the module. */
-    RESET_PeripheralReset(kRNG_RST_SHIFT_RSTn);
+	/* Reset the module. */
+	RESET_PeripheralReset(kRNG_RST_SHIFT_RSTn);
 #endif /* FSL_SDK_DISABLE_DRIVER_RESET_CONTROL */
 
 #if !(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL)
-    CLOCK_DisableClock(kCLOCK_Rng);
+	CLOCK_DisableClock(kCLOCK_Rng);
 #endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
 
 	dbgprint(DBG_VERB, "INFO: RNG de-initialization successful\n");

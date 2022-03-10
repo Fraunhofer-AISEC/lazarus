@@ -33,9 +33,8 @@ void SystemInit(void)
 
 void lzport_demo_app_init_board()
 {
-    // Init board hardware.
+	// Init board hardware.
 	BOARD_InitBootPins();
 	// Clocks are already configured, but variable must be set
 	SystemCoreClock = BOARD_BOOTCLOCKFROHF96M_CORE_CLOCK;
-
 }

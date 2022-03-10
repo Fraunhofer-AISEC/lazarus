@@ -18,11 +18,10 @@
  **********************************************************************************************************************/
 
 /*! @brief Direction type  */
-typedef enum _pin_mux_direction
-{
-    kPIN_MUX_DirectionInput = 0U,        /* Input direction */
-    kPIN_MUX_DirectionOutput = 1U,       /* Output direction */
-    kPIN_MUX_DirectionInputOrOutput = 2U /* Input or output direction */
+typedef enum _pin_mux_direction {
+	kPIN_MUX_DirectionInput = 0U,		 /* Input direction */
+	kPIN_MUX_DirectionOutput = 1U,		 /* Output direction */
+	kPIN_MUX_DirectionInputOrOutput = 2U /* Input or output direction */
 } pin_mux_direction_t;
 
 /*!
@@ -44,12 +43,13 @@ extern "C" {
  */
 void BOARD_InitBootPins(void);
 
-#define IOCON_PIO_DIGITAL_EN 0x0100u  /*!<@brief Enables digital function */
-#define IOCON_PIO_FUNC1 0x01u         /*!<@brief Selects pin function 1 */
-#define IOCON_PIO_INV_DI 0x00u        /*!<@brief Input function is not inverted */
-#define IOCON_PIO_MODE_INACT 0x00u    /*!<@brief No addition pin function */
-#define IOCON_PIO_OPENDRAIN_DI 0x00u  /*!<@brief Open drain is disabled */
-#define IOCON_PIO_SLEW_STANDARD 0x00u /*!<@brief Standard mode, output slew rate control is enabled */
+#define IOCON_PIO_DIGITAL_EN 0x0100u /*!<@brief Enables digital function */
+#define IOCON_PIO_FUNC1 0x01u		 /*!<@brief Selects pin function 1 */
+#define IOCON_PIO_INV_DI 0x00u		 /*!<@brief Input function is not inverted */
+#define IOCON_PIO_MODE_INACT 0x00u	 /*!<@brief No addition pin function */
+#define IOCON_PIO_OPENDRAIN_DI 0x00u /*!<@brief Open drain is disabled */
+#define IOCON_PIO_SLEW_STANDARD                                                                    \
+	0x00u /*!<@brief Standard mode, output slew rate control is enabled */
 
 /*! @name PIO0_29 (number 92), P8[2]/U6[13]/FC0_USART_RXD
   @{ */
@@ -115,17 +115,19 @@ void BOARD_InitBootPins(void);
  */
 void BOARD_InitDEBUG_UARTPins(void); /* Function assigned for the Cortex-M33 (Core #0) */
 
-#define IOCON_PIO_ASW_DI 0x00u        /*!<@brief Analog switch is open (disabled) */
-#define IOCON_PIO_ASW_DIS_EN 0x00u    /*!<@brief Analog switch is closed (enabled), only for A0 version */
-#define IOCON_PIO_ASW_EN 0x0400u      /*!<@brief Analog switch is closed (enabled) */
+#define IOCON_PIO_ASW_DI 0x00u /*!<@brief Analog switch is open (disabled) */
+#define IOCON_PIO_ASW_DIS_EN                                                                       \
+	0x00u /*!<@brief Analog switch is closed (enabled), only for A0 version */
+#define IOCON_PIO_ASW_EN 0x0400u	  /*!<@brief Analog switch is closed (enabled) */
 #define IOCON_PIO_DIGITAL_EN 0x0100u  /*!<@brief Enables digital function */
-#define IOCON_PIO_FUNC6 0x06u         /*!<@brief Selects pin function 6 */
-#define IOCON_PIO_INV_DI 0x00u        /*!<@brief Input function is not inverted */
-#define IOCON_PIO_MODE_INACT 0x00u    /*!<@brief No addition pin function */
+#define IOCON_PIO_FUNC6 0x06u		  /*!<@brief Selects pin function 6 */
+#define IOCON_PIO_INV_DI 0x00u		  /*!<@brief Input function is not inverted */
+#define IOCON_PIO_MODE_INACT 0x00u	  /*!<@brief No addition pin function */
 #define IOCON_PIO_MODE_PULLDOWN 0x10u /*!<@brief Selects pull-down function */
-#define IOCON_PIO_MODE_PULLUP 0x20u   /*!<@brief Selects pull-up function */
+#define IOCON_PIO_MODE_PULLUP 0x20u	  /*!<@brief Selects pull-up function */
 #define IOCON_PIO_OPENDRAIN_DI 0x00u  /*!<@brief Open drain is disabled */
-#define IOCON_PIO_SLEW_STANDARD 0x00u /*!<@brief Standard mode, output slew rate control is enabled */
+#define IOCON_PIO_SLEW_STANDARD                                                                    \
+	0x00u /*!<@brief Standard mode, output slew rate control is enabled */
 
 /*! @name PIO0_11 (number 13), U14[4]/SWDCLK_TRGT
   @{ */
@@ -220,77 +222,78 @@ void BOARD_InitDEBUG_UARTPins(void); /* Function assigned for the Cortex-M33 (Co
  */
 void BOARD_InitSWD_DEBUGPins(void); /* Function assigned for the Cortex-M33 (Core #0) */
 
-#define IOCON_PIO_DIGITAL_EN 0x0100u  /*!<@brief Enables digital function */
-#define IOCON_PIO_FUNC4 0x04u         /*!<@brief Selects pin function 4 */
-#define IOCON_PIO_FUNC7 0x07u         /*!<@brief Selects pin function 7 */
-#define IOCON_PIO_INV_DI 0x00u        /*!<@brief Input function is not inverted */
-#define IOCON_PIO_MODE_INACT 0x00u    /*!<@brief No addition pin function */
-#define IOCON_PIO_MODE_PULLUP 0x20u   /*!<@brief Selects pull-up function */
-#define IOCON_PIO_OPENDRAIN_DI 0x00u  /*!<@brief Open drain is disabled */
-#define IOCON_PIO_SLEW_STANDARD 0x00u /*!<@brief Standard mode, output slew rate control is enabled */
+#define IOCON_PIO_DIGITAL_EN 0x0100u /*!<@brief Enables digital function */
+#define IOCON_PIO_FUNC4 0x04u		 /*!<@brief Selects pin function 4 */
+#define IOCON_PIO_FUNC7 0x07u		 /*!<@brief Selects pin function 7 */
+#define IOCON_PIO_INV_DI 0x00u		 /*!<@brief Input function is not inverted */
+#define IOCON_PIO_MODE_INACT 0x00u	 /*!<@brief No addition pin function */
+#define IOCON_PIO_MODE_PULLUP 0x20u	 /*!<@brief Selects pull-up function */
+#define IOCON_PIO_OPENDRAIN_DI 0x00u /*!<@brief Open drain is disabled */
+#define IOCON_PIO_SLEW_STANDARD                                                                    \
+	0x00u /*!<@brief Standard mode, output slew rate control is enabled */
 
 /*! @name USB0_DP (number 97), P10[3]/D10[3]/USB0_FS_P
   @{ */
 /* Routed pin properties */
-#define BOARD_INITUSBPINS_USB0_DP_PERIPHERAL USBFSH               /*!<@brief Peripheral name */
-#define BOARD_INITUSBPINS_USB0_DP_SIGNAL USB_DP                   /*!<@brief Signal name */
-#define BOARD_INITUSBPINS_USB0_DP_PIN_NAME USB0_DP                /*!<@brief Routed pin name */
+#define BOARD_INITUSBPINS_USB0_DP_PERIPHERAL USBFSH				  /*!<@brief Peripheral name */
+#define BOARD_INITUSBPINS_USB0_DP_SIGNAL USB_DP					  /*!<@brief Signal name */
+#define BOARD_INITUSBPINS_USB0_DP_PIN_NAME USB0_DP				  /*!<@brief Routed pin name */
 #define BOARD_INITUSBPINS_USB0_DP_LABEL "P10[3]/D10[3]/USB0_FS_P" /*!<@brief Label */
-#define BOARD_INITUSBPINS_USB0_DP_NAME "USB0_DP"                  /*!<@brief Identifier */
-                                                                  /* @} */
+#define BOARD_INITUSBPINS_USB0_DP_NAME "USB0_DP"				  /*!<@brief Identifier */
+																  /* @} */
 
 /*! @name USB0_DM (number 98), P10[2]/D10[2]/USB0_FS_N
   @{ */
 /* Routed pin properties */
-#define BOARD_INITUSBPINS_USB0_DM_PERIPHERAL USBFSH               /*!<@brief Peripheral name */
-#define BOARD_INITUSBPINS_USB0_DM_SIGNAL USB_DM                   /*!<@brief Signal name */
-#define BOARD_INITUSBPINS_USB0_DM_PIN_NAME USB0_DM                /*!<@brief Routed pin name */
+#define BOARD_INITUSBPINS_USB0_DM_PERIPHERAL USBFSH				  /*!<@brief Peripheral name */
+#define BOARD_INITUSBPINS_USB0_DM_SIGNAL USB_DM					  /*!<@brief Signal name */
+#define BOARD_INITUSBPINS_USB0_DM_PIN_NAME USB0_DM				  /*!<@brief Routed pin name */
 #define BOARD_INITUSBPINS_USB0_DM_LABEL "P10[2]/D10[2]/USB0_FS_N" /*!<@brief Label */
-#define BOARD_INITUSBPINS_USB0_DM_NAME "USB0_DM"                  /*!<@brief Identifier */
-                                                                  /* @} */
+#define BOARD_INITUSBPINS_USB0_DM_NAME "USB0_DM"				  /*!<@brief Identifier */
+																  /* @} */
 
 /*! @name PIO0_22 (number 78), P10[1]/USB0_VBUS
   @{ */
 /* Routed pin properties */
-#define BOARD_INITUSBPINS_USB0_VBUS_PERIPHERAL USBFSH         /*!<@brief Peripheral name */
-#define BOARD_INITUSBPINS_USB0_VBUS_SIGNAL USB_VBUS           /*!<@brief Signal name */
-#define BOARD_INITUSBPINS_USB0_VBUS_PIN_NAME USB0_VBUS        /*!<@brief Routed pin name */
-#define BOARD_INITUSBPINS_USB0_VBUS_LABEL "P10[1]/USB0_VBUS"  /*!<@brief Label */
-#define BOARD_INITUSBPINS_USB0_VBUS_NAME "USB0_VBUS"          /*!<@brief Identifier */
-#define BOARD_INITUSBPINS_USB0_VBUS_PORT 0U                   /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITUSBPINS_USB0_VBUS_PIN 22U                   /*!<@brief PORT pin number */
-#define BOARD_INITUSBPINS_USB0_VBUS_PIN_MASK (1U << 22U)      /*!<@brief PORT pin mask */
-                                                              /* @} */
+#define BOARD_INITUSBPINS_USB0_VBUS_PERIPHERAL USBFSH		 /*!<@brief Peripheral name */
+#define BOARD_INITUSBPINS_USB0_VBUS_SIGNAL USB_VBUS			 /*!<@brief Signal name */
+#define BOARD_INITUSBPINS_USB0_VBUS_PIN_NAME USB0_VBUS		 /*!<@brief Routed pin name */
+#define BOARD_INITUSBPINS_USB0_VBUS_LABEL "P10[1]/USB0_VBUS" /*!<@brief Label */
+#define BOARD_INITUSBPINS_USB0_VBUS_NAME "USB0_VBUS"		 /*!<@brief Identifier */
+#define BOARD_INITUSBPINS_USB0_VBUS_PORT 0U				 /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITUSBPINS_USB0_VBUS_PIN 22U				 /*!<@brief PORT pin number */
+#define BOARD_INITUSBPINS_USB0_VBUS_PIN_MASK (1U << 22U) /*!<@brief PORT pin mask */
+														 /* @} */
 
 /*! @name USB1_DM (number 35), P9[2]/D9[2]/USB1_HS_N
   @{ */
 /* Routed pin properties */
-#define BOARD_INITUSBPINS_USB1_DM_PERIPHERAL USBHSH             /*!<@brief Peripheral name */
-#define BOARD_INITUSBPINS_USB1_DM_SIGNAL USB_DM                 /*!<@brief Signal name */
-#define BOARD_INITUSBPINS_USB1_DM_PIN_NAME USB1_DM              /*!<@brief Routed pin name */
+#define BOARD_INITUSBPINS_USB1_DM_PERIPHERAL USBHSH				/*!<@brief Peripheral name */
+#define BOARD_INITUSBPINS_USB1_DM_SIGNAL USB_DM					/*!<@brief Signal name */
+#define BOARD_INITUSBPINS_USB1_DM_PIN_NAME USB1_DM				/*!<@brief Routed pin name */
 #define BOARD_INITUSBPINS_USB1_DM_LABEL "P9[2]/D9[2]/USB1_HS_N" /*!<@brief Label */
-#define BOARD_INITUSBPINS_USB1_DM_NAME "USB1_DM"                /*!<@brief Identifier */
-                                                                /* @} */
+#define BOARD_INITUSBPINS_USB1_DM_NAME "USB1_DM"				/*!<@brief Identifier */
+																/* @} */
 
 /*! @name USB1_DP (number 34), P9[3]/D9[3]/USB1_HS_P
   @{ */
 /* Routed pin properties */
-#define BOARD_INITUSBPINS_USB1_DP_PERIPHERAL USBHSH             /*!<@brief Peripheral name */
-#define BOARD_INITUSBPINS_USB1_DP_SIGNAL USB_DP                 /*!<@brief Signal name */
-#define BOARD_INITUSBPINS_USB1_DP_PIN_NAME USB1_DP              /*!<@brief Routed pin name */
+#define BOARD_INITUSBPINS_USB1_DP_PERIPHERAL USBHSH				/*!<@brief Peripheral name */
+#define BOARD_INITUSBPINS_USB1_DP_SIGNAL USB_DP					/*!<@brief Signal name */
+#define BOARD_INITUSBPINS_USB1_DP_PIN_NAME USB1_DP				/*!<@brief Routed pin name */
 #define BOARD_INITUSBPINS_USB1_DP_LABEL "P9[3]/D9[3]/USB1_HS_P" /*!<@brief Label */
-#define BOARD_INITUSBPINS_USB1_DP_NAME "USB1_DP"                /*!<@brief Identifier */
-                                                                /* @} */
+#define BOARD_INITUSBPINS_USB1_DP_NAME "USB1_DP"				/*!<@brief Identifier */
+																/* @} */
 
 /*! @name USB1_VBUS (number 36), P9[1]/USB1_VBUS
   @{ */
 /* Routed pin properties */
-#define BOARD_INITUSBPINS_USB1_VBUS_PERIPHERAL USBHSH       /*!<@brief Peripheral name */
-#define BOARD_INITUSBPINS_USB1_VBUS_SIGNAL USB_VBUS         /*!<@brief Signal name */
-#define BOARD_INITUSBPINS_USB1_VBUS_PIN_NAME USB1_VBUS      /*!<@brief Routed pin name */
+#define BOARD_INITUSBPINS_USB1_VBUS_PERIPHERAL USBHSH		/*!<@brief Peripheral name */
+#define BOARD_INITUSBPINS_USB1_VBUS_SIGNAL USB_VBUS			/*!<@brief Signal name */
+#define BOARD_INITUSBPINS_USB1_VBUS_PIN_NAME USB1_VBUS		/*!<@brief Routed pin name */
 #define BOARD_INITUSBPINS_USB1_VBUS_LABEL "P9[1]/USB1_VBUS" /*!<@brief Label */
-#define BOARD_INITUSBPINS_USB1_VBUS_NAME "USB1_VBUS"        /*!<@brief Identifier */
-                                                            /* @} */
+#define BOARD_INITUSBPINS_USB1_VBUS_NAME "USB1_VBUS"		/*!<@brief Identifier */
+															/* @} */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
@@ -298,52 +301,53 @@ void BOARD_InitSWD_DEBUGPins(void); /* Function assigned for the Cortex-M33 (Cor
  */
 void BOARD_InitUSBPins(void); /* Function assigned for the Cortex-M33 (Core #0) */
 
-#define IOCON_PIO_DIGITAL_EN 0x0100u  /*!<@brief Enables digital function */
-#define IOCON_PIO_FUNC0 0x00u         /*!<@brief Selects pin function 0 */
-#define IOCON_PIO_INV_DI 0x00u        /*!<@brief Input function is not inverted */
-#define IOCON_PIO_MODE_PULLUP 0x20u   /*!<@brief Selects pull-up function */
-#define IOCON_PIO_OPENDRAIN_DI 0x00u  /*!<@brief Open drain is disabled */
-#define IOCON_PIO_SLEW_STANDARD 0x00u /*!<@brief Standard mode, output slew rate control is enabled */
+#define IOCON_PIO_DIGITAL_EN 0x0100u /*!<@brief Enables digital function */
+#define IOCON_PIO_FUNC0 0x00u		 /*!<@brief Selects pin function 0 */
+#define IOCON_PIO_INV_DI 0x00u		 /*!<@brief Input function is not inverted */
+#define IOCON_PIO_MODE_PULLUP 0x20u	 /*!<@brief Selects pull-up function */
+#define IOCON_PIO_OPENDRAIN_DI 0x00u /*!<@brief Open drain is disabled */
+#define IOCON_PIO_SLEW_STANDARD                                                                    \
+	0x00u /*!<@brief Standard mode, output slew rate control is enabled */
 
 /*! @name PIO1_4 (number 1), R78/P18[5]/LEDR/PWM_ARD
   @{ */
 /* Routed pin properties */
-#define BOARD_INITLEDSPINS_LED_BULE_PERIPHERAL GPIO                    /*!<@brief Peripheral name */
-#define BOARD_INITLEDSPINS_LED_BULE_SIGNAL PIO1                        /*!<@brief Signal name */
-#define BOARD_INITLEDSPINS_LED_BULE_CHANNEL 4                          /*!<@brief Signal channel */
-#define BOARD_INITLEDSPINS_LED_BULE_PIN_NAME PIO1_4                    /*!<@brief Routed pin name */
-#define BOARD_INITLEDSPINS_LED_BULE_LABEL "R78/P18[5]/LEDR/PWM_ARD"    /*!<@brief Label */
-#define BOARD_INITLEDSPINS_LED_BULE_NAME "LED_BULE"                    /*!<@brief Identifier */
+#define BOARD_INITLEDSPINS_LED_BULE_PERIPHERAL GPIO					   /*!<@brief Peripheral name */
+#define BOARD_INITLEDSPINS_LED_BULE_SIGNAL PIO1						   /*!<@brief Signal name */
+#define BOARD_INITLEDSPINS_LED_BULE_CHANNEL 4						   /*!<@brief Signal channel */
+#define BOARD_INITLEDSPINS_LED_BULE_PIN_NAME PIO1_4					   /*!<@brief Routed pin name */
+#define BOARD_INITLEDSPINS_LED_BULE_LABEL "R78/P18[5]/LEDR/PWM_ARD"	   /*!<@brief Label */
+#define BOARD_INITLEDSPINS_LED_BULE_NAME "LED_BULE"					   /*!<@brief Identifier */
 #define BOARD_INITLEDSPINS_LED_BULE_DIRECTION kPIN_MUX_DirectionOutput /*!<@brief Direction */
 
 /* Symbols to be used with GPIO driver */
-#define BOARD_INITLEDSPINS_LED_BULE_GPIO GPIO                          /*!<@brief GPIO peripheral base pointer */
-#define BOARD_INITLEDSPINS_LED_BULE_GPIO_PIN 4U                        /*!<@brief GPIO pin number */
-#define BOARD_INITLEDSPINS_LED_BULE_GPIO_PIN_MASK (1U << 4U)           /*!<@brief GPIO pin mask */
-#define BOARD_INITLEDSPINS_LED_BULE_PORT 1U                            /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITLEDSPINS_LED_BULE_PIN 4U                             /*!<@brief PORT pin number */
-#define BOARD_INITLEDSPINS_LED_BULE_PIN_MASK (1U << 4U)                /*!<@brief PORT pin mask */
-                                                                       /* @} */
+#define BOARD_INITLEDSPINS_LED_BULE_GPIO GPIO	/*!<@brief GPIO peripheral base pointer */
+#define BOARD_INITLEDSPINS_LED_BULE_GPIO_PIN 4U /*!<@brief GPIO pin number */
+#define BOARD_INITLEDSPINS_LED_BULE_GPIO_PIN_MASK (1U << 4U) /*!<@brief GPIO pin mask */
+#define BOARD_INITLEDSPINS_LED_BULE_PORT 1U				/*!<@brief PORT peripheral base pointer */
+#define BOARD_INITLEDSPINS_LED_BULE_PIN 4U				/*!<@brief PORT pin number */
+#define BOARD_INITLEDSPINS_LED_BULE_PIN_MASK (1U << 4U) /*!<@brief PORT pin mask */
+														/* @} */
 
 /*! @name PIO1_6 (number 5), R80/P18[9]/LEDB/PWM_ARD
   @{ */
 /* Routed pin properties */
-#define BOARD_INITLEDSPINS_LED_RED_PERIPHERAL GPIO                    /*!<@brief Peripheral name */
-#define BOARD_INITLEDSPINS_LED_RED_SIGNAL PIO1                        /*!<@brief Signal name */
-#define BOARD_INITLEDSPINS_LED_RED_CHANNEL 6                          /*!<@brief Signal channel */
-#define BOARD_INITLEDSPINS_LED_RED_PIN_NAME PIO1_6                    /*!<@brief Routed pin name */
-#define BOARD_INITLEDSPINS_LED_RED_LABEL "R80/P18[9]/LEDB/PWM_ARD"    /*!<@brief Label */
-#define BOARD_INITLEDSPINS_LED_RED_NAME "LED_RED"                     /*!<@brief Identifier */
+#define BOARD_INITLEDSPINS_LED_RED_PERIPHERAL GPIO					  /*!<@brief Peripheral name */
+#define BOARD_INITLEDSPINS_LED_RED_SIGNAL PIO1						  /*!<@brief Signal name */
+#define BOARD_INITLEDSPINS_LED_RED_CHANNEL 6						  /*!<@brief Signal channel */
+#define BOARD_INITLEDSPINS_LED_RED_PIN_NAME PIO1_6					  /*!<@brief Routed pin name */
+#define BOARD_INITLEDSPINS_LED_RED_LABEL "R80/P18[9]/LEDB/PWM_ARD"	  /*!<@brief Label */
+#define BOARD_INITLEDSPINS_LED_RED_NAME "LED_RED"					  /*!<@brief Identifier */
 #define BOARD_INITLEDSPINS_LED_RED_DIRECTION kPIN_MUX_DirectionOutput /*!<@brief Direction */
 
 /* Symbols to be used with GPIO driver */
-#define BOARD_INITLEDSPINS_LED_RED_GPIO GPIO                          /*!<@brief GPIO peripheral base pointer */
-#define BOARD_INITLEDSPINS_LED_RED_GPIO_PIN 6U                        /*!<@brief GPIO pin number */
-#define BOARD_INITLEDSPINS_LED_RED_GPIO_PIN_MASK (1U << 6U)           /*!<@brief GPIO pin mask */
-#define BOARD_INITLEDSPINS_LED_RED_PORT 1U                            /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITLEDSPINS_LED_RED_PIN 6U                             /*!<@brief PORT pin number */
-#define BOARD_INITLEDSPINS_LED_RED_PIN_MASK (1U << 6U)                /*!<@brief PORT pin mask */
-                                                                      /* @} */
+#define BOARD_INITLEDSPINS_LED_RED_GPIO GPIO   /*!<@brief GPIO peripheral base pointer */
+#define BOARD_INITLEDSPINS_LED_RED_GPIO_PIN 6U /*!<@brief GPIO pin number */
+#define BOARD_INITLEDSPINS_LED_RED_GPIO_PIN_MASK (1U << 6U) /*!<@brief GPIO pin mask */
+#define BOARD_INITLEDSPINS_LED_RED_PORT 1U			   /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITLEDSPINS_LED_RED_PIN 6U			   /*!<@brief PORT pin number */
+#define BOARD_INITLEDSPINS_LED_RED_PIN_MASK (1U << 6U) /*!<@brief PORT pin mask */
+													   /* @} */
 
 /*! @name PIO1_7 (number 9), R79/P18[7]/LEDG/PWM_ARD
   @{ */
@@ -397,14 +401,16 @@ void BOARD_InitUSBPins(void); /* Function assigned for the Cortex-M33 (Core #0) 
  */
 void BOARD_InitLEDsPins(void); /* Function assigned for the Cortex-M33 (Core #0) */
 
-#define IOCON_PIO_ASW_DIS_EN 0x00u    /*!<@brief Analog switch is closed (enabled), only for A0 version */
-#define IOCON_PIO_ASW_EN 0x0400u      /*!<@brief Analog switch is closed (enabled) */
-#define IOCON_PIO_DIGITAL_EN 0x0100u  /*!<@brief Enables digital function */
-#define IOCON_PIO_FUNC0 0x00u         /*!<@brief Selects pin function 0 */
-#define IOCON_PIO_INV_DI 0x00u        /*!<@brief Input function is not inverted */
-#define IOCON_PIO_MODE_PULLUP 0x20u   /*!<@brief Selects pull-up function */
-#define IOCON_PIO_OPENDRAIN_DI 0x00u  /*!<@brief Open drain is disabled */
-#define IOCON_PIO_SLEW_STANDARD 0x00u /*!<@brief Standard mode, output slew rate control is enabled */
+#define IOCON_PIO_ASW_DIS_EN                                                                       \
+	0x00u /*!<@brief Analog switch is closed (enabled), only for A0 version */
+#define IOCON_PIO_ASW_EN 0x0400u	 /*!<@brief Analog switch is closed (enabled) */
+#define IOCON_PIO_DIGITAL_EN 0x0100u /*!<@brief Enables digital function */
+#define IOCON_PIO_FUNC0 0x00u		 /*!<@brief Selects pin function 0 */
+#define IOCON_PIO_INV_DI 0x00u		 /*!<@brief Input function is not inverted */
+#define IOCON_PIO_MODE_PULLUP 0x20u	 /*!<@brief Selects pull-up function */
+#define IOCON_PIO_OPENDRAIN_DI 0x00u /*!<@brief Open drain is disabled */
+#define IOCON_PIO_SLEW_STANDARD                                                                    \
+	0x00u /*!<@brief Standard mode, output slew rate control is enabled */
 
 /*! @name PIO0_5 (number 88), S1/J10[1]/U3[12]/P17[8]/P7[7]/U11[4]/P0_5-ISP1
   @{ */
@@ -455,42 +461,42 @@ void BOARD_InitLEDsPins(void); /* Function assigned for the Cortex-M33 (Core #0)
 /*! @name PIO1_18 (number 64), S2/P18[16]/P24[2]/WAKE/GPIO
   @{ */
 /* Routed pin properties */
-#define BOARD_INITBUTTONSPINS_S2_PERIPHERAL GPIO                     /*!<@brief Peripheral name */
-#define BOARD_INITBUTTONSPINS_S2_SIGNAL PIO1                         /*!<@brief Signal name */
-#define BOARD_INITBUTTONSPINS_S2_CHANNEL 18                          /*!<@brief Signal channel */
-#define BOARD_INITBUTTONSPINS_S2_PIN_NAME PIO1_18                    /*!<@brief Routed pin name */
+#define BOARD_INITBUTTONSPINS_S2_PERIPHERAL GPIO					 /*!<@brief Peripheral name */
+#define BOARD_INITBUTTONSPINS_S2_SIGNAL PIO1						 /*!<@brief Signal name */
+#define BOARD_INITBUTTONSPINS_S2_CHANNEL 18							 /*!<@brief Signal channel */
+#define BOARD_INITBUTTONSPINS_S2_PIN_NAME PIO1_18					 /*!<@brief Routed pin name */
 #define BOARD_INITBUTTONSPINS_S2_LABEL "S2/P18[16]/P24[2]/WAKE/GPIO" /*!<@brief Label */
-#define BOARD_INITBUTTONSPINS_S2_NAME "S2"                           /*!<@brief Identifier */
-#define BOARD_INITBUTTONSPINS_S2_DIRECTION kPIN_MUX_DirectionInput   /*!<@brief Direction */
+#define BOARD_INITBUTTONSPINS_S2_NAME "S2"							 /*!<@brief Identifier */
+#define BOARD_INITBUTTONSPINS_S2_DIRECTION kPIN_MUX_DirectionInput	 /*!<@brief Direction */
 
 /* Symbols to be used with GPIO driver */
-#define BOARD_INITBUTTONSPINS_S2_GPIO GPIO                           /*!<@brief GPIO peripheral base pointer */
-#define BOARD_INITBUTTONSPINS_S2_GPIO_PIN 18U                        /*!<@brief GPIO pin number */
-#define BOARD_INITBUTTONSPINS_S2_GPIO_PIN_MASK (1U << 18U)           /*!<@brief GPIO pin mask */
-#define BOARD_INITBUTTONSPINS_S2_PORT 1U                             /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITBUTTONSPINS_S2_PIN 18U                             /*!<@brief PORT pin number */
-#define BOARD_INITBUTTONSPINS_S2_PIN_MASK (1U << 18U)                /*!<@brief PORT pin mask */
-                                                                     /* @} */
+#define BOARD_INITBUTTONSPINS_S2_GPIO GPIO	  /*!<@brief GPIO peripheral base pointer */
+#define BOARD_INITBUTTONSPINS_S2_GPIO_PIN 18U /*!<@brief GPIO pin number */
+#define BOARD_INITBUTTONSPINS_S2_GPIO_PIN_MASK (1U << 18U) /*!<@brief GPIO pin mask */
+#define BOARD_INITBUTTONSPINS_S2_PORT 1U			  /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITBUTTONSPINS_S2_PIN 18U			  /*!<@brief PORT pin number */
+#define BOARD_INITBUTTONSPINS_S2_PIN_MASK (1U << 18U) /*!<@brief PORT pin mask */
+													  /* @} */
 
 /*! @name PIO1_9 (number 10), S3/P18[1]/PIO1_9_GPIO_ARD
   @{ */
 /* Routed pin properties */
-#define BOARD_INITBUTTONSPINS_S3_PERIPHERAL GPIO                   /*!<@brief Peripheral name */
-#define BOARD_INITBUTTONSPINS_S3_SIGNAL PIO1                       /*!<@brief Signal name */
-#define BOARD_INITBUTTONSPINS_S3_CHANNEL 9                         /*!<@brief Signal channel */
-#define BOARD_INITBUTTONSPINS_S3_PIN_NAME PIO1_9                   /*!<@brief Routed pin name */
+#define BOARD_INITBUTTONSPINS_S3_PERIPHERAL GPIO				   /*!<@brief Peripheral name */
+#define BOARD_INITBUTTONSPINS_S3_SIGNAL PIO1					   /*!<@brief Signal name */
+#define BOARD_INITBUTTONSPINS_S3_CHANNEL 9						   /*!<@brief Signal channel */
+#define BOARD_INITBUTTONSPINS_S3_PIN_NAME PIO1_9				   /*!<@brief Routed pin name */
 #define BOARD_INITBUTTONSPINS_S3_LABEL "S3/P18[1]/PIO1_9_GPIO_ARD" /*!<@brief Label */
-#define BOARD_INITBUTTONSPINS_S3_NAME "S3"                         /*!<@brief Identifier */
+#define BOARD_INITBUTTONSPINS_S3_NAME "S3"						   /*!<@brief Identifier */
 #define BOARD_INITBUTTONSPINS_S3_DIRECTION kPIN_MUX_DirectionInput /*!<@brief Direction */
 
 /* Symbols to be used with GPIO driver */
-#define BOARD_INITBUTTONSPINS_S3_GPIO GPIO                         /*!<@brief GPIO peripheral base pointer */
-#define BOARD_INITBUTTONSPINS_S3_GPIO_PIN 9U                       /*!<@brief GPIO pin number */
-#define BOARD_INITBUTTONSPINS_S3_GPIO_PIN_MASK (1U << 9U)          /*!<@brief GPIO pin mask */
-#define BOARD_INITBUTTONSPINS_S3_PORT 1U                           /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITBUTTONSPINS_S3_PIN 9U                            /*!<@brief PORT pin number */
-#define BOARD_INITBUTTONSPINS_S3_PIN_MASK (1U << 9U)               /*!<@brief PORT pin mask */
-                                                                   /* @} */
+#define BOARD_INITBUTTONSPINS_S3_GPIO GPIO				  /*!<@brief GPIO peripheral base pointer */
+#define BOARD_INITBUTTONSPINS_S3_GPIO_PIN 9U			  /*!<@brief GPIO pin number */
+#define BOARD_INITBUTTONSPINS_S3_GPIO_PIN_MASK (1U << 9U) /*!<@brief GPIO pin mask */
+#define BOARD_INITBUTTONSPINS_S3_PORT 1U				  /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITBUTTONSPINS_S3_PIN 9U					  /*!<@brief PORT pin number */
+#define BOARD_INITBUTTONSPINS_S3_PIN_MASK (1U << 9U)	  /*!<@brief PORT pin mask */
+														  /* @} */
 
 /*! @name RESETN (number 32), S4/P16[10]/P23[2]/U14[8]/RESETN
   @{ */
@@ -518,17 +524,18 @@ void BOARD_InitLEDsPins(void); /* Function assigned for the Cortex-M33 (Core #0)
  */
 void BOARD_InitBUTTONsPins(void); /* Function assigned for the Cortex-M33 (Core #0) */
 
-#define IOCON_PIO_ASW_EN 0x0400u      /*!<@brief Analog switch is closed (enabled) */
-#define IOCON_PIO_DIGITAL_EN 0x0100u  /*!<@brief Enables digital function */
-#define IOCON_PIO_FUNC1 0x01u         /*!<@brief Selects pin function 1 */
-#define IOCON_PIO_FUNC2 0x02u         /*!<@brief Selects pin function 2 */
-#define IOCON_PIO_FUNC5 0x05u         /*!<@brief Selects pin function 5 */
-#define IOCON_PIO_FUNC7 0x07u         /*!<@brief Selects pin function 7 */
-#define IOCON_PIO_INV_DI 0x00u        /*!<@brief Input function is not inverted */
-#define IOCON_PIO_MODE_INACT 0x00u    /*!<@brief No addition pin function */
-#define IOCON_PIO_MODE_PULLUP 0x20u   /*!<@brief Selects pull-up function */
-#define IOCON_PIO_OPENDRAIN_DI 0x00u  /*!<@brief Open drain is disabled */
-#define IOCON_PIO_SLEW_STANDARD 0x00u /*!<@brief Standard mode, output slew rate control is enabled */
+#define IOCON_PIO_ASW_EN 0x0400u	 /*!<@brief Analog switch is closed (enabled) */
+#define IOCON_PIO_DIGITAL_EN 0x0100u /*!<@brief Enables digital function */
+#define IOCON_PIO_FUNC1 0x01u		 /*!<@brief Selects pin function 1 */
+#define IOCON_PIO_FUNC2 0x02u		 /*!<@brief Selects pin function 2 */
+#define IOCON_PIO_FUNC5 0x05u		 /*!<@brief Selects pin function 5 */
+#define IOCON_PIO_FUNC7 0x07u		 /*!<@brief Selects pin function 7 */
+#define IOCON_PIO_INV_DI 0x00u		 /*!<@brief Input function is not inverted */
+#define IOCON_PIO_MODE_INACT 0x00u	 /*!<@brief No addition pin function */
+#define IOCON_PIO_MODE_PULLUP 0x20u	 /*!<@brief Selects pull-up function */
+#define IOCON_PIO_OPENDRAIN_DI 0x00u /*!<@brief Open drain is disabled */
+#define IOCON_PIO_SLEW_STANDARD                                                                    \
+	0x00u /*!<@brief Standard mode, output slew rate control is enabled */
 
 /*! @name PIO1_20 (number 4), P17[1]/P24[5]/FC4_I2C_SCL_ARD
   @{ */
@@ -591,93 +598,93 @@ void BOARD_InitBUTTONsPins(void); /* Function assigned for the Cortex-M33 (Core 
 /*! @name PIO1_31 (number 91), P19[7]/P19[8]/PLU_IN0/GPIO
   @{ */
 /* Routed pin properties */
-#define BOARD_INITI2SPINS_MCLK_PERIPHERAL SYSCON                  /*!<@brief Peripheral name */
-#define BOARD_INITI2SPINS_MCLK_SIGNAL MCLK                        /*!<@brief Signal name */
-#define BOARD_INITI2SPINS_MCLK_PIN_NAME MCLK                      /*!<@brief Routed pin name */
+#define BOARD_INITI2SPINS_MCLK_PERIPHERAL SYSCON				  /*!<@brief Peripheral name */
+#define BOARD_INITI2SPINS_MCLK_SIGNAL MCLK						  /*!<@brief Signal name */
+#define BOARD_INITI2SPINS_MCLK_PIN_NAME MCLK					  /*!<@brief Routed pin name */
 #define BOARD_INITI2SPINS_MCLK_LABEL "P19[7]/P19[8]/PLU_IN0/GPIO" /*!<@brief Label */
-#define BOARD_INITI2SPINS_MCLK_NAME "MCLK"                        /*!<@brief Identifier */
-#define BOARD_INITI2SPINS_MCLK_PORT 1U                            /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITI2SPINS_MCLK_PIN 31U                            /*!<@brief PORT pin number */
-#define BOARD_INITI2SPINS_MCLK_PIN_MASK (1U << 31U)               /*!<@brief PORT pin mask */
-                                                                  /* @} */
+#define BOARD_INITI2SPINS_MCLK_NAME "MCLK"						  /*!<@brief Identifier */
+#define BOARD_INITI2SPINS_MCLK_PORT 1U				/*!<@brief PORT peripheral base pointer */
+#define BOARD_INITI2SPINS_MCLK_PIN 31U				/*!<@brief PORT pin number */
+#define BOARD_INITI2SPINS_MCLK_PIN_MASK (1U << 31U) /*!<@brief PORT pin mask */
+													/* @} */
 
 /*! @name PIO0_21 (number 76), P17[14]/FC7_I2S_SCK
   @{ */
 /* Routed pin properties */
-#define BOARD_INITI2SPINS_FC7_I2S_SCK_PERIPHERAL FLEXCOMM7        /*!<@brief Peripheral name */
-#define BOARD_INITI2SPINS_FC7_I2S_SCK_SIGNAL SCK                  /*!<@brief Signal name */
-#define BOARD_INITI2SPINS_FC7_I2S_SCK_PIN_NAME FC7_SCK            /*!<@brief Routed pin name */
+#define BOARD_INITI2SPINS_FC7_I2S_SCK_PERIPHERAL FLEXCOMM7		  /*!<@brief Peripheral name */
+#define BOARD_INITI2SPINS_FC7_I2S_SCK_SIGNAL SCK				  /*!<@brief Signal name */
+#define BOARD_INITI2SPINS_FC7_I2S_SCK_PIN_NAME FC7_SCK			  /*!<@brief Routed pin name */
 #define BOARD_INITI2SPINS_FC7_I2S_SCK_LABEL "P17[14]/FC7_I2S_SCK" /*!<@brief Label */
-#define BOARD_INITI2SPINS_FC7_I2S_SCK_NAME "FC7_I2S_SCK"          /*!<@brief Identifier */
-#define BOARD_INITI2SPINS_FC7_I2S_SCK_PORT 0U                     /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITI2SPINS_FC7_I2S_SCK_PIN 21U                     /*!<@brief PORT pin number */
-#define BOARD_INITI2SPINS_FC7_I2S_SCK_PIN_MASK (1U << 21U)        /*!<@brief PORT pin mask */
-                                                                  /* @} */
+#define BOARD_INITI2SPINS_FC7_I2S_SCK_NAME "FC7_I2S_SCK"		  /*!<@brief Identifier */
+#define BOARD_INITI2SPINS_FC7_I2S_SCK_PORT 0U /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITI2SPINS_FC7_I2S_SCK_PIN 21U /*!<@brief PORT pin number */
+#define BOARD_INITI2SPINS_FC7_I2S_SCK_PIN_MASK (1U << 21U) /*!<@brief PORT pin mask */
+														   /* @} */
 
 /*! @name PIO0_20 (number 74), P17[10]/FC7_I2S_TX
   @{ */
 /* Routed pin properties */
-#define BOARD_INITI2SPINS_FC7_I2S_TX_PERIPHERAL FLEXCOMM7           /*!<@brief Peripheral name */
-#define BOARD_INITI2SPINS_FC7_I2S_TX_SIGNAL RXD_SDA_MOSI_DATA       /*!<@brief Signal name */
+#define BOARD_INITI2SPINS_FC7_I2S_TX_PERIPHERAL FLEXCOMM7			/*!<@brief Peripheral name */
+#define BOARD_INITI2SPINS_FC7_I2S_TX_SIGNAL RXD_SDA_MOSI_DATA		/*!<@brief Signal name */
 #define BOARD_INITI2SPINS_FC7_I2S_TX_PIN_NAME FC7_RXD_SDA_MOSI_DATA /*!<@brief Routed pin name */
-#define BOARD_INITI2SPINS_FC7_I2S_TX_LABEL "P17[10]/FC7_I2S_TX"     /*!<@brief Label */
-#define BOARD_INITI2SPINS_FC7_I2S_TX_NAME "FC7_I2S_TX"              /*!<@brief Identifier */
-#define BOARD_INITI2SPINS_FC7_I2S_TX_PORT 0U                        /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITI2SPINS_FC7_I2S_TX_PIN 20U                        /*!<@brief PORT pin number */
-#define BOARD_INITI2SPINS_FC7_I2S_TX_PIN_MASK (1U << 20U)           /*!<@brief PORT pin mask */
-                                                                    /* @} */
+#define BOARD_INITI2SPINS_FC7_I2S_TX_LABEL "P17[10]/FC7_I2S_TX"		/*!<@brief Label */
+#define BOARD_INITI2SPINS_FC7_I2S_TX_NAME "FC7_I2S_TX"				/*!<@brief Identifier */
+#define BOARD_INITI2SPINS_FC7_I2S_TX_PORT 0U			  /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITI2SPINS_FC7_I2S_TX_PIN 20U			  /*!<@brief PORT pin number */
+#define BOARD_INITI2SPINS_FC7_I2S_TX_PIN_MASK (1U << 20U) /*!<@brief PORT pin mask */
+														  /* @} */
 
 /*! @name PIO0_19 (number 90), P17[12]/FC7_I2S_WS
   @{ */
 /* Routed pin properties */
-#define BOARD_INITI2SPINS_FC7_I2S_WS_PERIPHERAL FLEXCOMM7         /*!<@brief Peripheral name */
-#define BOARD_INITI2SPINS_FC7_I2S_WS_SIGNAL TXD_SCL_MISO_WS       /*!<@brief Signal name */
+#define BOARD_INITI2SPINS_FC7_I2S_WS_PERIPHERAL FLEXCOMM7		  /*!<@brief Peripheral name */
+#define BOARD_INITI2SPINS_FC7_I2S_WS_SIGNAL TXD_SCL_MISO_WS		  /*!<@brief Signal name */
 #define BOARD_INITI2SPINS_FC7_I2S_WS_PIN_NAME FC7_TXD_SCL_MISO_WS /*!<@brief Routed pin name */
-#define BOARD_INITI2SPINS_FC7_I2S_WS_LABEL "P17[12]/FC7_I2S_WS"   /*!<@brief Label */
-#define BOARD_INITI2SPINS_FC7_I2S_WS_NAME "FC7_I2S_WS"            /*!<@brief Identifier */
-#define BOARD_INITI2SPINS_FC7_I2S_WS_PORT 0U                      /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITI2SPINS_FC7_I2S_WS_PIN 19U                      /*!<@brief PORT pin number */
-#define BOARD_INITI2SPINS_FC7_I2S_WS_PIN_MASK (1U << 19U)         /*!<@brief PORT pin mask */
-                                                                  /* @} */
+#define BOARD_INITI2SPINS_FC7_I2S_WS_LABEL "P17[12]/FC7_I2S_WS"	  /*!<@brief Label */
+#define BOARD_INITI2SPINS_FC7_I2S_WS_NAME "FC7_I2S_WS"			  /*!<@brief Identifier */
+#define BOARD_INITI2SPINS_FC7_I2S_WS_PORT 0U			  /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITI2SPINS_FC7_I2S_WS_PIN 19U			  /*!<@brief PORT pin number */
+#define BOARD_INITI2SPINS_FC7_I2S_WS_PIN_MASK (1U << 19U) /*!<@brief PORT pin mask */
+														  /* @} */
 
 /*! @name PIO0_10 (number 21), U14[12]/SWO_TRGT
   @{ */
 /* Routed pin properties */
-#define BOARD_INITI2SPINS_FC6_I2S_CLK_PERIPHERAL FLEXCOMM6      /*!<@brief Peripheral name */
-#define BOARD_INITI2SPINS_FC6_I2S_CLK_SIGNAL SCK                /*!<@brief Signal name */
-#define BOARD_INITI2SPINS_FC6_I2S_CLK_PIN_NAME FC6_SCK          /*!<@brief Routed pin name */
-#define BOARD_INITI2SPINS_FC6_I2S_CLK_LABEL "U14[12]/SWO_TRGT"  /*!<@brief Label */
-#define BOARD_INITI2SPINS_FC6_I2S_CLK_NAME "FC6_I2S_CLK"        /*!<@brief Identifier */
-#define BOARD_INITI2SPINS_FC6_I2S_CLK_PORT 0U                   /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITI2SPINS_FC6_I2S_CLK_PIN 10U                   /*!<@brief PORT pin number */
-#define BOARD_INITI2SPINS_FC6_I2S_CLK_PIN_MASK (1U << 10U)      /*!<@brief PORT pin mask */
-                                                                /* @} */
+#define BOARD_INITI2SPINS_FC6_I2S_CLK_PERIPHERAL FLEXCOMM6	   /*!<@brief Peripheral name */
+#define BOARD_INITI2SPINS_FC6_I2S_CLK_SIGNAL SCK			   /*!<@brief Signal name */
+#define BOARD_INITI2SPINS_FC6_I2S_CLK_PIN_NAME FC6_SCK		   /*!<@brief Routed pin name */
+#define BOARD_INITI2SPINS_FC6_I2S_CLK_LABEL "U14[12]/SWO_TRGT" /*!<@brief Label */
+#define BOARD_INITI2SPINS_FC6_I2S_CLK_NAME "FC6_I2S_CLK"	   /*!<@brief Identifier */
+#define BOARD_INITI2SPINS_FC6_I2S_CLK_PORT 0U /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITI2SPINS_FC6_I2S_CLK_PIN 10U /*!<@brief PORT pin number */
+#define BOARD_INITI2SPINS_FC6_I2S_CLK_PIN_MASK (1U << 10U) /*!<@brief PORT pin mask */
+														   /* @} */
 
 /*! @name PIO1_13 (number 2), P17[20]/FC6_I2S_RX
   @{ */
 /* Routed pin properties */
-#define BOARD_INITI2SPINS_FC6_I2S_RX_PERIPHERAL FLEXCOMM6           /*!<@brief Peripheral name */
-#define BOARD_INITI2SPINS_FC6_I2S_RX_SIGNAL RXD_SDA_MOSI_DATA       /*!<@brief Signal name */
+#define BOARD_INITI2SPINS_FC6_I2S_RX_PERIPHERAL FLEXCOMM6			/*!<@brief Peripheral name */
+#define BOARD_INITI2SPINS_FC6_I2S_RX_SIGNAL RXD_SDA_MOSI_DATA		/*!<@brief Signal name */
 #define BOARD_INITI2SPINS_FC6_I2S_RX_PIN_NAME FC6_RXD_SDA_MOSI_DATA /*!<@brief Routed pin name */
-#define BOARD_INITI2SPINS_FC6_I2S_RX_LABEL "P17[20]/FC6_I2S_RX"     /*!<@brief Label */
-#define BOARD_INITI2SPINS_FC6_I2S_RX_NAME "FC6_I2S_RX"              /*!<@brief Identifier */
-#define BOARD_INITI2SPINS_FC6_I2S_RX_PORT 1U                        /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITI2SPINS_FC6_I2S_RX_PIN 13U                        /*!<@brief PORT pin number */
-#define BOARD_INITI2SPINS_FC6_I2S_RX_PIN_MASK (1U << 13U)           /*!<@brief PORT pin mask */
-                                                                    /* @} */
+#define BOARD_INITI2SPINS_FC6_I2S_RX_LABEL "P17[20]/FC6_I2S_RX"		/*!<@brief Label */
+#define BOARD_INITI2SPINS_FC6_I2S_RX_NAME "FC6_I2S_RX"				/*!<@brief Identifier */
+#define BOARD_INITI2SPINS_FC6_I2S_RX_PORT 1U			  /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITI2SPINS_FC6_I2S_RX_PIN 13U			  /*!<@brief PORT pin number */
+#define BOARD_INITI2SPINS_FC6_I2S_RX_PIN_MASK (1U << 13U) /*!<@brief PORT pin mask */
+														  /* @} */
 
 /*! @name PIO1_16 (number 87), P18[17]/SD1_PWR_EN
   @{ */
 /* Routed pin properties */
-#define BOARD_INITI2SPINS_FC6_I2S_WS_PERIPHERAL FLEXCOMM6         /*!<@brief Peripheral name */
-#define BOARD_INITI2SPINS_FC6_I2S_WS_SIGNAL TXD_SCL_MISO_WS       /*!<@brief Signal name */
+#define BOARD_INITI2SPINS_FC6_I2S_WS_PERIPHERAL FLEXCOMM6		  /*!<@brief Peripheral name */
+#define BOARD_INITI2SPINS_FC6_I2S_WS_SIGNAL TXD_SCL_MISO_WS		  /*!<@brief Signal name */
 #define BOARD_INITI2SPINS_FC6_I2S_WS_PIN_NAME FC6_TXD_SCL_MISO_WS /*!<@brief Routed pin name */
-#define BOARD_INITI2SPINS_FC6_I2S_WS_LABEL "P18[17]/SD1_PWR_EN"   /*!<@brief Label */
-#define BOARD_INITI2SPINS_FC6_I2S_WS_NAME "FC6_I2S_WS"            /*!<@brief Identifier */
-#define BOARD_INITI2SPINS_FC6_I2S_WS_PORT 1U                      /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITI2SPINS_FC6_I2S_WS_PIN 16U                      /*!<@brief PORT pin number */
-#define BOARD_INITI2SPINS_FC6_I2S_WS_PIN_MASK (1U << 16U)         /*!<@brief PORT pin mask */
-                                                                  /* @} */
+#define BOARD_INITI2SPINS_FC6_I2S_WS_LABEL "P18[17]/SD1_PWR_EN"	  /*!<@brief Label */
+#define BOARD_INITI2SPINS_FC6_I2S_WS_NAME "FC6_I2S_WS"			  /*!<@brief Identifier */
+#define BOARD_INITI2SPINS_FC6_I2S_WS_PORT 1U			  /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITI2SPINS_FC6_I2S_WS_PIN 16U			  /*!<@brief PORT pin number */
+#define BOARD_INITI2SPINS_FC6_I2S_WS_PIN_MASK (1U << 16U) /*!<@brief PORT pin mask */
+														  /* @} */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
@@ -685,15 +692,16 @@ void BOARD_InitBUTTONsPins(void); /* Function assigned for the Cortex-M33 (Core 
  */
 void BOARD_InitI2SPins(void); /* Function assigned for the Cortex-M33 (Core #0) */
 
-#define IOCON_PIO_ASW_DI 0x00u        /*!<@brief Analog switch is open (disabled) */
-#define IOCON_PIO_DIGITAL_EN 0x0100u  /*!<@brief Enables digital function */
-#define IOCON_PIO_FUNC0 0x00u         /*!<@brief Selects pin function 0 */
-#define IOCON_PIO_FUNC5 0x05u         /*!<@brief Selects pin function 5 */
-#define IOCON_PIO_INV_DI 0x00u        /*!<@brief Input function is not inverted */
-#define IOCON_PIO_MODE_INACT 0x00u    /*!<@brief No addition pin function */
-#define IOCON_PIO_MODE_PULLUP 0x20u   /*!<@brief Selects pull-up function */
-#define IOCON_PIO_OPENDRAIN_DI 0x00u  /*!<@brief Open drain is disabled */
-#define IOCON_PIO_SLEW_STANDARD 0x00u /*!<@brief Standard mode, output slew rate control is enabled */
+#define IOCON_PIO_ASW_DI 0x00u		 /*!<@brief Analog switch is open (disabled) */
+#define IOCON_PIO_DIGITAL_EN 0x0100u /*!<@brief Enables digital function */
+#define IOCON_PIO_FUNC0 0x00u		 /*!<@brief Selects pin function 0 */
+#define IOCON_PIO_FUNC5 0x05u		 /*!<@brief Selects pin function 5 */
+#define IOCON_PIO_INV_DI 0x00u		 /*!<@brief Input function is not inverted */
+#define IOCON_PIO_MODE_INACT 0x00u	 /*!<@brief No addition pin function */
+#define IOCON_PIO_MODE_PULLUP 0x20u	 /*!<@brief Selects pull-up function */
+#define IOCON_PIO_OPENDRAIN_DI 0x00u /*!<@brief Open drain is disabled */
+#define IOCON_PIO_SLEW_STANDARD                                                                    \
+	0x00u /*!<@brief Standard mode, output slew rate control is enabled */
 
 /*! @name PIO1_21 (number 30), P17[3]/P24[6]/FC4_I2C_SDA_ARD
   @{ */

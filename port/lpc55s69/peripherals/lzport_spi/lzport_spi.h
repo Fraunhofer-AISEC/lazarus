@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-# pragma once
+#pragma once
 
 void lzport_spi_init(void);
 int8_t lzport_spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr);

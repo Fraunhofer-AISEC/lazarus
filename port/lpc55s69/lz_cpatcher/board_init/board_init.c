@@ -26,7 +26,7 @@
 // typedef for non-secure callback functions
 typedef void (*funcptr_ns)(void) __attribute__((cmse_nonsecure_call));
 
-void lzport_cpatcher_init_board (void)
+void lzport_cpatcher_init_board(void)
 {
 	// Init board hardware.
 	BOARD_InitBootPins();
