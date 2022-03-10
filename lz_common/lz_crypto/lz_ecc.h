@@ -41,7 +41,6 @@ typedef mbedtls_mpi lz_ecc_private_key;
  */
 int lz_derive_ecc_keypair(lz_ecc_keypair *pub, const void *seed, size_t seed_size);
 
-
 #if defined(MBEDTLS_PEM_WRITE_C)
 /**
  * Exports the public part of the lz_ecc_keypair to a lz_ecc_pub_key_pem. The key in the buffer is in pem format.

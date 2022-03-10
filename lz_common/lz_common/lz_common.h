@@ -31,7 +31,7 @@
  * Definitions
  *******************************************/
 
-#define FLASH_PAGE_SIZE	512
+#define FLASH_PAGE_SIZE 512
 
 #define LEN_NONCE (32)
 #define LEN_UUID_V4_BIN (16)

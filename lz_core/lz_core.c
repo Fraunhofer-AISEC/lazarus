@@ -371,7 +371,7 @@ LZ_RESULT lz_core_wipe_static_symm(void)
 
 	// Zero static_symm
 	secure_zero_memory(&config_data_cpy.static_symm_info.static_symm,
-		   sizeof(config_data_cpy.static_symm_info.static_symm));
+					   sizeof(config_data_cpy.static_symm_info.static_symm));
 
 	config_data_cpy.static_symm_info.magic = LZ_MAGIC;
 
@@ -456,7 +456,8 @@ LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, lz_ecc_keypair *alias
 
 	lz_ecc_pub_key_pem alias_keypair_pem;
 	lz_pub_key_to_pem(alias_keypair, &alias_keypair_pem);
-	if (lz_set_serial_number_cert(&info, (unsigned char*)&alias_keypair_pem, sizeof(alias_keypair_pem)) != 0) {
+	if (lz_set_serial_number_cert(&info, (unsigned char *)&alias_keypair_pem,
+								  sizeof(alias_keypair_pem)) != 0) {
 		dbgprint(DBG_ERR, "ERROR: lz_set_serial_number_cert failed.\n");
 		return LZ_ERROR;
 	}
@@ -465,7 +466,7 @@ LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, lz_ecc_keypair *alias
 
 	// Store DeviceID pubkey
 	// Write the public key to the cert_store
-	lz_pub_key_to_pem(device_id_keypair, (lz_ecc_pub_key_pem*)&lz_img_cert_store.info.dev_pub_key);
+	lz_pub_key_to_pem(device_id_keypair, (lz_ecc_pub_key_pem *)&lz_img_cert_store.info.dev_pub_key);
 
 	// Provide backend public key to upper layers
 	memcpy((void *)&lz_img_cert_store.info.management_pub_key,
@@ -645,7 +646,8 @@ LZ_RESULT lz_core_create_device_id_csr(bool first_boot, lz_ecc_keypair *device_i
 	info.subject.country = "DE";
 	info.subject.org = "Lazarus";
 
-	if (lz_set_serial_number_csr(&info, (unsigned char*)&ta_copy.info.dev_pub_key, sizeof(ta_copy.info.dev_pub_key)) != 0) {
+	if (lz_set_serial_number_csr(&info, (unsigned char *)&ta_copy.info.dev_pub_key,
+								 sizeof(ta_copy.info.dev_pub_key)) != 0) {
 		dbgprint(DBG_ERR, "ERROR: lz_set_serial_number_csr failed.\n");
 		return LZ_ERROR;
 	}
@@ -725,7 +727,8 @@ LZ_RESULT lz_core_erase_staging_area(void)
 bool lz_core_is_updated(lz_ecc_keypair *lz_dev_id_keypair)
 {
 	lz_ecc_keypair old_key;
-	if (lz_pem_to_pub_key(&old_key, (lz_ecc_pub_key_pem*)&lz_data_store.trust_anchors.info.dev_pub_key) != 0) {
+	if (lz_pem_to_pub_key(
+			&old_key, (lz_ecc_pub_key_pem *)&lz_data_store.trust_anchors.info.dev_pub_key) != 0) {
 		return 1;
 	}
 	int re = lz_compare_public_key(lz_keypair_to_public(&old_key),
@@ -804,9 +807,10 @@ LZ_RESULT lz_core_verify_staging_elem_hdr_sig(const lz_auth_hdr_t *hdr, uint8_t 
 		return LZ_ERROR;
 	}
 
-	if (lz_ecdsa_verify_pub_pem((uint8_t *)&hdr->content, sizeof(hdr->content),
-								(lz_ecc_pub_key_pem*)&lz_data_store.trust_anchors.info.management_pub_key,
-								&hdr->signature) != 0) {
+	if (lz_ecdsa_verify_pub_pem(
+			(uint8_t *)&hdr->content, sizeof(hdr->content),
+			(lz_ecc_pub_key_pem *)&lz_data_store.trust_anchors.info.management_pub_key,
+			&hdr->signature) != 0) {
 		dbgprint(DBG_ERR, "ERROR: GEN - Failed to verify staging element header signature\n");
 		return LZ_ERROR;
 	}

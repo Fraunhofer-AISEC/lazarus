@@ -44,7 +44,7 @@
 #define LTC_INSTANCE LTC0 /* LTC base register.*/
 
 #if FSL_FEATURE_LTC_HAS_SHA
-#define MBEDTLS_FREESCALE_LTC_SHA1   /* Enable use of LTC SHA.*/
+#define MBEDTLS_FREESCALE_LTC_SHA1	 /* Enable use of LTC SHA.*/
 #define MBEDTLS_FREESCALE_LTC_SHA256 /* Enable use of LTC SHA256.*/
 #endif
 #if defined(FSL_FEATURE_LTC_HAS_DES) && FSL_FEATURE_LTC_HAS_DES
@@ -64,11 +64,11 @@
 #if defined(FSL_FEATURE_SOC_MMCAU_COUNT) && (FSL_FEATURE_SOC_MMCAU_COUNT > 0)
 #include "fsl_mmcau.h"
 
-#define MBEDTLS_FREESCALE_MMCAU_MD5    /* Enable use of MMCAU MD5.*/
+#define MBEDTLS_FREESCALE_MMCAU_MD5	   /* Enable use of MMCAU MD5.*/
 #define MBEDTLS_FREESCALE_MMCAU_SHA1   /* Enable use of MMCAU SHA1.*/
 #define MBEDTLS_FREESCALE_MMCAU_SHA256 /* Enable use of MMCAU SHA256.*/
-#define MBEDTLS_FREESCALE_MMCAU_DES    /* Enable use of MMCAU DES, when LTC is disabled.*/
-#define MBEDTLS_FREESCALE_MMCAU_AES    /* Enable use of MMCAU AES, when LTC is disabled.*/
+#define MBEDTLS_FREESCALE_MMCAU_DES	   /* Enable use of MMCAU DES, when LTC is disabled.*/
+#define MBEDTLS_FREESCALE_MMCAU_AES	   /* Enable use of MMCAU AES, when LTC is disabled.*/
 #endif
 
 /* Enable CAU3 use in library if there is CAU3 on chip. */
@@ -77,28 +77,29 @@
 
 #define MBEDTLS_CAU3_COMPLETION_SIGNAL kCAU3_TaskDonePoll
 
-#define MBEDTLS_FREESCALE_CAU3_AES    /* Enable use of CAU3 AES.*/
-#define MBEDTLS_FREESCALE_CAU3_DES    /* Enable use of CAU3 DES.*/
-#define MBEDTLS_FREESCALE_CAU3_SHA1   /* Enable use of CAU3 SHA1.*/
+#define MBEDTLS_FREESCALE_CAU3_AES	  /* Enable use of CAU3 AES.*/
+#define MBEDTLS_FREESCALE_CAU3_DES	  /* Enable use of CAU3 DES.*/
+#define MBEDTLS_FREESCALE_CAU3_SHA1	  /* Enable use of CAU3 SHA1.*/
 #define MBEDTLS_FREESCALE_CAU3_SHA256 /* Enable use of CAU3 SHA256.*/
-#define MBEDTLS_FREESCALE_CAU3_PKHA   /* Enable use of CAU3 PKHA.*/
+#define MBEDTLS_FREESCALE_CAU3_PKHA	  /* Enable use of CAU3 PKHA.*/
 #define FREESCALE_PKHA_INT_MAX_BYTES 512
 
 #define MBEDTLS_FREESCALE_CAU3_CIPHER_CMAC
 #endif
 
 /* Enable CAAM use in library if there is CAAM on chip. */
-#if defined(FSL_FEATURE_SOC_CAAM_COUNT) && (FSL_FEATURE_SOC_CAAM_COUNT > 0) && defined(CRYPTO_USE_DRIVER_CAAM)
+#if defined(FSL_FEATURE_SOC_CAAM_COUNT) && (FSL_FEATURE_SOC_CAAM_COUNT > 0) &&                     \
+	defined(CRYPTO_USE_DRIVER_CAAM)
 #include "fsl_caam.h"
 
 #define CAAM_INSTANCE CAAM
 
-#define MBEDTLS_FREESCALE_CAAM_AES     /* Enable use of CAAM AES.*/
+#define MBEDTLS_FREESCALE_CAAM_AES	   /* Enable use of CAAM AES.*/
 #define MBEDTLS_FREESCALE_CAAM_AES_GCM /* Enable use of CAAM AES GCM.*/
 
 #define MBEDTLS_FREESCALE_CAAM_DES /* Enable use of CAAM DES.*/
 
-#define MBEDTLS_FREESCALE_CAAM_SHA1   /* Enable use of CAAM SHA1.*/
+#define MBEDTLS_FREESCALE_CAAM_SHA1	  /* Enable use of CAAM SHA1.*/
 #define MBEDTLS_FREESCALE_CAAM_SHA256 /* Enable use of CAAM SHA256.*/
 
 #define MBEDTLS_FREESCALE_CAAM_PKHA /* Enable use of CAAM PKHA.*/
@@ -114,8 +115,8 @@
 #if defined(FSL_FEATURE_SOC_DCP_COUNT) && (FSL_FEATURE_SOC_DCP_COUNT > 0)
 #include "fsl_dcp.h"
 
-#define MBEDTLS_FREESCALE_DCP_AES    /* Enable use of DCP AES.*/
-#define MBEDTLS_FREESCALE_DCP_SHA1   /* Enable use of DCP SHA1.*/
+#define MBEDTLS_FREESCALE_DCP_AES	 /* Enable use of DCP AES.*/
+#define MBEDTLS_FREESCALE_DCP_SHA1	 /* Enable use of DCP SHA1.*/
 #define MBEDTLS_FREESCALE_DCP_SHA256 /* Enable use of DCP SHA256.*/
 
 #endif
@@ -135,7 +136,8 @@
 #endif
 #endif
 
-#if defined(MBEDTLS_FREESCALE_LTC_PKHA) || defined(MBEDTLS_FREESCALE_CAU3_PKHA) || defined(MBEDTLS_FREESCALE_CAAM_PKHA)
+#if defined(MBEDTLS_FREESCALE_LTC_PKHA) || defined(MBEDTLS_FREESCALE_CAU3_PKHA) ||                 \
+	defined(MBEDTLS_FREESCALE_CAAM_PKHA)
 /*
  * This FREESCALE_PKHA_LONG_OPERANDS_ENABLE macro can be defined.
  * In such a case both software and hardware algorithm for TFM is linked in.
@@ -157,8 +159,8 @@
 #if defined(FSL_FEATURE_SOC_AES_COUNT) && (FSL_FEATURE_SOC_AES_COUNT > 0)
 #include "fsl_aes.h"
 
-#define AES_INSTANCE AES0             /* AES base register.*/
-#define MBEDTLS_FREESCALE_LPC_AES     /* Enable use of LPC AES.*/
+#define AES_INSTANCE AES0			  /* AES base register.*/
+#define MBEDTLS_FREESCALE_LPC_AES	  /* Enable use of LPC AES.*/
 #define MBEDTLS_FREESCALE_LPC_AES_GCM /* Enable use of LPC AES GCM.*/
 
 #endif
@@ -181,13 +183,13 @@
 #if defined(FSL_FEATURE_SOC_CASPER_COUNT) && (FSL_FEATURE_SOC_CASPER_COUNT > 0)
 #include "fsl_casper.h"
 //
-#define CASPER_INSTANCE CASPER        /* CASPER base register.*/
+#define CASPER_INSTANCE CASPER		  /* CASPER base register.*/
 #define MBEDTLS_FREESCALE_CASPER_PKHA /* Enable use of CASPER PKHA.*/
 #define FREESCALE_PKHA_INT_MAX_BYTES (512)
 //
 #define MBEDTLS_ECP_MUL_COMB_ALT /* Alternate implementation of ecp_mul_comb() */
-#define MBEDTLS_ECP_MULADD_ALT /* Alternate implementation of mbedtls_ecp_muladd() */
-#define MBEDTLS_MCUX_CASPER_ECC /* CASPER implementation */
+#define MBEDTLS_ECP_MULADD_ALT	 /* Alternate implementation of mbedtls_ecp_muladd() */
+#define MBEDTLS_MCUX_CASPER_ECC	 /* CASPER implementation */
 //
 #define MBEDTLS_ECP_DP_SECP256R1_ENABLED /* Enable ECP_DP_SECP256R1 curve */
 //#define MBEDTLS_ECP_DP_SECP384R1_ENABLED /* Enable ECP_DP_SECP384R1 curve */
@@ -209,12 +211,14 @@
 /* Define ALT functions. */
 #define MBEDTLS_ECP_ALT
 
-#if defined(MBEDTLS_FREESCALE_MMCAU_DES) || defined(MBEDTLS_FREESCALE_LTC_DES) || defined(MBEDTLS_FREESCALE_CAAM_DES) || defined(MBEDTLS_FREESCALE_CAU3_DES)
+#if defined(MBEDTLS_FREESCALE_MMCAU_DES) || defined(MBEDTLS_FREESCALE_LTC_DES) ||                  \
+	defined(MBEDTLS_FREESCALE_CAAM_DES) || defined(MBEDTLS_FREESCALE_CAU3_DES)
 #define MBEDTLS_DES_ALT
 #define MBEDTLS_DES3_SETKEY_ENC_ALT
 #define MBEDTLS_DES3_SETKEY_DEC_ALT
 #define MBEDTLS_DES3_CRYPT_ECB_ALT
-#if defined(MBEDTLS_FREESCALE_LTC_DES) || defined(MBEDTLS_FREESCALE_MMCAU_DES) || defined(MBEDTLS_FREESCALE_CAAM_DES)
+#if defined(MBEDTLS_FREESCALE_LTC_DES) || defined(MBEDTLS_FREESCALE_MMCAU_DES) ||                  \
+	defined(MBEDTLS_FREESCALE_CAAM_DES)
 #define MBEDTLS_DES_SETKEY_ENC_ALT
 #define MBEDTLS_DES_SETKEY_DEC_ALT
 #define MBEDTLS_DES_CRYPT_ECB_ALT
@@ -239,9 +243,9 @@
 //#define MBEDTLS_AES256_ALT_SW
 //#define MBEDTLS_AES_CBC_ALT_SW
 #endif
-#if defined(MBEDTLS_FREESCALE_LTC_AES) || defined(MBEDTLS_FREESCALE_MMCAU_AES) || \
-    defined(MBEDTLS_FREESCALE_LPC_AES) || defined(MBEDTLS_FREESCALE_CAAM_AES) || \
-    defined(MBEDTLS_FREESCALE_HASHCRYPT_AES)
+#if defined(MBEDTLS_FREESCALE_LTC_AES) || defined(MBEDTLS_FREESCALE_MMCAU_AES) ||                  \
+	defined(MBEDTLS_FREESCALE_LPC_AES) || defined(MBEDTLS_FREESCALE_CAAM_AES) ||                   \
+	defined(MBEDTLS_FREESCALE_HASHCRYPT_AES)
 #define MBEDTLS_AES_ALT
 #define MBEDTLS_AES_SETKEY_ENC_ALT
 #define MBEDTLS_AES_SETKEY_DEC_ALT
@@ -257,11 +261,12 @@
 #define MBEDTLS_AES_CRYPT_CBC_ALT
 #define MBEDTLS_AES_CRYPT_CTR_ALT
 #endif
-#if defined(MBEDTLS_FREESCALE_LTC_AES_GCM) || defined(MBEDTLS_FREESCALE_LPC_AES_GCM) || \
-    defined(MBEDTLS_FREESCALE_CAAM_AES_GCM)
+#if defined(MBEDTLS_FREESCALE_LTC_AES_GCM) || defined(MBEDTLS_FREESCALE_LPC_AES_GCM) ||            \
+	defined(MBEDTLS_FREESCALE_CAAM_AES_GCM)
 #define MBEDTLS_GCM_CRYPT_ALT
 #endif
-#if defined(MBEDTLS_FREESCALE_LTC_PKHA) || defined(MBEDTLS_FREESCALE_CAU3_PKHA) || defined(MBEDTLS_FREESCALE_CAAM_PKHA)
+#if defined(MBEDTLS_FREESCALE_LTC_PKHA) || defined(MBEDTLS_FREESCALE_CAU3_PKHA) ||                 \
+	defined(MBEDTLS_FREESCALE_CAAM_PKHA)
 #define MBEDTLS_MPI_ADD_ABS_ALT
 #define MBEDTLS_MPI_SUB_ABS_ALT
 #define MBEDTLS_MPI_MUL_MPI_ALT
@@ -279,14 +284,14 @@
 #if defined(MBEDTLS_FREESCALE_CASPER_PKHA)
 #define MBEDTLS_RSA_PUBLIC_ALT
 #endif
-#if defined(MBEDTLS_FREESCALE_LTC_SHA1) || defined(MBEDTLS_FREESCALE_LPC_SHA1) || \
-    defined(MBEDTLS_FREESCALE_CAAM_SHA1) || defined(MBEDTLS_FREESCALE_CAU3_SHA1) || defined(MBEDTLS_FREESCALE_DCP_SHA1) || \
-    defined(MBEDTLS_FREESCALE_HASHCRYPT_SHA1)
+#if defined(MBEDTLS_FREESCALE_LTC_SHA1) || defined(MBEDTLS_FREESCALE_LPC_SHA1) ||                  \
+	defined(MBEDTLS_FREESCALE_CAAM_SHA1) || defined(MBEDTLS_FREESCALE_CAU3_SHA1) ||                \
+	defined(MBEDTLS_FREESCALE_DCP_SHA1) || defined(MBEDTLS_FREESCALE_HASHCRYPT_SHA1)
 #define MBEDTLS_SHA1_ALT
 #endif
-#if defined(MBEDTLS_FREESCALE_LTC_SHA256) || defined(MBEDTLS_FREESCALE_LPC_SHA256) || \
-    defined(MBEDTLS_FREESCALE_CAAM_SHA256) || defined(MBEDTLS_FREESCALE_CAU3_SHA256) || defined(MBEDTLS_FREESCALE_DCP_SHA256) || \
-    defined(MBEDTLS_FREESCALE_HASHCRYPT_SHA256)
+#if defined(MBEDTLS_FREESCALE_LTC_SHA256) || defined(MBEDTLS_FREESCALE_LPC_SHA256) ||              \
+	defined(MBEDTLS_FREESCALE_CAAM_SHA256) || defined(MBEDTLS_FREESCALE_CAU3_SHA256) ||            \
+	defined(MBEDTLS_FREESCALE_DCP_SHA256) || defined(MBEDTLS_FREESCALE_HASHCRYPT_SHA256)
 #define MBEDTLS_SHA256_ALT
 /*
  * LPC SHA module does not support SHA-224.
@@ -298,7 +303,8 @@
  * To use SHA-224 on LPC, do not define MBEDTLS_SHA256_ALT and both SHA-224 and SHA-256 will use
  * original mbed TLS software implementation.
  */
-#if defined(MBEDTLS_FREESCALE_LPC_SHA256) || defined(MBEDTLS_FREESCALE_DCP_SHA256) || defined(MBEDTLS_FREESCALE_HASHCRYPT_SHA256)
+#if defined(MBEDTLS_FREESCALE_LPC_SHA256) || defined(MBEDTLS_FREESCALE_DCP_SHA256) ||              \
+	defined(MBEDTLS_FREESCALE_HASHCRYPT_SHA256)
 #define MBEDTLS_SHA256_ALT_NO_224
 #endif
 #endif

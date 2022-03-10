@@ -58,8 +58,8 @@ typedef struct {
 // Writes and signs an lz_x509_csr_info struct to a buffer in PEM format.
 // Adds the given public key to the CSR and signs the CSR with the given
 // private key
-int lz_write_csr_to_pem(const lz_x509_csr_info *info, lz_ecc_keypair *keypair,
-						unsigned char *buf, size_t buf_size);
+int lz_write_csr_to_pem(const lz_x509_csr_info *info, lz_ecc_keypair *keypair, unsigned char *buf,
+						size_t buf_size);
 
 // Writes and signs an lz_x509_cert_info struct to a buffer in PEM format.
 int lz_write_cert_to_pem(const lz_x509_cert_info *info, lz_ecc_keypair *subject_keys,

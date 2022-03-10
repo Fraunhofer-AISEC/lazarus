@@ -56,8 +56,8 @@ int lz_x509_dn_to_string(const lz_x509_dn_info *info, char *buf, size_t buf_size
 	return n;
 }
 
-int lz_write_csr_to_pem(const lz_x509_csr_info *info, lz_ecc_keypair *keypair,
-						unsigned char *buf, size_t buf_size)
+int lz_write_csr_to_pem(const lz_x509_csr_info *info, lz_ecc_keypair *keypair, unsigned char *buf,
+						size_t buf_size)
 {
 	mbedtls_x509write_csr req;
 	mbedtls_x509write_csr_init(&req);
@@ -118,7 +118,8 @@ int lz_write_cert_to_pem(const lz_x509_cert_info *info, lz_ecc_keypair *subject_
 	CHECK(mbedtls_x509write_crt_set_validity(&cert, "20170101000000", "20370101000000"),
 		  "Failed setting the validity in cert");
 
-	CHECK(mbedtls_mpi_read_binary(&serial_number, (unsigned char*)info->serial_number, sizeof(info->serial_number)),
+	CHECK(mbedtls_mpi_read_binary(&serial_number, (unsigned char *)info->serial_number,
+								  sizeof(info->serial_number)),
 		  "Error converting serial number to MPI");
 	CHECK(mbedtls_x509write_crt_set_serial(&cert, &serial_number),
 		  "Failed setting the serial_number in cert");
@@ -152,13 +153,13 @@ clean:
 int lz_set_serial_number_csr(lz_x509_csr_info *info, const unsigned char *salt, size_t salt_len)
 {
 	return mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, salt, salt_len, NULL,
-						0, (unsigned char*)info->serial_number, sizeof(info->serial_number));
+						0, (unsigned char *)info->serial_number, sizeof(info->serial_number));
 }
 
 int lz_set_serial_number_cert(lz_x509_cert_info *info, const unsigned char *salt, size_t salt_len)
 {
 	return mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, salt, salt_len, NULL,
-						0, (unsigned char*)info->serial_number, sizeof(info->serial_number));
+						0, (unsigned char *)info->serial_number, sizeof(info->serial_number));
 }
 
 #endif

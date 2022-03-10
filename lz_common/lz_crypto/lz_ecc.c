@@ -68,7 +68,7 @@ int lz_pub_key_to_pem(lz_ecc_keypair *keypair, lz_ecc_pub_key_pem *pem)
 	int re = 0;
 
 	// Writing the pubkey to the buffer
-	CHECK(mbedtls_pk_write_pubkey_pem(keypair, (unsigned char*)pem->key, sizeof(pem->key)),
+	CHECK(mbedtls_pk_write_pubkey_pem(keypair, (unsigned char *)pem->key, sizeof(pem->key)),
 		  "Error writing pubkey (PEM)");
 
 clean:
@@ -79,7 +79,7 @@ int lz_priv_key_to_pem(lz_ecc_keypair *keypair, lz_ecc_priv_key_pem *pem)
 {
 	int re = 0;
 
-	CHECK(mbedtls_pk_write_key_pem(keypair, (unsigned char*)pem->key, sizeof(pem->key)),
+	CHECK(mbedtls_pk_write_key_pem(keypair, (unsigned char *)pem->key, sizeof(pem->key)),
 		  "Error writing pubkey (PEM)");
 
 clean:
@@ -93,7 +93,7 @@ int lz_pem_to_pub_key(lz_ecc_keypair *keypair, const lz_ecc_pub_key_pem *pem)
 	mbedtls_pk_init(keypair);
 	int re = 0;
 
-	CHECK(mbedtls_pk_parse_public_key(keypair, (unsigned char*)pem->key,
+	CHECK(mbedtls_pk_parse_public_key(keypair, (unsigned char *)pem->key,
 									  strnlen(pem->key, MAX_PUB_ECP_PEM_BYTES - 1) + 1),
 		  "Error parsing the public PEM key");
 
@@ -109,7 +109,7 @@ int lz_pem_to_priv_key(lz_ecc_keypair *keypair, const lz_ecc_priv_key_pem *pem)
 	mbedtls_pk_init(keypair);
 	int re = 0;
 
-	CHECK(mbedtls_pk_parse_key(keypair, (unsigned char*)pem->key, strlen(pem->key) + 1, NULL, 0),
+	CHECK(mbedtls_pk_parse_key(keypair, (unsigned char *)pem->key, strlen(pem->key) + 1, NULL, 0),
 		  "Error parsing the private PEM key");
 
 clean:
