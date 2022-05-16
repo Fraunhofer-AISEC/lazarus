@@ -1,5 +1,6 @@
 #!/bin/bash
 
+CLEAN_PROJECTS=0
 START_SERVER=0
 REVISION=2
 CPU_CORES=$(nproc)
