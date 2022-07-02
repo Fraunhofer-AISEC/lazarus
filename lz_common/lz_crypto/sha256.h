@@ -17,39 +17,30 @@
  * limitations under the License.
  */
 
+#pragma once
+
 #ifdef MBEDTLS_CONFIG_FILE
 
 #include MBEDTLS_CONFIG_FILE
 
-#include "lz_sha256.h"
-
 #ifdef MBEDTLS_SHA256_C
 
-#include "mbedtls/sha256.h"
+#include <stdint.h>
 
-#include "lz_crypto_common.h"
-
-int lz_sha256(uint8_t *result, const void *data, size_t dataSize)
-{
-	return mbedtls_sha256_ret(data, dataSize, result, 0);
-}
+/**
+ * Calculates the SHA256 hash of the data buffer and stores it into the result
+ * buffer
+ * @param[out] result   The buffer in which the result will be stored (must be
+ *                      at least SHA256_DIGEST_SIZE (32) bytes large)
+ * @param[in]  data     The data over which the sha256 should be computed
+ * @param[in]  dataSize The size of the data buffer
+ *
+ * @return 0 on success. If an error occurred, returns a non-0 int
+ */
+int lz_sha256(uint8_t *result, const void *data, size_t dataSize);
 
 int lz_sha256_two_parts(uint8_t *result, const void *data1, size_t data1Size, const void *data2,
-						size_t data2Size)
-{
-	mbedtls_sha256_context ctx;
-	mbedtls_sha256_init(&ctx);
-	int re;
-
-	CHECK(mbedtls_sha256_starts_ret(&ctx, 0), "Error creating SHA256 hash (1)");
-	CHECK(mbedtls_sha256_update_ret(&ctx, data1, data1Size), "Error creating SHA256 hash (2)");
-	CHECK(mbedtls_sha256_update_ret(&ctx, data2, data2Size), "Error creating SHA256 hash (3)");
-	CHECK(mbedtls_sha256_finish_ret(&ctx, result), "Error creating SHA256 hash (4)");
-
-clean:
-	mbedtls_sha256_free(&ctx);
-	return re;
-}
+						size_t data2Size);
 
 #endif
 

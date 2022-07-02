@@ -17,12 +17,11 @@
  * limitations under the License.
  */
 
-#ifndef LZ_CRYPTO_ECDSA_H_
-#define LZ_CRYPTO_ECDSA_H_
+#pragma once
 
 #ifdef MBEDTLS_CONFIG_FILE
 
-#include "lz_ecc.h"
+#include "ecc.h"
 
 /**
  * Hashes the data given in data with the length data_length and signs it with the key_pair.
@@ -64,5 +63,3 @@ int lz_ecdsa_verify_pub_pem(uint8_t *data, size_t data_length, lz_ecc_pub_key_pe
 							const lz_ecc_signature *sig);
 
 #endif /* MBEDTLS_CONFIG_FILE */
-
-#endif

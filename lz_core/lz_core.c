@@ -22,11 +22,11 @@
 
 #include "lz_common.h"
 #include "mbedtls/ecdsa.h"
-#include "lz_ecc.h"
-#include "lz_hmac.h"
-#include "lz_ecdsa.h"
-#include "lz_x509.h"
-#include "lz_sha256.h"
+#include "ecc.h"
+#include "hmac.h"
+#include "ecdsa.h"
+#include "x509.h"
+#include "sha256.h"
 
 #include "lzport_flash.h"
 #include "lzport_memory.h"

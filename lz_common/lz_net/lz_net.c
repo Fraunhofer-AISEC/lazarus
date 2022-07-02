@@ -27,8 +27,8 @@
 #include "lzport_gpio.h"
 #include "lz_flash_handler.h"
 #include "lz_net.h"
-#include "lz_sha256.h"
-#include "lz_ecdsa.h"
+#include "sha256.h"
+#include "ecdsa.h"
 #include "lz_awdt_handler.h"
 
 #define TIMEOUT_SOCKET_OPEN_MS 5000

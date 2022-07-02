@@ -17,25 +17,11 @@
  * limitations under the License.
  */
 
-#ifndef LZ_CRYPTO_LZ_ECDH_H_
-#define LZ_CRYPTO_LZ_ECDH_H_
+#include "crypto_common.h"
+#include "lzport_rng.h"
 
-#ifdef MBEDTLS_CONFIG_FILE
-
-#include MBEDTLS_CONFIG_FILE
-
-#if defined(MBEDTLS_ECDH_C)
-
-#define ECP_SECP256R1_KEY_SIZE 32
-
-int lz_ecdh_gen_key_pair(mbedtls_ecdh_context *ctx);
-
-int lz_ecdh_export_pub(uint8_t *pub, size_t len, mbedtls_ecdh_context *ctx);
-
-int lz_ecdh_derive_secret(mbedtls_ecdh_context *ctx, uint8_t *shared, uint32_t len);
-
-#endif
-
-#endif /* MBEDTLS_CONFIG_FILE */
-
-#endif /* LZ_CRYPTO_LZ_ECDH_H_ */
+int lz_rand(void *rng_state, unsigned char *output, size_t len)
+{
+	(void)rng_state;
+	return lzport_rng_get_random_data(output, len);
+}

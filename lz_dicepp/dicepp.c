@@ -23,8 +23,8 @@
 #include "lzport_dice.h"
 #include "lzport_rng.h"
 #include "lzport_flash.h"
-#include "lz_hmac.h"
-#include "lz_sha256.h"
+#include "hmac.h"
+#include "sha256.h"
 #include "dicepp.h"
 
 // Flash and RAM data structures according to the linker script. See notes on structure definitions in .h file

@@ -17,27 +17,22 @@
  * limitations under the License.
  */
 
+#pragma once
+
 #ifdef MBEDTLS_CONFIG_FILE
 
 #include MBEDTLS_CONFIG_FILE
 
-#ifdef MBEDTLS_MD_C
+#if defined(MBEDTLS_CHACHAPOLY_C)
 
-#include "lz_hmac.h"
-#include "lz_common.h"
-#include "mbedtls/md.h"
+int lz_chacha20_poly1305_encrypt(const unsigned char *input, uint32_t input_len,
+								 unsigned char *output, uint32_t output_len, uint8_t *nonce,
+								 size_t nonce_len, const uint8_t *aad, size_t aad_len,
+								 uint8_t *key);
 
-int lz_hmac_sha256(uint8_t *result, const void *data, size_t dataSize, const uint8_t *key,
-				   size_t keySize)
-{
-	if (keySize != SYM_KEY_LENGTH) {
-		return MBEDTLS_ERR_MD_BAD_INPUT_DATA;
-	}
-
-	const mbedtls_md_info_t *info_sha256 = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
-
-	return mbedtls_md_hmac(info_sha256, key, keySize, data, dataSize, result);
-}
+int lz_chacha20_poly1305_decrypt(const uint8_t *input, const uint32_t input_len, uint8_t *output,
+								 const uint32_t output_len, uint8_t *nonce, size_t nonce_len,
+								 const uint8_t *aad, size_t aad_len, uint8_t *key);
 
 #endif
 

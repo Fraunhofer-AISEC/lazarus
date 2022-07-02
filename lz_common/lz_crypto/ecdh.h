@@ -17,17 +17,22 @@
  * limitations under the License.
  */
 
-#ifndef LZ_CRYPTO_LZ_ECIES_H_
-#define LZ_CRYPTO_LZ_ECIES_H_
+#pragma once
 
 #ifdef MBEDTLS_CONFIG_FILE
 
-int lz_ecies_encrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, uint8_t *out,
-					 uint32_t out_len);
+#include MBEDTLS_CONFIG_FILE
 
-int lz_ecies_decrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, uint8_t *out,
-					 uint32_t out_len);
+#if defined(MBEDTLS_ECDH_C)
+
+#define ECP_SECP256R1_KEY_SIZE 32
+
+int lz_ecdh_gen_key_pair(mbedtls_ecdh_context *ctx);
+
+int lz_ecdh_export_pub(uint8_t *pub, size_t len, mbedtls_ecdh_context *ctx);
+
+int lz_ecdh_derive_secret(mbedtls_ecdh_context *ctx, uint8_t *shared, uint32_t len);
+
+#endif
 
 #endif /* MBEDTLS_CONFIG_FILE */
-
-#endif /* LZ_CRYPTO_LZ_ECIES_H_ */

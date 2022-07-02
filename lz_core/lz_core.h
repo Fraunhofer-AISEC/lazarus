@@ -20,8 +20,8 @@
 #ifndef LZ_CORE_H_
 #define LZ_CORE_H_
 
-#include "lz_ecc.h"
-#include "lz_ecdsa.h"
+#include "ecc.h"
+#include "ecdsa.h"
 
 boot_mode_t lz_core_run(void);
 

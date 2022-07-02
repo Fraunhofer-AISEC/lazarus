@@ -27,7 +27,7 @@
 #include "mbedtls/ecdh.h"
 #include "mbedtls/hmac_drbg.h"
 
-#include "lz_ecc.h"
+#include "ecc.h"
 
 int lz_derive_ecc_keypair(lz_ecc_keypair *keypair, const void *seed, size_t seed_size)
 {

@@ -17,8 +17,7 @@
  * limitations under the License.
  */
 
-#ifndef LZ_CRYPTO_X509_H_
-#define LZ_CRYPTO_X509_H_
+#pragma once
 
 #ifdef MBEDTLS_CONFIG_FILE
 
@@ -28,7 +27,7 @@
 
 #include <stdint.h>
 
-#include "lz_ecdsa.h"
+#include "ecdsa.h"
 #include "mbedtls/x509_crt.h"
 #include "mbedtls/x509_csr.h"
 #include "mbedtls/hkdf.h"
@@ -78,5 +77,3 @@ int lz_set_serial_number_cert(lz_x509_cert_info *info, const unsigned char *salt
 #endif
 
 #endif /* MBEDTLS_CONFIG_FILE */
-
-#endif

@@ -25,8 +25,8 @@
 #if defined(MBEDTLS_ECDH_C)
 
 #include "mbedtls/ecdh.h"
-#include "lz_crypto_common.h"
-#include "lz_ecdh.h"
+#include "crypto_common.h"
+#include "ecdh.h"
 
 int lz_ecdh_gen_key_pair(mbedtls_ecdh_context *ctx)
 {

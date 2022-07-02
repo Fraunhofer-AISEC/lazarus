@@ -24,7 +24,7 @@
 #include <stdint.h>
 #include "lzport_debug_output.h"
 #include "mbedtls/chachapoly.h"
-#include "lz_chacha20_poly1305.h"
+#include "chacha20_poly1305.h"
 
 #if defined(MBEDTLS_CHACHAPOLY_C)
 
