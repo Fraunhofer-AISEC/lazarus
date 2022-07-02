@@ -17,8 +17,7 @@
  * limitations under the License.
  */
 
-#ifndef LZ_CRYPTO_COMMON_H_
-#define LZ_CRYPTO_COMMON_H_
+#pragma once
 
 #include "lzport_debug_output.h"
 #include "lzport_rng.h"
@@ -64,5 +63,3 @@ typedef struct lz_ecc_signature {
 	} while (0);
 
 int lz_rand(void *rng_state, unsigned char *output, size_t len);
-
-#endif

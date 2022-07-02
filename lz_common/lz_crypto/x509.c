@@ -32,8 +32,8 @@
 #include "mbedtls/pk.h"
 
 #include "lz_config.h"
-#include "lz_crypto_common.h"
-#include "lz_x509.h"
+#include "crypto_common.h"
+#include "x509.h"
 
 #define SERIAL_NUMBER_FIELD_LENGTH 14
 

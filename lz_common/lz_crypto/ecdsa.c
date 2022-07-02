@@ -28,10 +28,10 @@
 #include "mbedtls/hmac_drbg.h"
 
 #include "lz_config.h"
-#include "lz_crypto_common.h"
-#include "lz_sha256.h"
-#include "lz_ecc.h"
-#include "lz_ecdsa.h"
+#include "crypto_common.h"
+#include "sha256.h"
+#include "ecc.h"
+#include "ecdsa.h"
 
 int lz_ecdsa_sign(uint8_t *data, size_t data_length, lz_ecc_keypair *key_pair,
 				  lz_ecc_signature *sig)

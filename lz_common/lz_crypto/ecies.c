@@ -25,9 +25,9 @@
 #include "mbedtls/ecdh.h"
 #include "mbedtls/hmac_drbg.h"
 #include "mbedtls/hkdf.h"
-#include "lz_ecc.h"
-#include "lz_chacha20_poly1305.h"
-#include "lz_ecdh.h"
+#include "ecc.h"
+#include "chacha20_poly1305.h"
+#include "ecdh.h"
 
 #if defined(MBEDTLS_HKDF_C) && defined(MBEDTLS_ECDH_C)
 

@@ -17,11 +17,28 @@
  * limitations under the License.
  */
 
-#include "lz_crypto_common.h"
-#include "lzport_rng.h"
+#ifdef MBEDTLS_CONFIG_FILE
 
-int lz_rand(void *rng_state, unsigned char *output, size_t len)
+#include MBEDTLS_CONFIG_FILE
+
+#ifdef MBEDTLS_MD_C
+
+#include "hmac.h"
+#include "lz_common.h"
+#include "mbedtls/md.h"
+
+int lz_hmac_sha256(uint8_t *result, const void *data, size_t dataSize, const uint8_t *key,
+				   size_t keySize)
 {
-	(void)rng_state;
-	return lzport_rng_get_random_data(output, len);
+	if (keySize != SYM_KEY_LENGTH) {
+		return MBEDTLS_ERR_MD_BAD_INPUT_DATA;
+	}
+
+	const mbedtls_md_info_t *info_sha256 = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+
+	return mbedtls_md_hmac(info_sha256, key, keySize, data, dataSize, result);
 }
+
+#endif
+
+#endif /* MBEDTLS_CONFIG_FILE */

@@ -17,8 +17,7 @@
  * limitations under the License.
  */
 
-#ifndef LZ_CRYPTO_LZ_ECC_H_
-#define LZ_CRYPTO_LZ_ECC_H_
+#pragma once
 
 #ifdef MBEDTLS_CONFIG_FILE
 
@@ -26,7 +25,7 @@
 
 #if defined(MBEDTLS_PK_WRITE_C)
 
-#include "lz_crypto_common.h"
+#include "crypto_common.h"
 
 #include "mbedtls/pk.h"
 #include "mbedtls/ecdh.h"
@@ -97,5 +96,3 @@ void lz_free_keypair(lz_ecc_keypair *keypair);
 #endif /* MBEDTLS_PK_WRITE_C_ */
 
 #endif /* MBEDTLS_CONFIG_FILE */
-
-#endif /* LZ_CRYPTO_LZ_ECC_H_ */

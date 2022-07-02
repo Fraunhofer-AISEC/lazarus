@@ -17,26 +17,40 @@
  * limitations under the License.
  */
 
-#ifndef LZ_CRYPTO_LZ_CHACHA20_POLY1305_H_
-#define LZ_CRYPTO_LZ_CHACHA20_POLY1305_H_
-
 #ifdef MBEDTLS_CONFIG_FILE
 
 #include MBEDTLS_CONFIG_FILE
 
-#if defined(MBEDTLS_CHACHAPOLY_C)
+#include "sha256.h"
 
-int lz_chacha20_poly1305_encrypt(const unsigned char *input, uint32_t input_len,
-								 unsigned char *output, uint32_t output_len, uint8_t *nonce,
-								 size_t nonce_len, const uint8_t *aad, size_t aad_len,
-								 uint8_t *key);
+#ifdef MBEDTLS_SHA256_C
 
-int lz_chacha20_poly1305_decrypt(const uint8_t *input, const uint32_t input_len, uint8_t *output,
-								 const uint32_t output_len, uint8_t *nonce, size_t nonce_len,
-								 const uint8_t *aad, size_t aad_len, uint8_t *key);
+#include "mbedtls/sha256.h"
+
+#include "crypto_common.h"
+
+int lz_sha256(uint8_t *result, const void *data, size_t dataSize)
+{
+	return mbedtls_sha256_ret(data, dataSize, result, 0);
+}
+
+int lz_sha256_two_parts(uint8_t *result, const void *data1, size_t data1Size, const void *data2,
+						size_t data2Size)
+{
+	mbedtls_sha256_context ctx;
+	mbedtls_sha256_init(&ctx);
+	int re;
+
+	CHECK(mbedtls_sha256_starts_ret(&ctx, 0), "Error creating SHA256 hash (1)");
+	CHECK(mbedtls_sha256_update_ret(&ctx, data1, data1Size), "Error creating SHA256 hash (2)");
+	CHECK(mbedtls_sha256_update_ret(&ctx, data2, data2Size), "Error creating SHA256 hash (3)");
+	CHECK(mbedtls_sha256_finish_ret(&ctx, result), "Error creating SHA256 hash (4)");
+
+clean:
+	mbedtls_sha256_free(&ctx);
+	return re;
+}
 
 #endif
 
 #endif /* MBEDTLS_CONFIG_FILE */
-
-#endif /* LZ_CRYPTO_LZ_CHACHA20_POLY1305_H_ */

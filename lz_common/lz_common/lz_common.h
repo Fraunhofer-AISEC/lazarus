@@ -25,7 +25,7 @@
 #include "lz_error.h"
 #include "lzport_memory.h"
 
-#include "lz_crypto_common.h"
+#include "crypto_common.h"
 
 /*******************************************
  * Definitions

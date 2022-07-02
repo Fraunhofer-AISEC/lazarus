@@ -17,8 +17,7 @@
  * limitations under the License.
  */
 
-#ifndef LZ_CRYPTO_HMAC_H_
-#define LZ_CRYPTO_HMAC_H_
+#pragma once
 
 #ifdef MBEDTLS_CONFIG_FILE
 
@@ -47,5 +46,3 @@ int lz_hmac_sha256(uint8_t *result, const void *data, size_t dataSize, const uin
 #endif
 
 #endif /* MBEDTLS_CONFIG_FILE */
-
-#endif

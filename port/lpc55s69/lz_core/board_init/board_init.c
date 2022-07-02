@@ -26,9 +26,9 @@
 #include "LPC55S69_cm33_core0.h"
 #include "fsl_power.h"
 
-#include "lz_ecc.h"
-#include "lz_ecdsa.h"
-#include "lz_sha256.h"
+#include "ecc.h"
+#include "ecdsa.h"
+#include "sha256.h"
 
 #include "lz_common.h"
 #include "lz_config.h"
