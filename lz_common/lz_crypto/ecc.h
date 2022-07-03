@@ -30,68 +30,68 @@
 #include "mbedtls/pk.h"
 #include "mbedtls/ecdh.h"
 
-typedef mbedtls_pk_context lz_ecc_keypair;
-typedef mbedtls_ecp_point lz_ecc_public_key;
-typedef mbedtls_mpi lz_ecc_private_key;
+typedef mbedtls_pk_context ecc_keypair_t;
+typedef mbedtls_ecp_point ecc_public_key_t;
+typedef mbedtls_mpi ecc_private_key_t;
 
 /**
  * Does the same as lz_derive_ecc_keys, but just takes in an uninitialized keypair instead of 2
  * single keys.
  */
-int lz_derive_ecc_keypair(lz_ecc_keypair *pub, const void *seed, size_t seed_size);
+int ecc_derive_keypair(ecc_keypair_t *pub, const void *seed, size_t seed_size);
 
 #if defined(MBEDTLS_PEM_WRITE_C)
 /**
- * Exports the public part of the lz_ecc_keypair to a lz_ecc_pub_key_pem. The key in the buffer is in pem format.
+ * Exports the public part of the ecc_keypair_t to a ecc_pub_key_pem_t. The key in the buffer is in pem format.
  * Returns the length of the key in pem format on success. Otherwise return will be < 0.
  */
-int lz_pub_key_to_pem(lz_ecc_keypair *keypair, lz_ecc_pub_key_pem *pem);
+int ecc_pub_key_to_pem(ecc_keypair_t *keypair, ecc_pub_key_pem_t *pem);
 
 /**
- * Exports a lz_ecc_keypair to a lz_ecc_pub_key_pem. The key in the buffer is in pem format.
+ * Exports a ecc_keypair_t to a ecc_pub_key_pem_t. The key in the buffer is in pem format.
  * Returns the length of the key in pem format on success. Otherwise return will be < 0.
  */
-int lz_priv_key_to_pem(lz_ecc_keypair *keypair, lz_ecc_priv_key_pem *pem);
+int ecc_priv_key_to_pem(ecc_keypair_t *keypair, ecc_priv_key_pem_t *pem);
 #endif
 
 #if defined(MBEDTLS_PK_PARSE_C)
 /**
- * Imports an lz_ecc_pub_key_pem to the public part of an lz_ecc_keypair. The key in the buffer must be in pem format.
+ * Imports an ecc_pub_key_pem_t to the public part of an ecc_keypair_t. The key in the buffer must be in pem format.
  * Returns 0 on success. If an error occurs, a negative number will be returned.
  *
- * Note: key must be freed after use using `lz_free_keypair`
+ * Note: key must be freed after use using `ecc_free_keypair`
  */
-int lz_pem_to_pub_key(lz_ecc_keypair *keypair, const lz_ecc_pub_key_pem *pem);
+int ecc_pem_to_pub_key(ecc_keypair_t *keypair, const ecc_pub_key_pem_t *pem);
 
 /**
- * Imports an ecc_public_key to a lz_ecc_pub_key_pem. The key in the buffer must be in pem format.
+ * Imports an ecc_public_key to a ecc_pub_key_pem_t. The key in the buffer must be in pem format.
  * Returns 0 on success. If an error occurs, a negative number will be returned.
  *
- * Note: key must be freed after use using `lz_free_keypair`
+ * Note: key must be freed after use using `ecc_free_keypair`
  */
-int lz_pem_to_priv_key(lz_ecc_keypair *keypair, const lz_ecc_priv_key_pem *pem);
+int ecc_pem_to_priv_key(ecc_keypair_t *keypair, const ecc_priv_key_pem_t *pem);
 #endif
 
 /**
  * Access function to the private key of a lz keypar
  */
-lz_ecc_private_key *lz_keypair_to_private(lz_ecc_keypair *keypair);
+ecc_private_key_t *ecc_keypair_to_private(ecc_keypair_t *keypair);
 
 /**
  * Access function to the public key of a lz keypar
  */
-lz_ecc_public_key *lz_keypair_to_public(lz_ecc_keypair *keypair);
+ecc_public_key_t *ecc_keypair_to_public(ecc_keypair_t *keypair);
 
 /**
  * Compares 2 given keys.
  * Returns 0, if the keys are equal.
  */
-int lz_compare_public_key(lz_ecc_public_key *k1, lz_ecc_public_key *k2);
+int ecc_compare_public_key(ecc_public_key_t *k1, ecc_public_key_t *k2);
 
 /**
  * Cleans up an lz keypair
  */
-void lz_free_keypair(lz_ecc_keypair *keypair);
+void ecc_free_keypair(ecc_keypair_t *keypair);
 
 #endif /* MBEDTLS_PK_WRITE_C_ */
 

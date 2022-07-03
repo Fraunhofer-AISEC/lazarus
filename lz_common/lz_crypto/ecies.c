@@ -33,7 +33,7 @@
 
 #define ECP_SECP256R1_KEY_SIZE 32
 
-int lz_ecies_encrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, uint8_t *out,
+int ecies_encrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, uint8_t *out,
 					 uint32_t out_len)
 {
 	// TODO check if nonce can be zero as key is never used twice
@@ -44,7 +44,7 @@ int lz_ecies_encrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, ui
 
 	// Generate ECDH Shared Secret
 	uint8_t shared[ECP_SECP256R1_KEY_SIZE];
-	ret = lz_ecdh_derive_secret(ctx, shared, sizeof(shared));
+	ret = ecdh_derive_secret(ctx, shared, sizeof(shared));
 	if (ret != 0) {
 		return ret;
 	}
@@ -59,7 +59,7 @@ int lz_ecies_encrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, ui
 	}
 
 	// Symmetrically encrypt the payload with AEAD
-	lz_chacha20_poly1305_encrypt(in, in_len, out, out_len, nonce, nonce_len, NULL, 0, key);
+	chacha20_poly1305_encrypt(in, in_len, out, out_len, nonce, nonce_len, NULL, 0, key);
 	if (ret != 0) {
 		return ret;
 	}
@@ -67,7 +67,7 @@ int lz_ecies_encrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, ui
 	return ret;
 }
 
-int lz_ecies_decrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, uint8_t *out,
+int ecies_decrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, uint8_t *out,
 					 uint32_t out_len)
 {
 	// TODO check if nonce can be zero as key is never used twice
@@ -78,7 +78,7 @@ int lz_ecies_decrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, ui
 
 	// Generate ECDH Shared Secret
 	uint8_t shared[ECP_SECP256R1_KEY_SIZE];
-	ret = lz_ecdh_derive_secret(ctx, shared, sizeof(shared));
+	ret = ecdh_derive_secret(ctx, shared, sizeof(shared));
 	if (ret != 0) {
 		return ret;
 	}
@@ -93,7 +93,7 @@ int lz_ecies_decrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, ui
 	}
 
 	// Symmetrically decrypt the payload with AEAD
-	ret = lz_chacha20_poly1305_decrypt(in, in_len, out, out_len, nonce, nonce_len, NULL, 0, key);
+	ret = chacha20_poly1305_decrypt(in, in_len, out, out_len, nonce, nonce_len, NULL, 0, key);
 	if (ret != 0) {
 		return ret;
 	}

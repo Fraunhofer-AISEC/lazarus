@@ -37,9 +37,9 @@
  *
  * @return 0 on success. If an error occurred, returns a non-0 int
  */
-int lz_sha256(uint8_t *result, const void *data, size_t dataSize);
+int sha256(uint8_t *result, const void *data, size_t dataSize);
 
-int lz_sha256_two_parts(uint8_t *result, const void *data1, size_t data1Size, const void *data2,
+int sha256_two_parts(uint8_t *result, const void *data1, size_t data1Size, const void *data2,
 						size_t data2Size);
 
 #endif

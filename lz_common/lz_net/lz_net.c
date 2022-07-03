@@ -304,7 +304,7 @@ LZ_RESULT lz_request_auth_element(lz_auth_hdr_t *request_hdr, uint8_t *request_p
 	dbgprint(DBG_INFO, "INFO: Signing request with AliasID..\n");
 
 	// Hash the payload of the ticket
-	if (lz_sha256(request_hdr->content.digest, request_payload,
+	if (sha256(request_hdr->content.digest, request_payload,
 				  request_hdr->content.payload_size) != 0) {
 		dbgprint(DBG_WARN, "WARN: Failed to hash payload of ticket\n");
 		result = LZ_ERROR;
@@ -312,15 +312,15 @@ LZ_RESULT lz_request_auth_element(lz_auth_hdr_t *request_hdr, uint8_t *request_p
 	}
 
 	// Sign the request with the DeviceID private key
-	lz_ecc_signature ecc_sig;
+	ecc_signature_t ecc_sig;
 
 	int status =
-		lz_ecdsa_sign_pem((void *)&request_hdr->content, sizeof(request_hdr->content),
-						  (lz_ecc_priv_key_pem *)&lz_img_boot_params.info.alias_id_keypair_priv,
+		ecdsa_sign_pem((void *)&request_hdr->content, sizeof(request_hdr->content),
+						  (ecc_priv_key_pem_t *)&lz_img_boot_params.info.alias_id_keypair_priv,
 						  &ecc_sig);
 
 	if (0 != status) {
-		dbgprint(DBG_ERR, "ERROR: lz_ecdsa_sign_pem\n");
+		dbgprint(DBG_ERR, "ERROR: ecdsa_sign_pem\n");
 		result = LZ_ERROR;
 		goto exit;
 	}
@@ -405,7 +405,7 @@ LZ_RESULT lz_net_update(hdr_type_t update_type, uint8_t *payload, uint32_t paylo
 	lz_get_uuid(fw_update_request_hdr.content.uuid);
 
 	// Hash the payload of the ticket (which is only the requested time)
-	if (lz_sha256(fw_update_request_hdr.content.digest, payload,
+	if (sha256(fw_update_request_hdr.content.digest, payload,
 				  fw_update_request_hdr.content.payload_size) != 0) {
 		dbgprint(DBG_ERR, "ERROR: Failed to hash payload of ticket\n");
 		result = LZ_ERROR;
@@ -413,10 +413,10 @@ LZ_RESULT lz_net_update(hdr_type_t update_type, uint8_t *payload, uint32_t paylo
 	}
 
 	// Sign the request
-	lz_ecc_signature alias_id_sig;
-	if (0 != lz_ecdsa_sign_pem(
+	ecc_signature_t alias_id_sig;
+	if (0 != ecdsa_sign_pem(
 				 (uint8_t *)&fw_update_request_hdr.content, sizeof(fw_update_request_hdr.content),
-				 (lz_ecc_priv_key_pem *)&lz_img_boot_params.info.alias_id_keypair_priv,
+				 (ecc_priv_key_pem_t *)&lz_img_boot_params.info.alias_id_keypair_priv,
 				 &alias_id_sig)) {
 		dbgprint(DBG_ERR, "ERROR: Failed to sign update request\n");
 		result = LZ_ERROR;

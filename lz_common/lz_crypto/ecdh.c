@@ -28,7 +28,7 @@
 #include "crypto_common.h"
 #include "ecdh.h"
 
-int lz_ecdh_gen_key_pair(mbedtls_ecdh_context *ctx)
+int ecdh_gen_key_pair(mbedtls_ecdh_context *ctx)
 {
 	int ret = -1;
 
@@ -57,7 +57,7 @@ exit:
 	return ret;
 }
 
-int lz_ecdh_export_pub(uint8_t *pub, size_t len, mbedtls_ecdh_context *ctx)
+int ecdh_export_pub(uint8_t *pub, size_t len, mbedtls_ecdh_context *ctx)
 {
 	if (len < ECP_SECP256R1_KEY_SIZE) {
 		dbgprint(DBG_INFO, "ERROR: Failed to export public key. Key size too small\n");
@@ -73,7 +73,7 @@ int lz_ecdh_export_pub(uint8_t *pub, size_t len, mbedtls_ecdh_context *ctx)
 	return ret;
 }
 
-int lz_ecdh_derive_secret(mbedtls_ecdh_context *ctx, uint8_t *shared, uint32_t len)
+int ecdh_derive_secret(mbedtls_ecdh_context *ctx, uint8_t *shared, uint32_t len)
 {
 	int ret = -1;
 

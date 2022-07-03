@@ -29,12 +29,12 @@
 
 #include "crypto_common.h"
 
-int lz_sha256(uint8_t *result, const void *data, size_t dataSize)
+int sha256(uint8_t *result, const void *data, size_t dataSize)
 {
 	return mbedtls_sha256_ret(data, dataSize, result, 0);
 }
 
-int lz_sha256_two_parts(uint8_t *result, const void *data1, size_t data1Size, const void *data2,
+int sha256_two_parts(uint8_t *result, const void *data1, size_t data1Size, const void *data2,
 						size_t data2Size)
 {
 	mbedtls_sha256_context ctx;

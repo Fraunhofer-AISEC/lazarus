@@ -39,20 +39,20 @@
 
 #define MAX_SIG_ECP_DER_BYTES 80
 
-typedef struct lz_ecc_pub_key_pem {
+typedef struct {
 	char key[MAX_PUB_ECP_PEM_BYTES];
 	// Length is not needed, since it can be figured out with strnlen(key, MAX_PUB_ECP_PEM_BYTES)-
-} lz_ecc_pub_key_pem;
+} ecc_pub_key_pem_t;
 
-typedef struct lz_ecc_priv_key_pem {
+typedef struct {
 	char key[MAX_PRIV_ECP_PEM_BYTES];
 	// Length is not needed, since it can be figured out with strnlen(key, MAX_PUB_ECP_PEM_BYTES)-
-} lz_ecc_priv_key_pem;
+} ecc_priv_key_pem_t;
 
-typedef struct lz_ecc_signature {
+typedef struct {
 	uint8_t sig[MAX_SIG_ECP_DER_BYTES];
 	uint32_t length;
-} lz_ecc_signature;
+} ecc_signature_t;
 
 #define CHECK(func, err)                                                                           \
 	do {                                                                                           \

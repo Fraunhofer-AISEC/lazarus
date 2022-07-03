@@ -27,7 +27,7 @@
 #include "lz_common.h"
 #include "mbedtls/md.h"
 
-int lz_hmac_sha256(uint8_t *result, const void *data, size_t dataSize, const uint8_t *key,
+int hmac_sha256(uint8_t *result, const void *data, size_t dataSize, const uint8_t *key,
 				   size_t keySize)
 {
 	if (keySize != SYM_KEY_LENGTH) {
