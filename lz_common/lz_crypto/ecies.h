@@ -21,10 +21,10 @@
 
 #ifdef MBEDTLS_CONFIG_FILE
 
-int lz_ecies_encrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, uint8_t *out,
+int ecies_encrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, uint8_t *out,
 					 uint32_t out_len);
 
-int lz_ecies_decrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, uint8_t *out,
+int ecies_decrypt(mbedtls_ecdh_context *ctx, uint8_t *in, uint32_t in_len, uint8_t *out,
 					 uint32_t out_len);
 
 #endif /* MBEDTLS_CONFIG_FILE */

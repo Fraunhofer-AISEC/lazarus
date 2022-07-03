@@ -32,7 +32,7 @@
 #define NONCE_LEN 12
 #define encrypted_len(plain_len) ((plain_len) + AUTHTAG_LEN)
 
-int lz_chacha20_poly1305_encrypt(const unsigned char *input, uint32_t input_len,
+int chacha20_poly1305_encrypt(const unsigned char *input, uint32_t input_len,
 								 unsigned char *output, uint32_t output_len, uint8_t *nonce,
 								 size_t nonce_len, const uint8_t *aad, size_t aad_len, uint8_t *key)
 {
@@ -70,7 +70,7 @@ int lz_chacha20_poly1305_encrypt(const unsigned char *input, uint32_t input_len,
 	return res;
 }
 
-int lz_chacha20_poly1305_decrypt(const uint8_t *input, const uint32_t input_len, uint8_t *output,
+int chacha20_poly1305_decrypt(const uint8_t *input, const uint32_t input_len, uint8_t *output,
 								 const uint32_t output_len, uint8_t *nonce, size_t nonce_len,
 								 const uint8_t *aad, size_t aad_len, uint8_t *key)
 {

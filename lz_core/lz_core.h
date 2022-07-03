@@ -25,16 +25,16 @@
 
 boot_mode_t lz_core_run(void);
 
-LZ_RESULT lz_core_create_device_id_csr(bool first_boot, lz_ecc_keypair *lz_keypair);
+LZ_RESULT lz_core_create_device_id_csr(bool first_boot, ecc_keypair_t *lz_keypair);
 
 LZ_RESULT lz_core_provide_params_ram(boot_mode_t boot_mode, bool lz_core_updated,
 									 bool firmware_update_necessary,
-									 lz_ecc_keypair *lz_alias_id_keypair,
-									 lz_ecc_keypair *lz_dev_id_keypair);
+									 ecc_keypair_t *lz_alias_id_keypair,
+									 ecc_keypair_t *lz_dev_id_keypair);
 
-LZ_RESULT lz_core_derive_device_id(lz_ecc_keypair *lz_keypair);
+LZ_RESULT lz_core_derive_device_id(ecc_keypair_t *lz_keypair);
 
-bool lz_core_is_updated(lz_ecc_keypair *lz_pub);
+bool lz_core_is_updated(ecc_keypair_t *lz_pub);
 
 LZ_RESULT lz_get_deferral_time(uint32_t *deferral_time);
 
@@ -80,6 +80,6 @@ LZ_RESULT lz_core_verify_staging_elem_hdr_sig(const lz_auth_hdr_t *hdr, uint8_t 
 LZ_RESULT lz_core_verify_staging_elem_hdr(const lz_auth_hdr_t *hdr, uint8_t *payload,
 										  uint8_t *nonce);
 
-LZ_RESULT lz_core_derive_alias_id_keypair(uint8_t *digest, lz_ecc_keypair *lz_alias_id_keypair);
+LZ_RESULT lz_core_derive_alias_id_keypair(uint8_t *digest, ecc_keypair_t *lz_alias_id_keypair);
 
 #endif /* LZ_CORE_H_ */

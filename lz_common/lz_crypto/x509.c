@@ -37,12 +37,12 @@
 
 #define SERIAL_NUMBER_FIELD_LENGTH 14
 
-size_t lz_x509_get_dn_length(const lz_x509_dn_info *info)
+size_t lz_x509_get_dn_length(const x509_dn_info *info)
 {
 	return strlen(info->common_name) + strlen(info->org) + strlen(info->country) + 10;
 }
 
-int lz_x509_dn_to_string(const lz_x509_dn_info *info, char *buf, size_t buf_size)
+int lz_x509_dn_to_string(const x509_dn_info *info, char *buf, size_t buf_size)
 {
 	if (buf_size < x509_get_dn_length(info)) {
 		dbgprint(DBG_INFO, "ERROR: Buffer too small for csr info.\n");
@@ -56,7 +56,7 @@ int lz_x509_dn_to_string(const lz_x509_dn_info *info, char *buf, size_t buf_size
 	return n;
 }
 
-int lz_write_csr_to_pem(const lz_x509_csr_info *info, lz_ecc_keypair *keypair, unsigned char *buf,
+int x509_write_csr_to_pem(const x509_csr_info *info, ecc_keypair_t *keypair, unsigned char *buf,
 						size_t buf_size)
 {
 	mbedtls_x509write_csr req;
@@ -89,8 +89,8 @@ clean:
 	return re;
 }
 
-int lz_write_cert_to_pem(const lz_x509_cert_info *info, lz_ecc_keypair *subject_keys,
-						 lz_ecc_keypair *issuer_keys, unsigned char *buf, size_t buf_size)
+int x509_write_cert_to_pem(const x509_cert_info *info, ecc_keypair_t *subject_keys,
+						 ecc_keypair_t *issuer_keys, unsigned char *buf, size_t buf_size)
 {
 	mbedtls_x509write_cert cert;
 	mbedtls_x509write_crt_init(&cert);
@@ -150,13 +150,13 @@ clean:
 
 #ifdef MBEDTLS_HKDF_C
 
-int lz_set_serial_number_csr(lz_x509_csr_info *info, const unsigned char *salt, size_t salt_len)
+int x509_set_serial_number_csr(x509_csr_info *info, const unsigned char *salt, size_t salt_len)
 {
 	return mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, salt, salt_len, NULL,
 						0, (unsigned char *)info->serial_number, sizeof(info->serial_number));
 }
 
-int lz_set_serial_number_cert(lz_x509_cert_info *info, const unsigned char *salt, size_t salt_len)
+int x509_set_serial_number_cert(x509_cert_info *info, const unsigned char *salt, size_t salt_len)
 {
 	return mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0, salt, salt_len, NULL,
 						0, (unsigned char *)info->serial_number, sizeof(info->serial_number));

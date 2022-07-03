@@ -146,7 +146,7 @@ typedef struct {
 		uint8_t digest[SHA256_DIGEST_LENGTH]; // Hash of the payload
 	} content;
 	// Signature over all elements of the header
-	lz_ecc_signature signature;
+	ecc_signature_t signature;
 } lz_auth_hdr_t;
 
 /*******************************************
@@ -167,7 +167,7 @@ typedef union {
 			time_t issue_time;
 			uint8_t digest[SHA256_DIGEST_LENGTH];
 		} content;
-		lz_ecc_signature signature;
+		ecc_signature_t signature;
 	} hdr;
 	uint8_t u8[0x800];
 } lz_img_hdr_t;
@@ -186,9 +186,9 @@ typedef struct {
 // certificates in the certificate bag
 typedef struct {
 	uint32_t magic; // Indicates the next layer that the passed structure is in good state
-	lz_ecc_pub_key_pem dev_pub_key;
-	lz_ecc_pub_key_pem code_auth_pub_key;
-	lz_ecc_pub_key_pem management_pub_key;
+	ecc_pub_key_pem_t dev_pub_key;
+	ecc_pub_key_pem_t code_auth_pub_key;
+	ecc_pub_key_pem_t management_pub_key;
 
 	lz_img_cert_index_t certTable[NUM_CERTS]; // Root, DeviceID and AliasID cert
 	uint32_t cursor; // Cursor points to the end of the last element in the certBag
@@ -213,9 +213,9 @@ typedef struct {
 
 typedef struct {
 	uint32_t magic;
-	lz_ecc_pub_key_pem dev_pub_key;
-	lz_ecc_pub_key_pem code_auth_pub_key;
-	lz_ecc_pub_key_pem management_pub_key;
+	ecc_pub_key_pem_t dev_pub_key;
+	ecc_pub_key_pem_t code_auth_pub_key;
+	ecc_pub_key_pem_t management_pub_key;
 
 	lz_img_cert_index_t certTable[2]; // Hub and DeviceID cert
 	uint32_t cursor;				  // Cursor points to the end of the last element in the certBag
@@ -283,8 +283,8 @@ typedef struct {
 
 typedef struct {
 	uint32_t magic;
-	lz_ecc_pub_key_pem alias_id_keypair_pub;
-	lz_ecc_priv_key_pem alias_id_keypair_priv;
+	ecc_pub_key_pem_t alias_id_keypair_pub;
+	ecc_priv_key_pem_t alias_id_keypair_priv;
 	uint8_t cur_nonce[LEN_NONCE];
 	uint8_t next_nonce[LEN_NONCE];
 	uint8_t dev_uuid[LEN_UUID_V4_BIN];

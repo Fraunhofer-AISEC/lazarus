@@ -33,14 +33,14 @@
 #include "ecc.h"
 #include "ecdsa.h"
 
-int lz_ecdsa_sign(uint8_t *data, size_t data_length, lz_ecc_keypair *key_pair,
-				  lz_ecc_signature *sig)
+int ecdsa_sign(uint8_t *data, size_t data_length, ecc_keypair_t *key_pair,
+				  ecc_signature_t *sig)
 {
 	int re = 0;
 
 	// We first hash the message
 	uint8_t hash[SHA256_DIGEST_LENGTH];
-	CHECK(lz_sha256(hash, data, data_length), "Could not hash message");
+	CHECK(sha256(hash, data, data_length), "Could not hash message");
 
 	// And then sign the hash
 	sig->length = 0;
@@ -52,28 +52,28 @@ clean:
 	return re;
 }
 
-int lz_ecdsa_sign_pem(uint8_t *data, size_t data_length, lz_ecc_priv_key_pem *key,
-					  lz_ecc_signature *sig)
+int ecdsa_sign_pem(uint8_t *data, size_t data_length, ecc_priv_key_pem_t *key,
+					  ecc_signature_t *sig)
 {
 	int re = 0;
-	lz_ecc_keypair keypair;
-	CHECK(lz_pem_to_priv_key(&keypair, key), "Could not import private key.");
+	ecc_keypair_t keypair;
+	CHECK(ecc_pem_to_priv_key(&keypair, key), "Could not import private key.");
 
-	CHECK(lz_ecdsa_sign(data, data_length, &keypair, sig), "Could not sign message");
+	CHECK(ecdsa_sign(data, data_length, &keypair, sig), "Could not sign message");
 
 clean:
-	lz_free_keypair(&keypair);
+	ecc_free_keypair(&keypair);
 	return re;
 }
 
-int lz_ecdsa_verify(uint8_t *data, size_t data_length, lz_ecc_keypair *key_pair,
-					lz_ecc_signature *sig)
+int ecdsa_verify(uint8_t *data, size_t data_length, ecc_keypair_t *key_pair,
+					ecc_signature_t *sig)
 {
 	int re = 0;
 
 	// We first hash the message
 	uint8_t hash[SHA256_DIGEST_LENGTH];
-	CHECK(lz_sha256(hash, data, data_length), "Could not hash message");
+	CHECK(sha256(hash, data, data_length), "Could not hash message");
 
 	// And then verify the hash
 	// TODO: Remove the CHECK from here (and just return something other than 0)
@@ -84,13 +84,13 @@ clean:
 	return re;
 }
 
-int lz_ecdsa_verify_pub(uint8_t *data, size_t data_length, lz_ecc_keypair *keypair,
-						lz_ecc_signature *sig)
+int ecdsa_verify_pub(uint8_t *data, size_t data_length, ecc_keypair_t *keypair,
+						ecc_signature_t *sig)
 {
 	int re = 0;
 
 	uint8_t hash[SHA256_DIGEST_LENGTH];
-	CHECK(lz_sha256(hash, data, data_length), "Could not hash message");
+	CHECK(sha256(hash, data, data_length), "Could not hash message");
 
 	CHECK(mbedtls_ecdsa_read_signature(mbedtls_pk_ec(*keypair), hash, sizeof(hash), sig->sig,
 									   sig->length),
@@ -99,8 +99,8 @@ clean:
 	return re;
 }
 
-int lz_ecdsa_verify_pub_pem(uint8_t *data, size_t data_length, lz_ecc_pub_key_pem *key,
-							const lz_ecc_signature *sig)
+int ecdsa_verify_pub_pem(uint8_t *data, size_t data_length, ecc_pub_key_pem_t *key,
+							const ecc_signature_t *sig)
 {
 	mbedtls_pk_context pk_context;
 	mbedtls_pk_init(&pk_context);
@@ -111,7 +111,7 @@ int lz_ecdsa_verify_pub_pem(uint8_t *data, size_t data_length, lz_ecc_pub_key_pe
 		  "Error parsing the public PEM key");
 
 	uint8_t hash[SHA256_DIGEST_LENGTH];
-	CHECK(lz_sha256(hash, data, data_length), "Could not hash message");
+	CHECK(sha256(hash, data, data_length), "Could not hash message");
 
 	CHECK(mbedtls_pk_verify(&pk_context, MBEDTLS_MD_SHA256, hash, sizeof(hash), sig->sig,
 							sig->length),

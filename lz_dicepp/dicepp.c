@@ -98,7 +98,7 @@ LZ_RESULT dicepp_create_secret_data(dicepp_secret_data_t *dicepp_secret_data)
 	lzport_read_cdi(dicepp_secret_data->cdi, sizeof(dicepp_secret_data->cdi));
 
 	// Create static_symm
-	if (lz_hmac_sha256(dicepp_secret_data->static_symm,
+	if (hmac_sha256(dicepp_secret_data->static_symm,
 					   (const void *)dicepp_data_store.info.dev_uuid, LEN_UUID_V4_BIN,
 					   dicepp_secret_data->cdi, SHA256_DIGEST_LENGTH) != 0) {
 		dbgprint(DBG_ERR, "ERROR: Creating static_symm failed.\n");
@@ -144,14 +144,14 @@ LZ_RESULT dicepp_calculate_cdi_prime(uint8_t cdi_prime[SHA256_DIGEST_LENGTH],
 									 dicepp_secret_data_t *dicepp_secret_data)
 {
 	// Hash Lazarus Core to calculate CDI_prime
-	if (lz_sha256(lz_core_digest, (const void *)lz_core_core,
+	if (sha256(lz_core_digest, (const void *)lz_core_core,
 				  (LZ_CORE_CODE_SIZE + LZ_CORE_NSC_SIZE)) != 0) {
 		dbgprint(DBG_ERR, "ERROR: Failed to hash Lazarus Core code area\n");
 		return LZ_ERROR;
 	}
 
 	// Calculate CDI_prime based on CDI and Lazarus Core's hash, and store it
-	if (lz_hmac_sha256(cdi_prime, lz_core_digest, SHA256_DIGEST_LENGTH,
+	if (hmac_sha256(cdi_prime, lz_core_digest, SHA256_DIGEST_LENGTH,
 					   (uint8_t *)dicepp_secret_data->cdi, SHA256_DIGEST_LENGTH) != 0) {
 		dbgprint(DBG_ERR, "ERROR: Failed to create CDIprime\n");
 		return LZ_ERROR;
@@ -172,7 +172,7 @@ LZ_RESULT dicepp_calculate_core_auth(uint8_t core_auth[SHA256_DIGEST_LENGTH],
 		   LEN_UUID_V4_BIN);
 
 	// Calculate core_auth based on Lazarus Core's hash || dev_uuid and static_symm, and store it
-	if (lz_hmac_sha256(core_auth, digest_core_auth, sizeof(digest_core_auth),
+	if (hmac_sha256(core_auth, digest_core_auth, sizeof(digest_core_auth),
 					   (uint8_t *)dicepp_secret_data->static_symm, SYM_KEY_LENGTH) != 0) {
 		dbgprint(DBG_ERR, "ERROR: Failed to derive core auth\n");
 		return LZ_ERROR;

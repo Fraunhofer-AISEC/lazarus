@@ -48,12 +48,12 @@ static LZ_RESULT lz_core_get_next_layer_addrs(boot_mode_t boot_mode,
 											  const uint8_t **boot_image_code,
 											  const lz_img_meta_t **img_meta);
 static LZ_RESULT lz_core_derive_dev_auth(uint8_t *dev_auth, uint32_t dev_auth_length,
-										 lz_ecc_keypair *lz_dev_id);
+										 ecc_keypair_t *lz_dev_id);
 
 boot_mode_t lz_core_run(void)
 {
 	bool initial_boot;
-	lz_ecc_keypair lz_dev_id_keypair;
+	ecc_keypair_t lz_dev_id_keypair;
 	boot_mode_t boot_mode;
 	uint8_t next_layer_digest[SHA256_DIGEST_LENGTH];
 
@@ -116,7 +116,7 @@ boot_mode_t lz_core_run(void)
 	// very first time
 
 	bool lz_core_updated = lz_core_is_updated(&lz_dev_id_keypair);
-	// bool lz_core_updated = lz_core_is_updated(&device_id_pk, lz_keypair_to_public(&lz_dev_id_keypair));
+	// bool lz_core_updated = lz_core_is_updated(&device_id_pk, ecc_keypair_to_public(&lz_dev_id_keypair));
 
 	if (lz_core_updated) {
 		dbgprint(
@@ -198,17 +198,17 @@ boot_mode_t lz_core_run(void)
 		}
 	}
 
-	lz_ecc_priv_key_pem pem;
-	lz_priv_key_to_pem(&lz_dev_id_keypair, &pem);
+	ecc_priv_key_pem_t pem;
+	ecc_priv_key_to_pem(&lz_dev_id_keypair, &pem);
 	uint8_t digest[SHA256_DIGEST_LENGTH];
-	if (lz_sha256_two_parts(digest, next_layer_digest, sizeof(next_layer_digest), &pem,
+	if (sha256_two_parts(digest, next_layer_digest, sizeof(next_layer_digest), &pem,
 							sizeof(pem)) < 0) {
 		dbgprint(DBG_ERR, "ERROR: Failed to derive digest from next layer and DeviceID\n");
 		return false;
 	}
 
 	// Create the volatile AliasID key pair based on measuring the next layer
-	lz_ecc_keypair lz_alias_id_keypair;
+	ecc_keypair_t lz_alias_id_keypair;
 	if (lz_core_derive_alias_id_keypair(digest, &lz_alias_id_keypair) != LZ_SUCCESS) {
 		dbgprint(
 			DBG_ERR,
@@ -250,10 +250,10 @@ boot_mode_t lz_core_run(void)
  * @param privKey The derived DeviceID private key
  * @return LZ_SUCCESS if successful, otherwise LZ_ERROR
  */
-LZ_RESULT lz_core_derive_device_id(lz_ecc_keypair *device_id_keypair)
+LZ_RESULT lz_core_derive_device_id(ecc_keypair_t *device_id_keypair)
 {
 	dbgprint(DBG_INFO, "INFO: Generating DeviceID key pair\n");
-	if (lz_derive_ecc_keypair(device_id_keypair, lz_core_boot_params->info.cdi_prime,
+	if (ecc_derive_keypair(device_id_keypair, lz_core_boot_params->info.cdi_prime,
 							  sizeof(lz_core_boot_params->info.cdi_prime))) {
 		dbgprint(DBG_ERR, "ERROR: Failed to derive DeviceID key pair (device_id_keypair)\n");
 		return LZ_ERROR;
@@ -388,7 +388,7 @@ LZ_RESULT lz_core_wipe_static_symm(void)
 }
 
 LZ_RESULT lz_core_derive_dev_auth(uint8_t *dev_auth, uint32_t dev_auth_length,
-								  lz_ecc_keypair *lz_dev_id)
+								  ecc_keypair_t *lz_dev_id)
 {
 	uint8_t digest_dev_auth[MAX_PUB_ECP_PEM_BYTES + LEN_UUID_V4_BIN];
 
@@ -401,12 +401,12 @@ LZ_RESULT lz_core_derive_dev_auth(uint8_t *dev_auth, uint32_t dev_auth_length,
 	memset(digest_dev_auth, 0, sizeof(digest_dev_auth));
 
 	// Concatenate devID public and dev_uuid to calculate dev_auth
-	lz_pub_key_to_pem(lz_dev_id, (lz_ecc_pub_key_pem *)digest_dev_auth);
+	ecc_pub_key_to_pem(lz_dev_id, (ecc_pub_key_pem_t *)digest_dev_auth);
 	memcpy(digest_dev_auth + MAX_PUB_ECP_PEM_BYTES, lz_core_boot_params->info.dev_uuid,
 		   LEN_UUID_V4_BIN);
 
 	// Compute dev auth
-	if (lz_hmac_sha256(dev_auth, digest_dev_auth, sizeof(digest_dev_auth),
+	if (hmac_sha256(dev_auth, digest_dev_auth, sizeof(digest_dev_auth),
 					   (uint8_t *)&(lz_core_boot_params->info.core_auth),
 					   sizeof(lz_core_boot_params->info.core_auth))) {
 		dbgprint(DBG_ERR, "ERROR: Creating dev_auth failed.\n");
@@ -417,11 +417,11 @@ LZ_RESULT lz_core_derive_dev_auth(uint8_t *dev_auth, uint32_t dev_auth_length,
 }
 
 // Calculates the alias key pair and stores it in alias_creds
-LZ_RESULT lz_core_derive_alias_id_keypair(uint8_t *digest, lz_ecc_keypair *lz_alias_id_keypair)
+LZ_RESULT lz_core_derive_alias_id_keypair(uint8_t *digest, ecc_keypair_t *lz_alias_id_keypair)
 {
 	dbgprint(DBG_INFO, "INFO: Generating Alias Identity\n");
 
-	if (lz_derive_ecc_keypair(lz_alias_id_keypair, digest, sizeof(digest))) {
+	if (ecc_derive_keypair(lz_alias_id_keypair, digest, sizeof(digest))) {
 		dbgprint(DBG_ERR, "ERROR: Failed to derive alias id key pair (device_id_keypair)\n");
 		return LZ_ERROR;
 	}
@@ -431,8 +431,8 @@ LZ_RESULT lz_core_derive_alias_id_keypair(uint8_t *digest, lz_ecc_keypair *lz_al
 	return LZ_SUCCESS;
 }
 
-LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, lz_ecc_keypair *alias_keypair,
-									lz_ecc_keypair *device_id_keypair)
+LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, ecc_keypair_t *alias_keypair,
+									ecc_keypair_t *device_id_keypair)
 {
 	const lz_img_hdr_t *boot_image_hdr;
 	uint32_t rem_length = 0;
@@ -446,7 +446,7 @@ LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, lz_ecc_keypair *alias
 	// Create a cert with the device_id_key as issuer and the alias_id as subject
 	// Then sign that thing and store it somewhere
 
-	lz_x509_cert_info info;
+	x509_cert_info info;
 	info.issuer.common_name = "DeviceID";
 	info.issuer.org = "Lazarus";
 	info.issuer.country = "DE";
@@ -454,11 +454,11 @@ LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, lz_ecc_keypair *alias
 	info.subject.org = "Lazarus";
 	info.subject.country = "DE";
 
-	lz_ecc_pub_key_pem alias_keypair_pem;
-	lz_pub_key_to_pem(alias_keypair, &alias_keypair_pem);
-	if (lz_set_serial_number_cert(&info, (unsigned char *)&alias_keypair_pem,
+	ecc_pub_key_pem_t alias_keypair_pem;
+	ecc_pub_key_to_pem(alias_keypair, &alias_keypair_pem);
+	if (x509_set_serial_number_cert(&info, (unsigned char *)&alias_keypair_pem,
 								  sizeof(alias_keypair_pem)) != 0) {
-		dbgprint(DBG_ERR, "ERROR: lz_set_serial_number_cert failed.\n");
+		dbgprint(DBG_ERR, "ERROR: x509_set_serial_number_cert failed.\n");
 		return LZ_ERROR;
 	}
 	// Create the cert store with all certificates
@@ -466,7 +466,7 @@ LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, lz_ecc_keypair *alias
 
 	// Store DeviceID pubkey
 	// Write the public key to the cert_store
-	lz_pub_key_to_pem(device_id_keypair, (lz_ecc_pub_key_pem *)&lz_img_cert_store.info.dev_pub_key);
+	ecc_pub_key_to_pem(device_id_keypair, (ecc_pub_key_pem_t *)&lz_img_cert_store.info.dev_pub_key);
 
 	// Provide backend public key to upper layers
 	memcpy((void *)&lz_img_cert_store.info.management_pub_key,
@@ -521,13 +521,13 @@ LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, lz_ecc_keypair *alias
 
 	// Finally, load the volatile AliasID certificate
 	rem_length = sizeof(lz_img_cert_store.certBag) - lz_img_cert_store.info.cursor;
-	if (lz_write_cert_to_pem(
+	if (x509_write_cert_to_pem(
 			&info, alias_keypair, device_id_keypair,
 			(unsigned char *)&lz_img_cert_store.certBag[lz_img_cert_store.info.cursor],
 			rem_length) != 0) {
 		dbgprint(
 			DBG_ERR,
-			"ERROR: lz_write_cert_to_pem failed. ImgCertStore overflow likely (INDEX_IMG_CERTSTORE_ALIASID).\n");
+			"ERROR: x509_write_cert_to_pem failed. ImgCertStore overflow likely (INDEX_IMG_CERTSTORE_ALIASID).\n");
 		return LZ_ERROR;
 	}
 	rem_length = strlen((const char *)&lz_img_cert_store.certBag[lz_img_cert_store.info.cursor]);
@@ -547,16 +547,16 @@ LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, lz_ecc_keypair *alias
 // This function provides all required boot parameters for the next layer as fixed structures at fixed locations in RAM.
 LZ_RESULT lz_core_provide_params_ram(boot_mode_t boot_mode, bool lz_core_updated,
 									 bool firmware_update_necessary,
-									 lz_ecc_keypair *lz_alias_id_keypair,
-									 lz_ecc_keypair *lz_dev_id_keypair)
+									 ecc_keypair_t *lz_alias_id_keypair,
+									 ecc_keypair_t *lz_dev_id_keypair)
 {
 	// Create a temporary boot parameters structure on the stack, later write it to the designated area.
 	// We cannot directly write, because the area overlaps with Lazarus Core's boot parameters,
 	// which we still require until the end of this function.
 	lz_img_boot_params_info_t img_boot_params_info_cpy = { 0 };
 
-	lz_pub_key_to_pem(lz_alias_id_keypair, &img_boot_params_info_cpy.alias_id_keypair_pub);
-	lz_priv_key_to_pem(lz_alias_id_keypair, &img_boot_params_info_cpy.alias_id_keypair_priv);
+	ecc_pub_key_to_pem(lz_alias_id_keypair, &img_boot_params_info_cpy.alias_id_keypair_pub);
+	ecc_priv_key_to_pem(lz_alias_id_keypair, &img_boot_params_info_cpy.alias_id_keypair_priv);
 
 	// App and UD get next nonce for retrieving boot/deferral tickets, UM doesn't need it
 	// App currently also gets dev_uuid TODO check if that is OK or if another identifier must be
@@ -623,7 +623,7 @@ LZ_RESULT lz_core_provide_params_ram(boot_mode_t boot_mode, bool lz_core_updated
 /**
  * Create DeviceID Certificate Signing Request and store it in flash
  */
-LZ_RESULT lz_core_create_device_id_csr(bool first_boot, lz_ecc_keypair *device_id_keypair)
+LZ_RESULT lz_core_create_device_id_csr(bool first_boot, ecc_keypair_t *device_id_keypair)
 {
 	// Create a trust anchors structure to RAM, rewrite and flash when finished
 	trust_anchors_t ta_copy = { 0 };
@@ -640,15 +640,15 @@ LZ_RESULT lz_core_create_device_id_csr(bool first_boot, lz_ecc_keypair *device_i
 	}
 
 	// Store new DeviceID public key
-	lz_pub_key_to_pem(device_id_keypair, &ta_copy.info.dev_pub_key);
-	lz_x509_csr_info info;
+	ecc_pub_key_to_pem(device_id_keypair, &ta_copy.info.dev_pub_key);
+	x509_csr_info info;
 	info.subject.common_name = "DeviceID";
 	info.subject.country = "DE";
 	info.subject.org = "Lazarus";
 
-	if (lz_set_serial_number_csr(&info, (unsigned char *)&ta_copy.info.dev_pub_key,
+	if (x509_set_serial_number_csr(&info, (unsigned char *)&ta_copy.info.dev_pub_key,
 								 sizeof(ta_copy.info.dev_pub_key)) != 0) {
-		dbgprint(DBG_ERR, "ERROR: lz_set_serial_number_csr failed.\n");
+		dbgprint(DBG_ERR, "ERROR: x509_set_serial_number_csr failed.\n");
 		return LZ_ERROR;
 	}
 
@@ -674,9 +674,9 @@ LZ_RESULT lz_core_create_device_id_csr(bool first_boot, lz_ecc_keypair *device_i
 		}
 	}
 
-	if (lz_write_csr_to_pem(&info, device_id_keypair, &ta_copy.certBag[ta_copy.info.cursor],
+	if (x509_write_csr_to_pem(&info, device_id_keypair, &ta_copy.certBag[ta_copy.info.cursor],
 							length) < 0) {
-		dbgprint(DBG_ERR, "ERROR: lz_write_csr_to_pem failed.\n");
+		dbgprint(DBG_ERR, "ERROR: x509_write_csr_to_pem failed.\n");
 		return LZ_ERROR;
 	}
 	length = strlen((char *)&ta_copy.certBag[ta_copy.info.cursor]);
@@ -724,16 +724,16 @@ LZ_RESULT lz_core_erase_staging_area(void)
 
 // Check if derived DeviceID matches with the stored identity.
 // DeviceID may only change when Lazarus Core was updated
-bool lz_core_is_updated(lz_ecc_keypair *lz_dev_id_keypair)
+bool lz_core_is_updated(ecc_keypair_t *lz_dev_id_keypair)
 {
-	lz_ecc_keypair old_key;
-	if (lz_pem_to_pub_key(
-			&old_key, (lz_ecc_pub_key_pem *)&lz_data_store.trust_anchors.info.dev_pub_key) != 0) {
+	ecc_keypair_t old_key;
+	if (ecc_pem_to_pub_key(
+			&old_key, (ecc_pub_key_pem_t *)&lz_data_store.trust_anchors.info.dev_pub_key) != 0) {
 		return 1;
 	}
-	int re = lz_compare_public_key(lz_keypair_to_public(&old_key),
-								   lz_keypair_to_public(lz_dev_id_keypair));
-	lz_free_keypair(&old_key);
+	int re = ecc_compare_public_key(ecc_keypair_to_public(&old_key),
+								   ecc_keypair_to_public(lz_dev_id_keypair));
+	ecc_free_keypair(&old_key);
 
 	return re;
 }
@@ -796,8 +796,8 @@ LZ_RESULT lz_core_verify_staging_elem_hdr_sig(const lz_auth_hdr_t *hdr, uint8_t 
 	uint8_t digest[SHA256_DIGEST_LENGTH];
 
 	// Hash the staging element's payload
-	if (lz_sha256(digest, payload, hdr->content.payload_size) != 0) {
-		dbgprint(DBG_ERR, "ERROR: lz_sha256 failed.\n");
+	if (sha256(digest, payload, hdr->content.payload_size) != 0) {
+		dbgprint(DBG_ERR, "ERROR: sha256 failed.\n");
 		return LZ_ERROR;
 	}
 
@@ -807,9 +807,9 @@ LZ_RESULT lz_core_verify_staging_elem_hdr_sig(const lz_auth_hdr_t *hdr, uint8_t 
 		return LZ_ERROR;
 	}
 
-	if (lz_ecdsa_verify_pub_pem(
+	if (ecdsa_verify_pub_pem(
 			(uint8_t *)&hdr->content, sizeof(hdr->content),
-			(lz_ecc_pub_key_pem *)&lz_data_store.trust_anchors.info.management_pub_key,
+			(ecc_pub_key_pem_t *)&lz_data_store.trust_anchors.info.management_pub_key,
 			&hdr->signature) != 0) {
 		dbgprint(DBG_ERR, "ERROR: GEN - Failed to verify staging element header signature\n");
 		return LZ_ERROR;
@@ -897,8 +897,8 @@ LZ_RESULT lz_core_verify_image(const lz_img_hdr_t *image_hdr, const uint8_t *ima
 	}
 
 	// Compute the digest of the next layer's image
-	if (lz_sha256(digest, image_code, image_hdr->hdr.content.size) != 0) {
-		dbgprint(DBG_ERR, "ERROR: lz_sha256 failed.\n");
+	if (sha256(digest, image_code, image_hdr->hdr.content.size) != 0) {
+		dbgprint(DBG_ERR, "ERROR: sha256 failed.\n");
 		return LZ_ERROR;
 	}
 
@@ -914,9 +914,9 @@ LZ_RESULT lz_core_verify_image(const lz_img_hdr_t *image_hdr, const uint8_t *ima
 		return LZ_ERROR;
 	}
 
-	if (lz_ecdsa_verify_pub_pem(
+	if (ecdsa_verify_pub_pem(
 			(uint8_t *)&image_hdr->hdr.content, sizeof(image_hdr->hdr.content),
-			(lz_ecc_pub_key_pem *)&lz_data_store.trust_anchors.info.code_auth_pub_key,
+			(ecc_pub_key_pem_t *)&lz_data_store.trust_anchors.info.code_auth_pub_key,
 			&image_hdr->hdr.signature) != 0) {
 		dbgprint(DBG_ERR, "ERROR: Failed to verify image signature with code signing key\n");
 		return LZ_ERROR;

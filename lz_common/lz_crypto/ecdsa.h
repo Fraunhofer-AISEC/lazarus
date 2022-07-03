@@ -28,38 +28,38 @@
  * Signature will be stored in the sig parameter.
  * Return 0 on success.
  */
-int lz_ecdsa_sign(uint8_t *data, size_t data_length, lz_ecc_keypair *key_pair,
-				  lz_ecc_signature *sig);
+int ecdsa_sign(uint8_t *data, size_t data_length, ecc_keypair_t *key_pair,
+				  ecc_signature_t *sig);
 
 /**
  * Hashes the data given in data with the length data_length and signs it with the given private key.
  * Signature will be stored in the sig parameter.
  * Return 0 on success.
  */
-int lz_ecdsa_sign_pem(uint8_t *data, size_t data_length, lz_ecc_priv_key_pem *key,
-					  lz_ecc_signature *sig);
+int ecdsa_sign_pem(uint8_t *data, size_t data_length, ecc_priv_key_pem_t *key,
+					  ecc_signature_t *sig);
 
 /**
  * Verifies the signature sig for data with the length of data_length using key_pair as key.
  * Note: The private part of the key (d) is not used.
  * Return 0 on success.
  */
-int lz_ecdsa_verify(uint8_t *data, size_t data_length, lz_ecc_keypair *key_pair,
-					lz_ecc_signature *sig);
+int ecdsa_verify(uint8_t *data, size_t data_length, ecc_keypair_t *key_pair,
+					ecc_signature_t *sig);
 
 /**
  * Verifies the signature sig for data with the length of data_length using the key key.
  * Uses only the public part of the ecc_keypair
  * Return 0 on success.
  */
-int lz_ecdsa_verify_pub(uint8_t *data, size_t data_length, lz_ecc_keypair *keypair,
-						lz_ecc_signature *sig);
+int ecdsa_verify_pub(uint8_t *data, size_t data_length, ecc_keypair_t *keypair,
+						ecc_signature_t *sig);
 
 /**
  * Verifies the signature sig for data with the length of data_length using the key key.
  * Return 0 on success.
  */
-int lz_ecdsa_verify_pub_pem(uint8_t *data, size_t data_length, lz_ecc_pub_key_pem *key,
-							const lz_ecc_signature *sig);
+int ecdsa_verify_pub_pem(uint8_t *data, size_t data_length, ecc_pub_key_pem_t *key,
+							const ecc_signature_t *sig);
 
 #endif /* MBEDTLS_CONFIG_FILE */

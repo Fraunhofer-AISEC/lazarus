@@ -39,38 +39,38 @@ typedef struct {
 	char *common_name;
 	char *org;
 	char *country;
-} lz_x509_dn_info;
+} x509_dn_info;
 
 typedef struct {
-	lz_x509_dn_info subject;
+	x509_dn_info subject;
 
 	char serial_number[SERIAL_NUMBER_LENGTH];
-} lz_x509_csr_info;
+} x509_csr_info;
 
 typedef struct {
-	lz_x509_dn_info issuer;
-	lz_x509_dn_info subject;
+	x509_dn_info issuer;
+	x509_dn_info subject;
 
 	char serial_number[SERIAL_NUMBER_LENGTH];
-} lz_x509_cert_info;
+} x509_cert_info;
 
-// Writes and signs an lz_x509_csr_info struct to a buffer in PEM format.
+// Writes and signs an x509_csr_info struct to a buffer in PEM format.
 // Adds the given public key to the CSR and signs the CSR with the given
 // private key
-int lz_write_csr_to_pem(const lz_x509_csr_info *info, lz_ecc_keypair *keypair, unsigned char *buf,
+int x509_write_csr_to_pem(const x509_csr_info *info, ecc_keypair_t *keypair, unsigned char *buf,
 						size_t buf_size);
 
-// Writes and signs an lz_x509_cert_info struct to a buffer in PEM format.
-int lz_write_cert_to_pem(const lz_x509_cert_info *info, lz_ecc_keypair *subject_keys,
-						 lz_ecc_keypair *issuer_keys, unsigned char *buf, size_t buf_size);
+// Writes and signs an x509_cert_info struct to a buffer in PEM format.
+int x509_write_cert_to_pem(const x509_cert_info *info, ecc_keypair_t *subject_keys,
+						 ecc_keypair_t *issuer_keys, unsigned char *buf, size_t buf_size);
 
 #ifdef MBEDTLS_HKDF_C
 
 // Sets the serial number of a csr using a given salt
-int lz_set_serial_number_csr(lz_x509_csr_info *info, const unsigned char *salt, size_t salt_len);
+int x509_set_serial_number_csr(x509_csr_info *info, const unsigned char *salt, size_t salt_len);
 
 // Sets the serial number of a cert using a given salt
-int lz_set_serial_number_cert(lz_x509_cert_info *info, const unsigned char *salt, size_t salt_len);
+int x509_set_serial_number_cert(x509_cert_info *info, const unsigned char *salt, size_t salt_len);
 
 #endif
 

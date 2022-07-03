@@ -29,7 +29,7 @@
 
 #include "ecc.h"
 
-int lz_derive_ecc_keypair(lz_ecc_keypair *keypair, const void *seed, size_t seed_size)
+int ecc_derive_keypair(ecc_keypair_t *keypair, const void *seed, size_t seed_size)
 {
 	mbedtls_pk_init(keypair);
 	mbedtls_hmac_drbg_context hmac_drbg_ctx;
@@ -63,7 +63,7 @@ clean:
 }
 
 #if defined(MBEDTLS_PEM_WRITE_C)
-int lz_pub_key_to_pem(lz_ecc_keypair *keypair, lz_ecc_pub_key_pem *pem)
+int ecc_pub_key_to_pem(ecc_keypair_t *keypair, ecc_pub_key_pem_t *pem)
 {
 	int re = 0;
 
@@ -75,7 +75,7 @@ clean:
 	return re;
 }
 
-int lz_priv_key_to_pem(lz_ecc_keypair *keypair, lz_ecc_priv_key_pem *pem)
+int ecc_priv_key_to_pem(ecc_keypair_t *keypair, ecc_priv_key_pem_t *pem)
 {
 	int re = 0;
 
@@ -88,7 +88,7 @@ clean:
 #endif
 
 #if defined(MBEDTLS_PK_PARSE_C)
-int lz_pem_to_pub_key(lz_ecc_keypair *keypair, const lz_ecc_pub_key_pem *pem)
+int ecc_pem_to_pub_key(ecc_keypair_t *keypair, const ecc_pub_key_pem_t *pem)
 {
 	mbedtls_pk_init(keypair);
 	int re = 0;
@@ -104,7 +104,7 @@ clean:
 	return re;
 }
 
-int lz_pem_to_priv_key(lz_ecc_keypair *keypair, const lz_ecc_priv_key_pem *pem)
+int ecc_pem_to_priv_key(ecc_keypair_t *keypair, const ecc_priv_key_pem_t *pem)
 {
 	mbedtls_pk_init(keypair);
 	int re = 0;
@@ -120,22 +120,22 @@ clean:
 }
 #endif
 
-lz_ecc_private_key *lz_keypair_to_private(lz_ecc_keypair *keypair)
+ecc_private_key_t *ecc_keypair_to_private(ecc_keypair_t *keypair)
 {
 	return &mbedtls_pk_ec(*keypair)->d;
 }
 
-lz_ecc_public_key *lz_keypair_to_public(lz_ecc_keypair *keypair)
+ecc_public_key_t *ecc_keypair_to_public(ecc_keypair_t *keypair)
 {
 	return &mbedtls_pk_ec(*keypair)->Q;
 }
 
-int lz_compare_public_key(lz_ecc_public_key *k1, lz_ecc_public_key *k2)
+int ecc_compare_public_key(ecc_public_key_t *k1, ecc_public_key_t *k2)
 {
 	return mbedtls_ecp_point_cmp(k1, k2);
 }
 
-void lz_free_keypair(lz_ecc_keypair *keypair)
+void ecc_free_keypair(ecc_keypair_t *keypair)
 {
 	mbedtls_pk_free(keypair);
 }
