@@ -45,7 +45,7 @@ int ecdsa_sign(uint8_t *data, size_t data_length, ecc_keypair_t *key_pair,
 	// And then sign the hash
 	sig->length = 0;
 	CHECK(mbedtls_pk_sign(key_pair, MBEDTLS_MD_SHA256, hash, sizeof(hash), sig->sig,
-						  (size_t *)&sig->length, lz_rand, 0),
+						  (size_t *)&sig->length, crypto_rand, 0),
 		  "Could not sign message");
 
 clean:

@@ -44,7 +44,7 @@ int ecdh_gen_key_pair(mbedtls_ecdh_context *ctx)
 	}
 
 	// This actually generates a key pair
-	ret = mbedtls_ecdh_gen_public(&ctx->grp, &ctx->d, &ctx->Q, lz_rand, NULL);
+	ret = mbedtls_ecdh_gen_public(&ctx->grp, &ctx->d, &ctx->Q, crypto_rand, NULL);
 	if (ret != 0) {
 		dbgprint(DBG_INFO,
 				 "ERROR: Failed to generate key-pair - mbedtls_ecdh_gen_public returned "
@@ -83,7 +83,7 @@ int ecdh_derive_secret(mbedtls_ecdh_context *ctx, uint8_t *shared, uint32_t len)
 	}
 
 	// Derive shared secret
-	ret = mbedtls_ecdh_compute_shared(&ctx->grp, &ctx->z, &ctx->Qp, &ctx->d, lz_rand, NULL);
+	ret = mbedtls_ecdh_compute_shared(&ctx->grp, &ctx->z, &ctx->Qp, &ctx->d, crypto_rand, NULL);
 	if (ret != 0) {
 		dbgprint(DBG_INFO,
 				 "ERROR: Failed to generate shared secret - mbedtls_ecdh_compute_shared "

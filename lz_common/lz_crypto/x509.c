@@ -80,7 +80,7 @@ int x509_write_csr_to_pem(const x509_csr_info *info, ecc_keypair_t *keypair, uns
 		  "Error setting subject name for CSR");
 
 	// Writing to the buffer
-	CHECK(mbedtls_x509write_csr_pem(&req, buf, buf_size, lz_rand, NULL),
+	CHECK(mbedtls_x509write_csr_pem(&req, buf, buf_size, crypto_rand, NULL),
 		  "Error while writing CSR as DER");
 
 clean:
@@ -134,7 +134,7 @@ int x509_write_cert_to_pem(const x509_cert_info *info, ecc_keypair_t *subject_ke
 	// TODO: Add extKeyUsage to id-kp-clientAuth
 	// CHECK(mbedtls_x509write_crt_set_extension(&cert,), "Failed setting the key usage in cert");
 
-	CHECK(mbedtls_x509write_crt_pem(&cert, buf, buf_size, lz_rand, 0),
+	CHECK(mbedtls_x509write_crt_pem(&cert, buf, buf_size, crypto_rand, 0),
 		  "Failed writing the cert as pem");
 
 	// Signed von der device ID
