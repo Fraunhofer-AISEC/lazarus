@@ -32,14 +32,7 @@
 #include "lz_awdt_handler.h"
 #include "lz_awdt.h"
 #include "lz_net.h"
-
 #include "net.h"
-#include "sensor.h"
-#include "lz_led.h"
-
-#if (1 == FREERTOS_BENCHMARK_ACTIVE)
-#include "benchmark.h"
-#endif
 
 int main(void)
 {
@@ -51,28 +44,14 @@ int main(void)
 	lzport_gpio_rts_init();
 	lzport_gpio_set_rts(false);
 	lz_print_img_info("Demo App", &lz_app_hdr);
-
-#if (1 == FREERTOS_BENCHMARK_ACTIVE)
-	vTraceEnable(TRC_INIT);
-#endif
-
 	lzport_usart_init_esp();
 
 	xTaskCreate(net_task, "NET ", configMINIMAL_STACK_SIZE * 10, NULL, 5, NULL);
 	xTaskCreate(lz_awdt_task, "ADT ", configMINIMAL_STACK_SIZE * 5, NULL, 4, NULL);
-#if (RUN_IOT_SENSOR_DEMO == 1)
-	xTaskCreate(sensor_task, "DEM", configMINIMAL_STACK_SIZE * 6, NULL, 3, NULL);
-#endif
-	xTaskCreate(led_task, "LED ", configMINIMAL_STACK_SIZE, NULL, 3, NULL);
-#if (1 == FREERTOS_BENCHMARK_ACTIVE)
-	xTaskCreate(benchmark_task, "MRK", configMINIMAL_STACK_SIZE * 20, NULL, 5, NULL);
-#endif
 
 	vTaskStartScheduler();
 
-	for (;;)
-		;
-
+	// Should never be reached
 	return 0;
 }
 

@@ -156,10 +156,6 @@ LZ_RESULT lzport_socket_open(uint32_t handle, const char *host_name, uint32_t de
 			return LZ_SUCCESS;
 		}
 
-#if (1 == LZ_DBG_NETWORK)
-		lzport_gpio_toggle_trace();
-#endif
-
 		if (result == LZ_ERROR_WIFI_ALREADY_CONNECTED) {
 			dbgprint(DBG_WARN, "WARN: Socket is already open\n");
 			return LZ_SUCCESS;

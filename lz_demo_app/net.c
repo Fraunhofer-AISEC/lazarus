@@ -31,18 +31,11 @@
 #include "lz_common.h"
 #include "lz_net.h"
 #include "lz_awdt.h"
-#include "sensor.h"
 
 static TaskHandle_t net_task_handle = NULL;
 
 void net_task(void *params)
 {
-#if (1 == LZ_DBG_TRACE_BOOT_ACTIVE_WO_TICKET)
-	lzport_gpio_toggle_trace();
-	vTaskDelay(pdMS_TO_TICKS(2000));
-	NVIC_SystemReset();
-#endif
-
 	// Setup ESP8266, connect to Wi-Fi AP
 	if (LZ_SUCCESS != lz_net_init()) {
 		dbgprint(DBG_ERR, "ERROR: Could not initialize network connection. Waiting forever..\n");
@@ -84,10 +77,6 @@ void net_task(void *params)
 
 	// Notify AWDT task that network connection is established
 	xTaskNotifyGive(get_task_awdt_handle());
-
-#if (RUN_IOT_SENSOR_DEMO == 1)
-	xTaskNotifyGive(get_sensor_task_handle());
-#endif
 
 	for (;;) {
 		// TODO regularly check the network status and re-establish connection if lost

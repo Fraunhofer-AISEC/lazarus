@@ -335,11 +335,6 @@ LZ_RESULT lz_request_auth_element(lz_auth_hdr_t *request_hdr, uint8_t *request_p
 	memcpy((void *)(tcp_buf + sizeof(lz_auth_hdr_t)), request_payload,
 		   request_hdr->content.payload_size);
 
-	// Timestamp 2 (falling edge) - begin network
-#if (1 == LZ_DBG_TRACE_DEFERRAL_ACTIVE)
-	lzport_gpio_toggle_trace();
-#endif
-
 	if (lz_net_request((char *)lz_data_store.config_data.nw_info.server_ip_addr,
 					   lz_data_store.config_data.nw_info.server_port, tcp_buf, sizeof(tcp_buf),
 					   tcp_buf_response, sizeof(tcp_buf_response)) != LZ_SUCCESS) {
