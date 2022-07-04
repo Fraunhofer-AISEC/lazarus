@@ -62,4 +62,4 @@ typedef struct {
 		}                                                                                          \
 	} while (0);
 
-int lz_rand(void *rng_state, unsigned char *output, size_t len);
+int crypto_rand(void *rng_state, unsigned char *output, size_t len);
