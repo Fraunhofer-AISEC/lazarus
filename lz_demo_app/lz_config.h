@@ -35,16 +35,4 @@
 // Set the desired debug output here (The definitions from above can be OR'ed)
 #define LZ_DBG_LEVEL (DBG_ERR | DBG_WARN | DBG_INFO)
 
-// Toggle the GPIO trace output to measure the boot time
-// TODO delete only for testing
-#define LZ_DBG_TRACE_BOOT_ACTIVE_WO_TICKET 0
-#define LZ_DBG_TRACE_BOOT_ACTIVE_W_TICKET 0
-#define LZ_DBG_TRACE_DEFERRAL_ACTIVE 0
-#define LZ_DBG_NETWORK 0
-
-#define FREERTOS_BENCHMARK_ACTIVE 0
-#define FREERTOS_BENCHMARK_DEFERRAL_OUTPUT 0
-
-#define RUN_IOT_SENSOR_DEMO 0
-
 #endif /* LZ_CONFIG_H_ */

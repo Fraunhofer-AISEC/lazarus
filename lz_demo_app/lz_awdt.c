@@ -31,18 +31,12 @@
 #include "lz_common.h"
 #include "lz_net.h"
 #include "lz_awdt.h"
-#include "lz_led.h"
-
-#include "sensor.h"
-#include "benchmark.h"
 
 static TaskHandle_t task_awdt_handle = NULL;
 
 void lz_awdt_task(void *params)
 {
 	task_awdt_handle = xTaskGetCurrentTaskHandle();
-	// TODO better solution
-	uint32_t multiple = 0;
 
 	// Wait until network connection is established
 	ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(portMAX_DELAY));
@@ -51,37 +45,14 @@ void lz_awdt_task(void *params)
 
 	// Periodically fetch new deferral tickets to avoid a system reset
 	for (;;) {
-		multiple++;
 
-		// Trigger flashing the blue LED to indicate that a deferral ticket is to be fetched
-		xTaskNotifyGive(get_led_task_handle());
+		dbgprint(DBG_INFO, "INFO: Fetching deferral ticket with a time of %ds..\n",
+					DEFERRAL_TICKET_TIME_MS / 1000);
 
-#if (RUN_IOT_SENSOR_DEMO == 1)
-		if ((multiple % DEFERRAL_TICKET_FETCHING_MULT) == 0) {
-#endif
-			dbgprint(DBG_INFO, "INFO: Fetching deferral ticket with a time of %ds..\n",
-					 DEFERRAL_TICKET_TIME_MS / 1000);
-
-			LZ_RESULT result = lz_net_refresh_awdt(DEFERRAL_TICKET_TIME_MS);
-
-			if (result == LZ_SUCCESS) {
-				lzport_gpio_set_status_led(true, LED_ON);
-			} else {
-				lzport_gpio_set_status_led(false, LED_ON);
-			}
-#if (RUN_IOT_SENSOR_DEMO == 1)
-		}
-		// TODO own task
-		send_sensor_data();
-#endif
+		LZ_RESULT result = lz_net_refresh_awdt(DEFERRAL_TICKET_TIME_MS);
 
 		dbgprint(DBG_INFO, "INFO: Waiting for %dms\n", DEFERRAL_TICKET_TASK_WAIT_MS);
 		vTaskDelayUntil(&last_wake_time, pdMS_TO_TICKS(DEFERRAL_TICKET_TASK_WAIT_MS));
-
-#if (1 == FREERTOS_BENCHMARK_ACTIVE)
-		// Trigger run-time evaluation
-		xTaskNotifyGive(get_benchmark_task_handle());
-#endif
 	}
 }
 
