@@ -44,7 +44,7 @@ size_t lz_x509_get_dn_length(const lz_x509_dn_info *info)
 
 int lz_x509_dn_to_string(const lz_x509_dn_info *info, char *buf, size_t buf_size)
 {
-	if (buf_size < lz_x509_get_dn_length(info)) {
+	if (buf_size < x509_get_dn_length(info)) {
 		dbgprint(DBG_INFO, "ERROR: Buffer too small for csr info.\n");
 		return -1;
 	}
@@ -67,10 +67,10 @@ int lz_write_csr_to_pem(const lz_x509_csr_info *info, lz_ecc_keypair *keypair, u
 	mbedtls_x509write_csr_set_md_alg(&req, MBEDTLS_MD_SHA256);
 	mbedtls_x509write_csr_set_key(&req, keypair);
 
-	int dn_buf_size = lz_x509_get_dn_length(&info->subject) + SERIAL_NUMBER_FIELD_LENGTH +
+	int dn_buf_size = x509_get_dn_length(&info->subject) + SERIAL_NUMBER_FIELD_LENGTH +
 					  sizeof(info->serial_number);
 	char *dn_buf = malloc(dn_buf_size);
-	CHECK(lz_x509_dn_to_string(&info->subject, dn_buf, dn_buf_size), "Error copying information");
+	CHECK(x509_dn_to_string(&info->subject, dn_buf, dn_buf_size), "Error copying information");
 
 	memccpy(dn_buf + re + 1, info->serial_number, 1, sizeof(info->serial_number));
 	re += sizeof(info->serial_number);
@@ -103,15 +103,15 @@ int lz_write_cert_to_pem(const lz_x509_cert_info *info, lz_ecc_keypair *subject_
 	mbedtls_x509write_crt_set_subject_key(&cert, subject_keys);
 	mbedtls_x509write_crt_set_issuer_key(&cert, issuer_keys);
 
-	size_t issuer_buf_size = lz_x509_get_dn_length(&info->issuer);
+	size_t issuer_buf_size = x509_get_dn_length(&info->issuer);
 	issuer_buf = malloc(issuer_buf_size);
-	lz_x509_dn_to_string(&info->issuer, issuer_buf, issuer_buf_size);
+	x509_dn_to_string(&info->issuer, issuer_buf, issuer_buf_size);
 	CHECK(mbedtls_x509write_crt_set_issuer_name(&cert, issuer_buf),
 		  "Failed setting the issuer name in cert");
 
-	size_t subject_buf_size = lz_x509_get_dn_length(&info->subject);
+	size_t subject_buf_size = x509_get_dn_length(&info->subject);
 	subject_buf = malloc(subject_buf_size);
-	lz_x509_dn_to_string(&info->subject, subject_buf, subject_buf_size);
+	x509_dn_to_string(&info->subject, subject_buf, subject_buf_size);
 	CHECK(mbedtls_x509write_crt_set_subject_name(&cert, subject_buf),
 		  "Failed setting the subject name in cert");
 

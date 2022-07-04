@@ -21,7 +21,6 @@
 #include "fsl_common.h"
 #include "fsl_spi.h"
 #include "fsl_reset.h"
-#include "bme280.h"
 
 #define EXAMPLE_SPI_MASTER SPI8
 #define EXAMPLE_SPI_MASTER_CLK_SRC kCLOCK_HsLspi
@@ -79,7 +78,7 @@ int8_t lzport_spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *
 		ret = INT8_C(-1);
 	} else {
 		memcpy(reg_data, rx_data + 1, len);
-		ret = BME280_OK;
+		ret = 0;
 	}
 
 	return ret;
@@ -115,7 +114,7 @@ int8_t lzport_spi_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t len,
 	if (SPI_MasterTransferBlocking(EXAMPLE_SPI_MASTER, &spi_transfer) != kStatus_Success) {
 		ret = INT8_C(-1);
 	} else {
-		ret = BME280_OK;
+		ret = 0;
 	}
 
 	return ret;
