@@ -29,6 +29,7 @@ SRC_DIRS := ./ \
 			../thirdparty/lpc55s69_sdk/utilities \
 			../thirdparty/mbedtls/library \
 			../thirdparty/freertos \
+			../thirdparty/BME280_driver \
 			../lz_common/lz_common \
 			../lz_common/lz_crypto \
 			../lz_common/lz_net \
@@ -74,7 +75,6 @@ INCLUDES = 		./ \
 				../thirdparty/lpc55s69_sdk/component/uart \
 				../thirdparty/freertos/include \
 				../thirdparty/freertos/portable/GCC/ARM_CM33_NTZ/non_secure \
-				../thirdparty/BME280_driver \
 				../thirdparty/BME280_driver \
 
 # Defines used in that build
