@@ -37,12 +37,12 @@
 
 #define SERIAL_NUMBER_FIELD_LENGTH 14
 
-size_t lz_x509_get_dn_length(const x509_dn_info *info)
+static size_t x509_get_dn_length(const x509_dn_info *info)
 {
 	return strlen(info->common_name) + strlen(info->org) + strlen(info->country) + 10;
 }
 
-int lz_x509_dn_to_string(const x509_dn_info *info, char *buf, size_t buf_size)
+static int x509_dn_to_string(const x509_dn_info *info, char *buf, size_t buf_size)
 {
 	if (buf_size < x509_get_dn_length(info)) {
 		dbgprint(DBG_INFO, "ERROR: Buffer too small for csr info.\n");
