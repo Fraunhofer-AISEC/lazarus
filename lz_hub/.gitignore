@@ -10,7 +10,7 @@ __pycache__/
 /*.cpython-36.pyc
 /*.pyc
 /wifi_credentials
+/wifi_credentials_*
 /trust_anchors_signed.bin
 /trust_anchors.bin
-/wifi_credentials_aisec
 /lz_hubs.db
