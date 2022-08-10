@@ -74,8 +74,6 @@ INCLUDES = 		./ \
 				../thirdparty/lpc55s69_sdk/component/uart \
 				../thirdparty/freertos/include \
 				../thirdparty/freertos/portable/GCC/ARM_CM33_NTZ/non_secure \
-				../thirdparty/BME280_driver \
-				../thirdparty/BME280_driver \
 
 # Defines used in that build
 DEFINES = CPU_LPC55S69JBD100 \
