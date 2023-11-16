@@ -32,13 +32,6 @@
 #include "board.h"
 #endif
 
-/* PRINTF is the LPC55S69 version of printf. Provide your own version here if necessary */
-#define dbgprint(lvl, fmt, ...)                                                                    \
-	do {                                                                                           \
-		if (LZ_DBG_LEVEL & (uint32_t)lvl)                                                          \
-			PRINTF(fmt, ##__VA_ARGS__);                                                            \
-	} while (0)
-
 /* This is the initialization of the debug usart which is excluded if the debug output is not needed */
 #define lzport_init_debug()                                                                        \
 	do {                                                                                           \
@@ -46,10 +39,24 @@
 			BOARD_InitDebugConsole();                                                              \
 	} while (0)
 
+/* PRINTF is the LPC55S69 version of printf. Provide your own version here if necessary */
+#define print_internal(lvl, fmt, ...)                                                              \
+	do {                                                                                           \
+		if (LZ_DBG_LEVEL & (uint32_t)lvl)                                                          \
+			PRINTF(fmt, ##__VA_ARGS__);                                                            \
+	} while (0)
+
+#define ERROR(fmt, ...) print_internal(DBG_ERR, "ERROR: " fmt, ##__VA_ARGS__)
+#define WARN(fmt, ...) print_internal(DBG_WARN, "WARN: " fmt, ##__VA_ARGS__)
+#define INFO(fmt, ...) print_internal(DBG_INFO, "INFO: " fmt, ##__VA_ARGS__)
+#define VERB(fmt, ...) print_internal(DBG_VERB, "VERB: " fmt, ##__VA_ARGS__)
+#define TRACE(fmt, ...) print_internal(DBG_TRACE, "TRACE: " fmt, ##__VA_ARGS__)
+#define HEXDUMP(fmt, ...) print_internal(DBG_TRACE, fmt, ##__VA_ARGS__)
+
 #if (LZ_DBG_LEVEL > DBG_NONE)
-void dbgprint_data(uint8_t *data, uint32_t len, char *info);
+void hexdump(uint8_t *data, uint32_t len, char *info);
 #else
-#define dbgprint_data(data, len, info)
+#define hexdump(data, len, info)
 #endif
 
 #endif /* lzport_DEBUG_OUTPUT_H */

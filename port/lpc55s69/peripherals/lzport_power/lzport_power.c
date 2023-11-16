@@ -24,25 +24,25 @@
 
 void lzport_power_enter_sleep(void)
 {
-	dbgprint(DBG_VERB, "INFO: Preparing sleep mode..\n");
+	VERB("Preparing sleep mode..\n");
 	svc_prepare_sleep();
-	dbgprint(DBG_VERB, "INFO: Entering sleep\n");
+	VERB("Entering sleep\n");
 	__WFI();
-	dbgprint(DBG_VERB, "INFO: Exit sleep mode..\n");
+	VERB("Exit sleep mode..\n");
 }
 
 void lzport_power_init_rng_ring_oscillator(void)
 {
-	dbgprint(DBG_VERB, "INFO: Initialing RNG ring oscillator..\n");
+	VERB("Initialing RNG ring oscillator..\n");
 	PMC->PDRUNCFGCLR0 = PMC_PDRUNCFG0_PDEN_RNG_MASK;
-	dbgprint(DBG_VERB, "INFO: Initialized RNG ring oscillator..\n");
+	VERB("Initialized RNG ring oscillator..\n");
 }
 
 void lzport_power_deinit_rng_ring_oscillator(void)
 {
-	dbgprint(DBG_VERB, "INFO: Deinitializing RNG ring oscillator..\n");
+	VERB("Deinitializing RNG ring oscillator..\n");
 	PMC->PDRUNCFGSET0 = PMC_PDRUNCFG0_PDEN_RNG_MASK;
-	dbgprint(DBG_VERB, "INFO: Deinitialized RNG ring oscillator..\n");
+	VERB("Deinitialized RNG ring oscillator..\n");
 }
 
 bool lzport_power_is_ring_oscillator_enabled(void)

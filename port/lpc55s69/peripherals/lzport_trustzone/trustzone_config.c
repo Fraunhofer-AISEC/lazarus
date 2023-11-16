@@ -94,7 +94,7 @@ void init_trustzone(void)
 
 void init_secure_ahb_controller(void)
 {
-	dbgprint(DBG_INFO, "INFO: Initializing Secure AHB controller..\n");
+	INFO("Initializing Secure AHB controller..\n");
 	//--------------------------------------------------------------------
 	//--- AHB Security Level Configurations ------------------------------
 	//--------------------------------------------------------------------
@@ -160,10 +160,23 @@ void init_secure_ahb_controller(void)
 	AHB_SECURE_CTRL->SEC_CTRL_AHB_PORT10[0].SLAVE1_RULE = 0;
 
 	//--- Security level configuration of masters ------------------------
-	// Other masters only have non-secure non-privileged access by now
-	// can be changed to non-secure privileged if required
-	AHB_SECURE_CTRL->MASTER_SEC_LEVEL = 0x00000000U;
-	AHB_SECURE_CTRL->MASTER_SEC_ANTI_POL_REG = 0x3FFFFFFFU;
+	// Other masters only have non-secure privileged access
+	AHB_SECURE_CTRL->MASTER_SEC_LEVEL =
+		AHB_SECURE_CTRL_MASTER_SEC_LEVEL_CPU1S(0x1) | AHB_SECURE_CTRL_MASTER_SEC_LEVEL_CPU1S(0x1) |
+		AHB_SECURE_CTRL_MASTER_SEC_LEVEL_USBFSD(0x1) | AHB_SECURE_CTRL_MASTER_SEC_LEVEL_SDMA0(0x1) |
+		AHB_SECURE_CTRL_MASTER_SEC_LEVEL_SDIO(0x1) | AHB_SECURE_CTRL_MASTER_SEC_LEVEL_HASH(0x1) |
+		AHB_SECURE_CTRL_MASTER_SEC_LEVEL_USBFSH(0x1) | AHB_SECURE_CTRL_MASTER_SEC_LEVEL_SDMA1(0x1) |
+		AHB_SECURE_CTRL_MASTER_SEC_LEVEL_MASTER_SEC_LEVEL_LOCK(0x1);
+	AHB_SECURE_CTRL->MASTER_SEC_ANTI_POL_REG =
+		AHB_SECURE_CTRL_MASTER_SEC_ANTI_POL_REG_CPU1S(0x2) |
+		AHB_SECURE_CTRL_MASTER_SEC_ANTI_POL_REG_CPU1S(0x2) |
+		AHB_SECURE_CTRL_MASTER_SEC_ANTI_POL_REG_USBFSD(0x2) |
+		AHB_SECURE_CTRL_MASTER_SEC_ANTI_POL_REG_SDMA0(0x2) |
+		AHB_SECURE_CTRL_MASTER_SEC_ANTI_POL_REG_SDIO(0x2) |
+		AHB_SECURE_CTRL_MASTER_SEC_ANTI_POL_REG_HASH(0x2) |
+		AHB_SECURE_CTRL_MASTER_SEC_ANTI_POL_REG_USBFSH(0x2) |
+		AHB_SECURE_CTRL_MASTER_SEC_ANTI_POL_REG_SDMA1(0x2) |
+		AHB_SECURE_CTRL_MASTER_SEC_ANTI_POL_REG_MASTER_SEC_LEVEL_ANTIPOL_LOCK(0x1);
 
 	//--------------------------------------------------------------------
 	//--- Pins: Reading GPIO state ---------------------------------------
@@ -205,29 +218,37 @@ void init_secure_ahb_controller(void)
 	// Secure GPIO MASK and CPU1 MASK registers are writtable
 	AHB_SECURE_CTRL->SEC_MASK_LOCK = 0x00000A0AU;
 
-	// Lock SAU and the CPU0 Lock Register itself
-	AHB_SECURE_CTRL->CPU0_LOCK_REG = 0x000001AAU;
-	// CPU1 has only access to NS VTOR and NS MPU
-	AHB_SECURE_CTRL->CPU1_LOCK_REG = 0x0000000AU;
+	// Lock SAU, MPU configuration and the CPU0 Lock Register itself
+	AHB_SECURE_CTRL->CPU0_LOCK_REG = AHB_SECURE_CTRL_CPU0_LOCK_REG_LOCK_NS_VTOR(0x2) |
+									 AHB_SECURE_CTRL_CPU0_LOCK_REG_LOCK_NS_MPU(0x2) |
+									 AHB_SECURE_CTRL_CPU0_LOCK_REG_LOCK_S_VTAIRCR(0x2) |
+									 AHB_SECURE_CTRL_CPU0_LOCK_REG_LOCK_S_MPU(0x0) |
+									 AHB_SECURE_CTRL_CPU0_LOCK_REG_LOCK_SAU(0x0) |
+									 AHB_SECURE_CTRL_CPU0_LOCK_REG_CPU0_LOCK_REG_LOCK(0x0);
+
+	// CPU1 has only access to NS VTOR and NS MPU, which is not locked
+	AHB_SECURE_CTRL->CPU1_LOCK_REG = AHB_SECURE_CTRL_CPU1_LOCK_REG_LOCK_NS_VTOR(0x2) |
+									 AHB_SECURE_CTRL_CPU1_LOCK_REG_LOCK_NS_MPU(0x2) |
+									 AHB_SECURE_CTRL_CPU1_LOCK_REG_CPU1_LOCK_REG_LOCK(0x2);
 
 	// Configure Secure AHB Controller Miscellaneous Control Register
 	// Field					Value		Meaning
 	// WRITE_LOCK				0x2			DISABLED, will be enabled through DP register
 	// ENABLE_SECURE_CHECKING	0x1			AHB bus matrix secure checking ENABLED
-	// ENABLE_S_PRIV_CHECK		0x1			AHB bus matrix secure privilege check ENABLED
+	// ENABLE_S_PRIV_CHECK		0x2			AHB bus matrix secure privilege check DISABLED
 	// ENABLE_NS_PRIV_CHECK		0x2			AHB bus matrix non-secure privilege check DISABLED
 	// DIABLE_VIOLATION_ABORT	0x2			Do not cause abort on violations
-	// DISABLE SI-MASTER STRICT	0x1			Tier mode, simple master can access same or lower tier
-	// DISABLE SM-MASTER STRICT	0x1			Tier mode, smart master can access same or lower tier
+	// DISABLE SI-MASTER STRICT	0x2			Strict mode, simple master can access same or lower tier
+	// DISABLE SM-MASTER STRICT	0x2			Strict mode, smart master can access same or lower tier
 	// IDAU_ALL_NS				0x2			IDAU is enabled
 	AHB_SECURE_CTRL->MISC_CTRL_REG =
 		AHB_SECURE_CTRL_MISC_CTRL_REG_WRITE_LOCK(0x2) |
 		AHB_SECURE_CTRL_MISC_CTRL_REG_ENABLE_SECURE_CHECKING(0x1U) |
-		AHB_SECURE_CTRL_MISC_CTRL_REG_ENABLE_S_PRIV_CHECK(0x1) |
+		AHB_SECURE_CTRL_MISC_CTRL_REG_ENABLE_S_PRIV_CHECK(0x2) |
 		AHB_SECURE_CTRL_MISC_CTRL_DP_REG_ENABLE_NS_PRIV_CHECK(0x2) |
 		AHB_SECURE_CTRL_MISC_CTRL_REG_DISABLE_VIOLATION_ABORT(0x2) |
-		AHB_SECURE_CTRL_MISC_CTRL_REG_DISABLE_SIMPLE_MASTER_STRICT_MODE(0x1) |
-		AHB_SECURE_CTRL_MISC_CTRL_REG_DISABLE_SMART_MASTER_STRICT_MODE(0x1) |
+		AHB_SECURE_CTRL_MISC_CTRL_REG_DISABLE_SIMPLE_MASTER_STRICT_MODE(0x2) |
+		AHB_SECURE_CTRL_MISC_CTRL_REG_DISABLE_SMART_MASTER_STRICT_MODE(0x2) |
 		AHB_SECURE_CTRL_MISC_CTRL_REG_IDAU_ALL_NS(0x2);
 
 	// Configure MISC DP register with the same configuration, otherwise the related control signals
@@ -237,13 +258,13 @@ void init_secure_ahb_controller(void)
 		(AHB_SECURE_CTRL->MISC_CTRL_REG & ~AHB_SECURE_CTRL_MISC_CTRL_REG_WRITE_LOCK_MASK) |
 		AHB_SECURE_CTRL_MISC_CTRL_REG_WRITE_LOCK(0x1);
 
-	dbgprint(DBG_VERB, "INFO: MISC_CTRL_REG:    %X\n", AHB_SECURE_CTRL->MISC_CTRL_REG);
-	dbgprint(DBG_VERB, "INFO: MISC_CTRL_DP_REG: %X\n", AHB_SECURE_CTRL->MISC_CTRL_DP_REG);
+	VERB("MISC_CTRL_REG:    %X\n", AHB_SECURE_CTRL->MISC_CTRL_REG);
+	VERB("MISC_CTRL_DP_REG: %X\n", AHB_SECURE_CTRL->MISC_CTRL_DP_REG);
 }
 
 void print_secure_ahb_controller_status(void)
 {
-	dbgprint(DBG_SAHBC, "--- SECURE AHB CONTROLLER STATUS ---\n");
+	VERB("--- SECURE AHB CONTROLLER STATUS ---\n");
 	print_control();
 	print_flash_rom();
 	print_ram();
@@ -264,9 +285,9 @@ void configure_nsc_region(uint32_t region_nbr, uint32_t base_addr, uint32_t size
 				/* Enable region */
 				((1u << SAU_RLAR_ENABLE_Pos) & SAU_RLAR_ENABLE_Msk);
 
-	dbgprint(DBG_VERB, "INFO: Region %u from 0x%x to 0x%x as %s. State = %s\n", SAU->RNR, SAU->RBAR,
-			 SAU->RLAR, ((SAU->RLAR & (1U << SAU_RLAR_NSC_Pos)) ? "NSC" : "NS"),
-			 ((SAU->RLAR & (1U << SAU_RLAR_ENABLE_Pos)) ? "ENABLED" : "DISABLED"));
+	VERB("Region %u from 0x%x to 0x%x as %s. State = %s\n", SAU->RNR, SAU->RBAR, SAU->RLAR,
+		 ((SAU->RLAR & (1U << SAU_RLAR_NSC_Pos)) ? "NSC" : "NS"),
+		 ((SAU->RLAR & (1U << SAU_RLAR_ENABLE_Pos)) ? "ENABLED" : "DISABLED"));
 }
 
 void configure_ns_region(uint32_t region_nbr, uint32_t base_addr, uint32_t size)
@@ -282,154 +303,136 @@ void configure_ns_region(uint32_t region_nbr, uint32_t base_addr, uint32_t size)
 				/* Enable region */
 				((1u << SAU_RLAR_ENABLE_Pos) & SAU_RLAR_ENABLE_Msk);
 
-	dbgprint(DBG_VERB, "INFO: Region %u from 0x%x to 0x%x as %s. State = %s\n", SAU->RNR, SAU->RBAR,
-			 (SAU->RLAR & SAU_RLAR_LADDR_Msk),
-			 ((SAU->RLAR & (1U << SAU_RLAR_NSC_Pos)) ? "NSC" : "NS"),
-			 ((SAU->RLAR & (1U << SAU_RLAR_ENABLE_Pos)) ? "ENABLED" : "DISABLED"));
+	VERB("Region %u from 0x%x to 0x%x as %s. State = %s\n", SAU->RNR, SAU->RBAR,
+		 (SAU->RLAR & SAU_RLAR_LADDR_Msk), ((SAU->RLAR & (1U << SAU_RLAR_NSC_Pos)) ? "NSC" : "NS"),
+		 ((SAU->RLAR & (1U << SAU_RLAR_ENABLE_Pos)) ? "ENABLED" : "DISABLED"));
 }
 
 void print_control(void)
 {
-	dbgprint(DBG_SAHBC, "\n");
-	dbgprint(DBG_SAHBC, "MISC_CTRL_REG: \n");
+	VERB("\nMISC_CTRL_REG: \n");
 
 	uint32_t v = AHB_SECURE_CTRL->MISC_CTRL_REG & 0x3;
-	dbgprint(DBG_SAHBC, "WRITE_LOCK                      = %d: %s\n", v,
-			 (v == 0x2) ? "UNLOCKED" : "LOCKED");
+	VERB("WRITE_LOCK                      = %d: %s\n", v, (v == 0x2) ? "UNLOCKED" : "LOCKED");
 	v = AHB_SECURE_CTRL->MISC_CTRL_DP_REG & 0x3;
-	dbgprint(DBG_SAHBC, "WRITE_LOCK_DP                   = %d: %s\n", v,
-			 (v == 0x2) ? "UNLOCKED" : "LOCKED");
+	VERB("WRITE_LOCK_DP                   = %d: %s\n", v, (v == 0x2) ? "UNLOCKED" : "LOCKED");
 
 	v = (AHB_SECURE_CTRL->MISC_CTRL_REG >> 2) & 0x3;
-	dbgprint(DBG_SAHBC, "ENABLE_SECURE_CHECKING          = %d: %s\n", v,
-			 (v == 0x2) ? "DISABLED" : "ENABLED");
+	VERB("ENABLE_SECURE_CHECKING          = %d: %s\n", v, (v == 0x2) ? "DISABLED" : "ENABLED");
 	v = (AHB_SECURE_CTRL->MISC_CTRL_DP_REG >> 2) & 0x3;
-	dbgprint(DBG_SAHBC, "ENABLE_SECURE_CHECKING_DP       = %d: %s\n", v,
-			 (v == 0x2) ? "DISABLED" : "ENABLED");
+	VERB("ENABLE_SECURE_CHECKING_DP       = %d: %s\n", v, (v == 0x2) ? "DISABLED" : "ENABLED");
 
 	v = (AHB_SECURE_CTRL->MISC_CTRL_REG >> 4) & 0x3;
-	dbgprint(DBG_SAHBC, "ENABLE_S_PRIV_CHECK             = %d: %s\n", v,
-			 (v == 0x2) ? "DISABLED" : "ENABLED");
+	VERB("ENABLE_S_PRIV_CHECK             = %d: %s\n", v, (v == 0x2) ? "DISABLED" : "ENABLED");
 	v = (AHB_SECURE_CTRL->MISC_CTRL_DP_REG >> 4) & 0x3;
-	dbgprint(DBG_SAHBC, "ENABLE_S_PRIV_CHECK_DP          = %d: %s\n", v,
-			 (v == 0x2) ? "DISABLED" : "ENABLED");
+	VERB("ENABLE_S_PRIV_CHECK_DP          = %d: %s\n", v, (v == 0x2) ? "DISABLED" : "ENABLED");
 
 	v = (AHB_SECURE_CTRL->MISC_CTRL_REG >> 6) & 0x3;
-	dbgprint(DBG_SAHBC, "ENABLE_NS_PRIV_CHECK            = %d: %s\n", v,
-			 (v == 0x2) ? "DISABLED" : "ENABLED");
+	VERB("ENABLE_NS_PRIV_CHECK            = %d: %s\n", v, (v == 0x2) ? "DISABLED" : "ENABLED");
 	v = (AHB_SECURE_CTRL->MISC_CTRL_DP_REG >> 6) & 0x3;
-	dbgprint(DBG_SAHBC, "ENABLE_NS_PRIV_CHECK_DP         = %d: %s\n", v,
-			 (v == 0x2) ? "DISABLED" : "ENABLED");
+	VERB("ENABLE_NS_PRIV_CHECK_DP         = %d: %s\n", v, (v == 0x2) ? "DISABLED" : "ENABLED");
 
 	v = (AHB_SECURE_CTRL->MISC_CTRL_REG >> 8) & 0x3;
-	dbgprint(DBG_SAHBC, "DISABLE_VIOLATION_ABORT         = %d: %s\n", v,
-			 (v == 0x2) ? "ABORT" : "IRQ");
+	VERB("DISABLE_VIOLATION_ABORT         = %d: %s\n", v, (v == 0x2) ? "ABORT" : "IRQ");
 	v = (AHB_SECURE_CTRL->MISC_CTRL_DP_REG >> 8) & 0x3;
-	dbgprint(DBG_SAHBC, "DISABLE_VIOLATION_ABORT_DP      = %d: %s\n", v,
-			 (v == 0x2) ? "ABORT" : "IRQ");
+	VERB("DISABLE_VIOLATION_ABORT_DP      = %d: %s\n", v, (v == 0x2) ? "ABORT" : "IRQ");
 
 	v = (AHB_SECURE_CTRL->MISC_CTRL_REG >> 10) & 0x3;
-	dbgprint(DBG_SAHBC, "DISABLE_SIMPLE_MASTER_STRCT_MODE= %d: %s\n", v,
-			 (v == 0x2) ? "STRICT" : "RELAXED");
+	VERB("DISABLE_SIMPLE_MASTER_STRCT_MODE= %d: %s\n", v, (v == 0x2) ? "STRICT" : "RELAXED");
 	v = (AHB_SECURE_CTRL->MISC_CTRL_DP_REG >> 10) & 0x3;
-	dbgprint(DBG_SAHBC, "DISABLE_SMPL_MSTER_STRCT_MODE_DP= %d: %s\n", v,
-			 (v == 0x2) ? "STRICT" : "RELAXED");
+	VERB("DISABLE_SMPL_MSTER_STRCT_MODE_DP= %d: %s\n", v, (v == 0x2) ? "STRICT" : "RELAXED");
 
 	v = (AHB_SECURE_CTRL->MISC_CTRL_REG >> 12) & 0x3;
-	dbgprint(DBG_SAHBC, "DISABLE_SMART_MASTER_STRICT_MODE= %d: %s\n", v,
-			 (v == 0x2) ? "STRICT" : "RELAXED");
+	VERB("DISABLE_SMART_MASTER_STRICT_MODE= %d: %s\n", v, (v == 0x2) ? "STRICT" : "RELAXED");
 	v = (AHB_SECURE_CTRL->MISC_CTRL_DP_REG >> 12) & 0x3;
-	dbgprint(DBG_SAHBC, "DISABLE_SMRT_MSTER_STRCT_MODE_DP= %d: %s\n", v,
-			 (v == 0x2) ? "STRICT" : "RELAXED");
+	VERB("DISABLE_SMRT_MSTER_STRCT_MODE_DP= %d: %s\n", v, (v == 0x2) ? "STRICT" : "RELAXED");
 
 	v = (AHB_SECURE_CTRL->MISC_CTRL_REG >> 14) & 0x3;
-	dbgprint(DBG_SAHBC, "IDAU_ALL_NS                     = %d: %s\n", v,
-			 (v == 0x2) ? "IDAU ON" : "IDAU OFF");
+	VERB("IDAU_ALL_NS                     = %d: %s\n", v, (v == 0x2) ? "IDAU ON" : "IDAU OFF");
 	v = (AHB_SECURE_CTRL->MISC_CTRL_DP_REG >> 14) & 0x3;
-	dbgprint(DBG_SAHBC, "IDAU_ALL_NS_DP                  = %d: %s\n", v,
-			 (v == 0x2) ? "IDAU ON" : "IDAU OFF");
+	VERB("IDAU_ALL_NS_DP                  = %d: %s\n", v, (v == 0x2) ? "IDAU ON" : "IDAU OFF");
 }
 
 void print_ram(void)
 {
-	dbgprint(DBG_SAHBC, "\n");
-	dbgprint(DBG_SAHBC, "RAMX ACCESS RULES\n");
-	dbgprint(DBG_SAHBC, "RAMX Slave Rule: ");
+	VERB("\n");
+	VERB("RAMX ACCESS RULES\n");
+	VERB("RAMX Slave Rule: ");
 	print_tier(AHB_SECURE_CTRL->SEC_CTRL_RAMX[0].SLAVE_RULE & 0x3);
 	uint32_t curr_location = RAMX_START;
-	dbgprint(DBG_SAHBC, "Sub-Region Rules:\n");
+	VERB("Sub-Region Rules:\n");
 	for (uint8_t i = 0; i < RAMX_REGION_COUNT; i++) {
 		uint32_t value = (AHB_SECURE_CTRL->SEC_CTRL_RAMX[0].MEM_RULE[0] >> (i * 4)) & 0x3;
 		if (value) {
-			dbgprint(DBG_SAHBC, "Region %02d (%08x-%08x): ", i, curr_location,
-					 curr_location + RAM_REGION_SIZE - 1);
+			VERB("Region %02d (%08x-%08x): ", i, curr_location,
+				 curr_location + RAM_REGION_SIZE - 1);
 			print_tier(value);
 			curr_location += RAM_REGION_SIZE;
 		}
 	}
-	dbgprint(DBG_SAHBC, "\n");
-	dbgprint(DBG_SAHBC, "RAM ACCESS RULES\n");
-	dbgprint(DBG_SAHBC, "RAM0 Slave Rule: ");
+	VERB("\n");
+	VERB("RAM ACCESS RULES\n");
+	VERB("RAM0 Slave Rule: ");
 	print_tier(AHB_SECURE_CTRL->SEC_CTRL_RAM0[0].SLAVE_RULE & 0x3);
-	dbgprint(DBG_SAHBC, "Sub-Region Rules:\n");
+	VERB("Sub-Region Rules:\n");
 	curr_location = RAM_START;
 	for (uint8_t i = 0; i < RAM0_REGION_COUNT; i++) {
 		uint32_t value = (AHB_SECURE_CTRL->SEC_CTRL_RAM0[0].MEM_RULE[0] >> (i * 4)) & 0x3;
 		if (value) {
-			dbgprint(DBG_SAHBC, "Region %02d (%08x-%08x): ", i, curr_location,
-					 curr_location + RAM_REGION_SIZE - 1);
+			VERB("Region %02d (%08x-%08x): ", i, curr_location,
+				 curr_location + RAM_REGION_SIZE - 1);
 			print_tier(value);
 			curr_location += RAM_REGION_SIZE;
 		}
 	}
-	dbgprint(DBG_SAHBC, "\n");
-	dbgprint(DBG_SAHBC, "RAM1 Slave Rule: ");
+	VERB("\n");
+	VERB("RAM1 Slave Rule: ");
 	print_tier(AHB_SECURE_CTRL->SEC_CTRL_RAM1[0].SLAVE_RULE & 0x3);
-	dbgprint(DBG_SAHBC, "Sub-Region Rules:\n");
+	VERB("Sub-Region Rules:\n");
 	for (uint8_t i = 0; i < RAM1_REGION_COUNT; i++) {
 		uint32_t value = (AHB_SECURE_CTRL->SEC_CTRL_RAM1[0].MEM_RULE[0] >> (i * 4)) & 0x3;
 		if (value) {
-			dbgprint(DBG_SAHBC, "Region %02d (%08x-%08x): ", i, curr_location,
-					 curr_location + RAM_REGION_SIZE - 1);
+			VERB("Region %02d (%08x-%08x): ", i, curr_location,
+				 curr_location + RAM_REGION_SIZE - 1);
 			print_tier(value);
 			curr_location += RAM_REGION_SIZE;
 		}
 	}
-	dbgprint(DBG_SAHBC, "\n");
-	dbgprint(DBG_SAHBC, "RAM2 Slave Rule: ");
+	VERB("\n");
+	VERB("RAM2 Slave Rule: ");
 	print_tier(AHB_SECURE_CTRL->SEC_CTRL_RAM2[0].SLAVE_RULE & 0x3);
-	dbgprint(DBG_SAHBC, "Sub-Region Rules:\n");
+	VERB("Sub-Region Rules:\n");
 	for (uint8_t i = 0; i < RAM2_REGION_COUNT; i++) {
 		uint32_t value = (AHB_SECURE_CTRL->SEC_CTRL_RAM2[0].MEM_RULE[0] >> (i * 4)) & 0x3;
 		if (value) {
-			dbgprint(DBG_SAHBC, "Region %02d (%08x-%08x): ", i, curr_location,
-					 curr_location + RAM_REGION_SIZE - 1);
+			VERB("Region %02d (%08x-%08x): ", i, curr_location,
+				 curr_location + RAM_REGION_SIZE - 1);
 			print_tier(value);
 			curr_location += RAM_REGION_SIZE;
 		}
 	}
-	dbgprint(DBG_SAHBC, "\n");
-	dbgprint(DBG_SAHBC, "RAM3 Slave Rule: ");
+	VERB("\n");
+	VERB("RAM3 Slave Rule: ");
 	print_tier(AHB_SECURE_CTRL->SEC_CTRL_RAM3[0].SLAVE_RULE & 0x3);
-	dbgprint(DBG_SAHBC, "Sub-Region Rules:\n");
+	VERB("Sub-Region Rules:\n");
 	for (uint8_t i = 0; i < RAM3_REGION_COUNT; i++) {
 		uint32_t value = (AHB_SECURE_CTRL->SEC_CTRL_RAM3[0].MEM_RULE[0] >> (i * 4)) & 0x3;
 		if (value) {
-			dbgprint(DBG_SAHBC, "Region %02d (%08x-%08x): ", i, curr_location,
-					 curr_location + RAM_REGION_SIZE - 1);
+			VERB("Region %02d (%08x-%08x): ", i, curr_location,
+				 curr_location + RAM_REGION_SIZE - 1);
 			print_tier(value);
 			curr_location += RAM_REGION_SIZE;
 		}
 	}
-	dbgprint(DBG_SAHBC, "\n");
-	dbgprint(DBG_SAHBC, "RAM4 Slave Rule: ");
+	VERB("\n");
+	VERB("RAM4 Slave Rule: ");
 	print_tier(AHB_SECURE_CTRL->SEC_CTRL_RAM4[0].SLAVE_RULE & 0x3);
-	dbgprint(DBG_SAHBC, "Sub-Region Rules:\n");
+	VERB("Sub-Region Rules:\n");
 	for (uint8_t i = 0; i < RAM4_REGION_COUNT; i++) {
 		uint32_t value = (AHB_SECURE_CTRL->SEC_CTRL_RAM4[0].MEM_RULE[0] >> (i * 4)) & 0x3;
 		if (value) {
-			dbgprint(DBG_SAHBC, "Region %02d (%08x-%08x): ", i, curr_location,
-					 curr_location + RAM_REGION_SIZE - 1);
+			VERB("Region %02d (%08x-%08x): ", i, curr_location,
+				 curr_location + RAM_REGION_SIZE - 1);
 			print_tier(value);
 			curr_location += RAM_REGION_SIZE;
 		}
@@ -438,36 +441,36 @@ void print_ram(void)
 
 void print_flash_rom(void)
 {
-	dbgprint(DBG_SAHBC, "FLASH ACCESS RULES\n");
-	dbgprint(DBG_SAHBC, "Flash Slave Rule: ");
+	VERB("FLASH ACCESS RULES\n");
+	VERB("Flash Slave Rule: ");
 	print_tier(AHB_SECURE_CTRL->SEC_CTRL_FLASH_ROM[0].SLAVE_RULE & 0x3);
 	uint32_t curr_location = FLASH_START;
-	dbgprint(DBG_SAHBC, "Sub-Region Rules:\n");
+	VERB("Sub-Region Rules:\n");
 	for (uint8_t i = 0; i < FLASH_REGION_COUNT; i++) {
 		uint32_t value = (AHB_SECURE_CTRL->SEC_CTRL_FLASH_ROM[0].SEC_CTRL_FLASH_MEM_RULE[i / 8] >>
 						  ((i % 8) * 4)) &
 						 0x3;
 		// Print only if value is not zero (non-secure unprivileged = default)
 		if (value) {
-			dbgprint(DBG_SAHBC, "Region %02d (%08x-%08x): ", i, curr_location,
-					 curr_location + FLASH_REGION_SIZE - 1);
+			VERB("Region %02d (%08x-%08x): ", i, curr_location,
+				 curr_location + FLASH_REGION_SIZE - 1);
 			print_tier(value);
 		}
 		curr_location += FLASH_REGION_SIZE;
 	}
-	dbgprint(DBG_SAHBC, "\n");
-	dbgprint(DBG_SAHBC, "ROM ACCESS RULES\n");
-	dbgprint(DBG_SAHBC, "ROM Slave Rule: ");
+	VERB("\n");
+	VERB("ROM ACCESS RULES\n");
+	VERB("ROM Slave Rule: ");
 	print_tier((AHB_SECURE_CTRL->SEC_CTRL_FLASH_ROM[0].SLAVE_RULE >> 4) & 0x3);
 	curr_location = ROM_START;
-	dbgprint(DBG_SAHBC, "Sub-Region Rules:\n");
+	VERB("Sub-Region Rules:\n");
 	for (uint8_t i = 0; i < ROM_REGION_COUNT; i++) {
 		uint32_t value =
 			(AHB_SECURE_CTRL->SEC_CTRL_FLASH_ROM[0].SEC_CTRL_ROM_MEM_RULE[i / 8] >> ((i % 8) * 4)) &
 			0x3;
 		if (value) {
-			dbgprint(DBG_SAHBC, "Region %02d (%08x-%08x): ", i, curr_location,
-					 curr_location + ROM_REGION_SIZE - 1);
+			VERB("Region %02d (%08x-%08x): ", i, curr_location,
+				 curr_location + ROM_REGION_SIZE - 1);
 			print_tier(value);
 		}
 		curr_location += ROM_REGION_SIZE;
@@ -478,16 +481,16 @@ void print_tier(uint32_t value)
 {
 	switch (value) {
 	case 0:
-		dbgprint(DBG_SAHBC, "%d = non-secure, unprivileged\n", value);
+		VERB("%d = non-secure, unprivileged\n", value);
 		break;
 	case 1:
-		dbgprint(DBG_SAHBC, "%d = non-secure, privileged\n", value);
+		VERB("%d = non-secure, privileged\n", value);
 		break;
 	case 2:
-		dbgprint(DBG_SAHBC, "%d = secure,     unprivileged\n", value);
+		VERB("%d = secure,     unprivileged\n", value);
 		break;
 	case 3:
-		dbgprint(DBG_SAHBC, "%d = secure,     privileged\n", value);
+		VERB("%d = secure,     privileged\n", value);
 		break;
 	}
 	return;

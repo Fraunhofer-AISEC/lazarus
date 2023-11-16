@@ -34,7 +34,12 @@
 		<link>
 			<name>lz_common</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/lz_common</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/lz_common</locationURI>
+		</link>
+		<link>
+			<name>lz_cpatcher</name>
+			<type>2</type>
+			<locationURI>PARENT-3-PROJECT_LOC/lz_cpatcher</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

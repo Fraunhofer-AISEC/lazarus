@@ -107,7 +107,7 @@ void lzport_rng_init(void)
 					RNG_ONLINE_TEST_VAL_MAX_CHI_SQUARED_SHIFT);
 	}
 
-	dbgprint(DBG_VERB, "INFO: RNG initialization successful\n");
+	VERB("RNG initialization successful\n");
 }
 
 /**
@@ -130,7 +130,7 @@ void lzport_rng_deinit(void)
 	CLOCK_DisableClock(kCLOCK_Rng);
 #endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
 
-	dbgprint(DBG_VERB, "INFO: RNG de-initialization successful\n");
+	VERB("RNG de-initialization successful\n");
 }
 
 /**
@@ -144,20 +144,20 @@ LZ_RESULT lzport_rng_get_random_data(void *data, size_t size)
 	LZ_RESULT result = LZ_ERROR;
 
 	if (kStatus_Success == get_random_data(data, size)) {
-		dbgprint(DBG_VERB, "INFO: RNG generating random data successful\n");
+		VERB("RNG generating random data successful\n");
 		result = LZ_SUCCESS;
 	} else {
-		dbgprint(DBG_VERB, "WARN: Generating random data not successful. Reinitialing RNG..\n");
+		VERB("WARN: Generating random data not successful. Reinitialing RNG..\n");
 
 		// Try to re-init the TRNG
 		lzport_rng_init();
 
 		// Try again
 		if (kStatus_Success == get_random_data(data, size)) {
-			dbgprint(DBG_VERB, "INFO: RNG generating random data now successful\n");
+			VERB("RNG generating random data now successful\n");
 			result = LZ_SUCCESS;
 		} else {
-			dbgprint(DBG_ERR, "ERROR: Generating random data failed\n");
+			ERROR("Generating random data failed\n");
 		}
 	}
 

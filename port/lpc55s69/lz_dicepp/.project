@@ -34,22 +34,22 @@
 		<link>
 			<name>lz_common</name>
 			<type>2</type>
-			<location>/home/simon/repos/lazarus/lz_common</location>
+			<locationURI>PARENT-3-PROJECT_LOC/lz_common</locationURI>
 		</link>
 		<link>
 			<name>lz_dicepp</name>
 			<type>2</type>
-			<location>/home/simon/repos/lazarus/lz_dicepp</location>
+			<locationURI>PARENT-3-PROJECT_LOC/lz_dicepp</locationURI>
 		</link>
 		<link>
 			<name>peripherals</name>
 			<type>2</type>
-			<location>/home/simon/repos/lazarus/port/lpc55s69/peripherals</location>
+			<locationURI>PARENT-1-PROJECT_LOC/peripherals</locationURI>
 		</link>
 		<link>
 			<name>thirdparty</name>
 			<type>2</type>
-			<location>/home/simon/repos/lazarus/thirdparty</location>
+			<locationURI>PARENT-3-PROJECT_LOC/thirdparty</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

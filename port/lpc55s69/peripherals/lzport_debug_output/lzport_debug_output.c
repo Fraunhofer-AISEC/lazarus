@@ -22,18 +22,22 @@
 
 #if (LZ_DBG_LEVEL > 0)
 
-void dbgprint_data(uint8_t *data, uint32_t len, char *info)
+void hexdump(uint8_t *data, uint32_t len, char *info)
 {
 	if (info) {
-		dbgprint(DBG_INFO, "INFO: %s:\n0x", info);
+		print_internal(DBG_INFO, "INFO: %s:", info);
 	}
 	for (uint32_t i = 0; i < len; i++) {
-		if (((i + 1) % 30) == 0) {
-			dbgprint(DBG_INFO, "\n");
+		if ((i % 16) == 0) {
+			print_internal("%s0x%x:", (!i && !info) ? "" : "\n", i);
 		}
-		dbgprint(DBG_INFO, "%02x", data[i]);
+		if (data[i] < 0x10) {
+			print_internal(DBG_INFO, " 0%x", data[i]);
+		} else {
+			print_internal(DBG_INFO, " %x", data[i]);
+		}
 	}
-	dbgprint(DBG_INFO, "\n");
+	print_internal(DBG_INFO, "\n");
 }
 
 #endif

@@ -22,7 +22,7 @@
 /**
  * Millisecond counter
  */
-static uint32_t tick_ms = 0;
+static volatile uint32_t tick_ms = 0;
 
 /**
  * Returns the current tick value in milliseconds

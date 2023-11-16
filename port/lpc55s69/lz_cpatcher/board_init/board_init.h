@@ -18,3 +18,5 @@
  */
 
 #pragma once
+
+void lzport_cpatcher_init_board(void);

@@ -58,23 +58,19 @@ void lzport_core_board_init(void)
 void switch_to_next_layer(boot_mode_t boot_mode)
 {
 	if (LZ_CPATCHER == boot_mode) {
-		dbgprint(DBG_INFO, "INFO: Entering SECURE Core Patcher from Lazarus Core at %x..\n",
-				 LZ_CPATCHER_CODE_START);
+		INFO("Entering SECURE Core Patcher from Lazarus Core at %x..\n", LZ_CPATCHER_CODE_START);
 
-		funcptr_s_t re_um = (funcptr_s_t)(*((uint32_t *)((LZ_CPATCHER_CODE_START) + 4U)));
+		funcptr_s_t lz_cpatcher = (funcptr_s_t)(*((uint32_t *)((LZ_CPATCHER_CODE_START) + 4U)));
 
-		re_um();
+		lz_cpatcher();
 	} else if (LZ_UDOWNLOADER == boot_mode) {
-		dbgprint(DBG_INFO,
-				 "INFO: Entering NON_SECURE Update Downloader from Lazarus Core at %x..\n",
-				 LZ_UD_CODE_START);
+		INFO("Entering NON_SECURE Update Downloader from Lazarus Core at %x..\n", LZ_UD_CODE_START);
 
 		funcptr_ns_t ud_ns = (funcptr_ns_t)(*((uint32_t *)(LZ_UD_CODE_START + 4U)));
 
 		ud_ns();
 	} else if (APP == boot_mode) {
-		dbgprint(DBG_INFO, "INFO: Entering NON_SECURE App from Lazarus Core at %x..\n",
-				 LZ_APP_CODE_START);
+		INFO("Entering NON_SECURE App from Lazarus Core at %x..\n", LZ_APP_CODE_START);
 
 		funcptr_ns_t app_ns = (funcptr_ns_t)(*((uint32_t *)(LZ_APP_CODE_START + 4U)));
 

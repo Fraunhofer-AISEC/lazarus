@@ -19,7 +19,7 @@
 					<folderInfo id="com.crt.advproject.config.exe.debug.1085733320." name="/" resourcePath="">
 						<toolChain id="com.crt.advproject.toolchain.exe.debug.116317891" name="NXP MCU Tools" superClass="com.crt.advproject.toolchain.exe.debug">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="com.crt.advproject.platform.exe.debug.1417599136" name="ARM-based MCU (Debug)" superClass="com.crt.advproject.platform.exe.debug"/>
-							<builder buildPath="${workspace_loc:/lz_core/lz_core}" command="make" id="com.crt.advproject.builder.exe.debug.413678905" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="com.crt.advproject.builder.exe.debug"/>
+							<builder buildPath="${workspace_loc:/lz_core}/../../../lz_core" command="make" id="com.crt.advproject.builder.exe.debug.413678905" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="com.crt.advproject.builder.exe.debug"/>
 							<tool id="com.crt.advproject.cpp.exe.debug.229815406" name="MCU C++ Compiler" superClass="com.crt.advproject.cpp.exe.debug">
 								<option id="com.crt.advproject.cpp.hdrlib.328552535" name="Library headers" superClass="com.crt.advproject.cpp.hdrlib" useByScannerDiscovery="false"/>
 								<option id="com.crt.advproject.cpp.fpu.1019393895" name="Floating point" superClass="com.crt.advproject.cpp.fpu" useByScannerDiscovery="true" value="com.crt.advproject.cpp.fpu.fpv5sp.hard" valueType="enumerated"/>
@@ -324,16 +324,6 @@
 								<option id="com.crt.advproject.debugger.security.nonsecureimageenable.1260840199" name="Enable pre-programming of Non-Secure Image" superClass="com.crt.advproject.debugger.security.nonsecureimageenable"/>
 								<option id="com.crt.advproject.debugger.security.nonsecureimage.867317348" name="Non-Secure Project" superClass="com.crt.advproject.debugger.security.nonsecureimage"/>
 							</tool>
-						</toolChain>
-					</folderInfo>
-					<folderInfo id="com.crt.advproject.config.exe.debug.1085733320.1262274643" name="/" resourcePath="lz_core">
-						<toolChain id="com.crt.advproject.toolchain.exe.debug.670506157" name="NXP MCU Tools" superClass="com.crt.advproject.toolchain.exe.debug" unusedChildren="">
-							<tool id="com.crt.advproject.cpp.exe.debug.453283616" name="MCU C++ Compiler" superClass="com.crt.advproject.cpp.exe.debug.229815406"/>
-							<tool id="com.crt.advproject.gcc.exe.debug.122068634" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.debug.1043827681"/>
-							<tool id="com.crt.advproject.gas.exe.debug.55273087" name="MCU Assembler" superClass="com.crt.advproject.gas.exe.debug.1787963655"/>
-							<tool id="com.crt.advproject.link.cpp.exe.debug.1125324122" name="MCU C++ Linker" superClass="com.crt.advproject.link.cpp.exe.debug.1640921965"/>
-							<tool id="com.crt.advproject.link.exe.debug.376165301" name="MCU Linker" superClass="com.crt.advproject.link.exe.debug.1226606763"/>
-							<tool id="com.crt.advproject.tool.debug.debug.6090384" name="MCU Debugger" superClass="com.crt.advproject.tool.debug.debug.1339417954"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
@@ -713,19 +703,11 @@
 &lt;vendor&gt;NXP&lt;/vendor&gt;
 &lt;memory can_program="true" id="Flash" is_ro="true" size="630" type="Flash"/&gt;
 &lt;memory id="RAM" size="304" type="RAM"/&gt;
-&lt;memoryInstance derived_from="Flash" driver="LPC55xx_S.cfx" edited="true" id="LZ_CORE_IRQ" location="0x1000f800" size="0x800"/&gt;
-&lt;memoryInstance derived_from="Flash" driver="LPC55xx_S.cfx" edited="true" id="LZ_CORE_HDR" location="0x10010000" size="0x800"/&gt;
-&lt;memoryInstance derived_from="Flash" driver="LPC55xx_S.cfx" edited="true" id="LZ_CORE_CODE" location="0x10010800" size="0x17400"/&gt;
-&lt;memoryInstance derived_from="Flash" edited="true" id="SG_veneer_table" location="0x10027c00" size="0x400"/&gt;
-&lt;memoryInstance derived_from="Flash" edited="true" id="CP_HDR" location="0x10033800" size="0x800"/&gt;
-&lt;memoryInstance derived_from="Flash" edited="true" id="CP_CODE" location="0x10034000" size="0x13800"/&gt;
-&lt;memoryInstance derived_from="Flash" edited="true" id="UD_HDR" location="0x10047800" size="0x800"/&gt;
-&lt;memoryInstance derived_from="Flash" edited="true" id="UD_CODE" location="0x10048000" size="0x13800"/&gt;
-&lt;memoryInstance derived_from="Flash" edited="true" id="APP_HDR" location="0x1005b800" size="0x800"/&gt;
-&lt;memoryInstance derived_from="Flash" edited="true" id="APP_CODE" location="0x1005c000" size="0x1d000"/&gt;
-&lt;memoryInstance derived_from="Flash" edited="true" id="LZ_DATA_STORE" location="0x10079000" size="0x2000"/&gt;
-&lt;memoryInstance derived_from="Flash" edited="true" id="STAGING_AREA" location="0x1007b000" size="0x1f000"/&gt;
-&lt;memoryInstance derived_from="RAM" edited="true" id="SRAM" location="0x30000000" size="0x8000"/&gt;
+&lt;memoryInstance derived_from="Flash" driver="LPC55xx.cfx" id="PROGRAM_FLASH" location="0x00000000" size="0x0009d800"/&gt;
+&lt;memoryInstance derived_from="RAM" id="SRAM" location="0x20000000" size="0x00040000"/&gt;
+&lt;memoryInstance derived_from="RAM" id="SRAMX" location="0x04000000" size="0x00008000"/&gt;
+&lt;memoryInstance derived_from="RAM" id="USB_RAM" location="0x40100000" size="0x00004000"/&gt;
+&lt;memoryInstance derived_from="RAM" id="SRAM4" location="0x20040000" size="0x00004000"/&gt;
 &lt;/chip&gt;
 &lt;processor&gt;
 &lt;name gcc_name="cortex-m33"&gt;Cortex-M33&lt;/name&gt;

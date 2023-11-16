@@ -48,7 +48,7 @@ int _write(int32_t file, uint8_t *ptr, int32_t len)
 		}
 		return len;
 	} else if (file == STDOUT_FILE_NUM) {
-		dbgprint(DBG_ERR, "\nError: printf etc. cannot be used. use 'dbgprint' instead\n");
+		ERROR("\nError: stdlib I/O functions cannot be used.\n");
 		return len;
 	}
 	errno = ENOSYS;
@@ -132,7 +132,7 @@ int _unlink(const uint8_t *name)
 	return -1;
 }
 
-int _times(struct tms *buf)
+int _times(void *buf)
 {
 	errno = ENOSYS;
 	return -1;

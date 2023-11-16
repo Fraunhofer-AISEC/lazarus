@@ -21,6 +21,7 @@
 #define FLASH_API_H_
 
 #include "fsl_iap.h"
+#include "lz_common.h"
 
 /** The flash page size is 512 Bytes */
 #define FLASH_PAGE_SIZE 0x200U

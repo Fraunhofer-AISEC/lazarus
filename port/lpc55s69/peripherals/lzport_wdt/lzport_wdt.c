@@ -55,8 +55,8 @@ bool lzport_last_reset_awdt(void)
 {
 	// Check if reset was due to Watchdog
 	if (WWDT->MOD & (WWDT_MOD_WDTOF_MASK)) {
-		dbgprint(DBG_AWDT, "INFO: The microcontroller was reset because of a watchdog "
-						   "reset\n");
+		VERB("The microcontroller was reset because of a watchdog "
+			 "reset\n");
 
 		// Clean the time out flag.
 		uint32_t reg = (WWDT->MOD & (~WWDT_MOD_WDINT_MASK));
@@ -75,13 +75,13 @@ bool lzport_last_reset_awdt(void)
  */
 void lzport_wdt_init(uint32_t timeout_s)
 {
-	dbgprint(DBG_AWDT, "INFO: Initializing Watchdog Timer..\n");
+	VERB("Initializing Watchdog Timer..\n");
 
 	// If timeout is higher than maximum WDT timeout, the watchdog is reloaded internally
 	// via the WWDT Warning Interrupt until the specified limit is reached
 	wwdt_multiple = timeout_s / WWDT_MAX_PERIOD_S;
 	wwdt_last = timeout_s % WWDT_MAX_PERIOD_S;
-	dbgprint(DBG_AWDT, "INFO: wwdt_multiple = %d, wwdt_last = %d\n", wwdt_multiple, wwdt_last);
+	VERB("wwdt_multiple = %d, wwdt_last = %d\n", wwdt_multiple, wwdt_last);
 
 	// Enable FRO 1M clock for WWDT module.
 	SYSCON->CLOCK_CTRL |= SYSCON_CLOCK_CTRL_FRO1MHZ_CLK_ENA_MASK;
@@ -138,7 +138,7 @@ void lzport_wdt_init(uint32_t timeout_s)
 		WWDT->MOD |= WWDT_MOD_WDPROTECT(false);
 	}
 
-	dbgprint(DBG_AWDT, "INFO: WDT Successfully initialized\n");
+	VERB("WDT Successfully initialized\n");
 }
 
 /**
@@ -152,8 +152,7 @@ void lzport_wdt_reload(uint32_t timeout_s)
 	// via the WWDT Warning Interrupt until the specified limit is reached
 	wwdt_multiple = timeout_s / WWDT_MAX_PERIOD_S;
 	wwdt_last = timeout_s % WWDT_MAX_PERIOD_S;
-	dbgprint(DBG_AWDT, "INFO: WDT Reload - wwdt_multiple = %d, wwdt_last = %d\n", wwdt_multiple,
-			 wwdt_last);
+	VERB("WDT Reload - wwdt_multiple = %d, wwdt_last = %d\n", wwdt_multiple, wwdt_last);
 
 	// The WDT divides the input frequency into it by 4
 	wdt_freq_hz = CLOCK_GetWdtClkFreq() / 4;
@@ -181,7 +180,7 @@ void lzport_wdt_reload(uint32_t timeout_s)
 	WWDT->FEED = WWDT_SECOND_WORD_OF_REFRESH;
 	EnableGlobalIRQ(primaskValue);
 
-	dbgprint(DBG_AWDT, "INFO: WDT successfully reloaded!\n");
+	VERB("WDT successfully reloaded!\n");
 }
 
 __attribute__((used)) __attribute__((section(".text_Flash_IRQ"))) void WDT_BOD_IRQHandler(void)

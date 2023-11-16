@@ -20,20 +20,32 @@
 #ifndef LZPORT_NET_H_
 #define LZPORT_NET_H_
 
-#include "lz_error.h"
+/*******************************************
+ * Error Handling
+ *******************************************/
+typedef uint32_t NET_RESULT;
 
-LZ_RESULT lzport_net_init(uint8_t *ip, uint8_t *mac, char *ssid, char *pwd);
+#define NET_SUCCESS 0x00000000
 
-LZ_RESULT lzport_socket_close(uint32_t handle, uint32_t timeout_ms);
-LZ_RESULT lzport_socket_open(uint32_t handle, const char *host_name, uint32_t dest_port,
+#define NET_ERROR 0xFFFFFF0F
+#define NET_ERROR_BUSY 0xFFFFFF0E
+#define NET_ERROR_ALREADY_CONNECTED 0xFFFFFF0D
+#define NET_ERROR_TIMEOUT 0xFFFFFF0C
+
+NET_RESULT lzport_net_init(uint8_t *ip, uint8_t *mac, char *ssid, char *pwd);
+
+NET_RESULT lzport_net_reset(void);
+
+NET_RESULT lzport_socket_close(uint32_t handle, uint32_t timeout_ms);
+NET_RESULT lzport_socket_open(uint32_t handle, const char *host_name, uint32_t dest_port,
 							 uint32_t timeout_ms);
-LZ_RESULT lzport_socket_send(uint32_t handle, uint8_t *data, uint32_t len, uint32_t timeout_ms);
-LZ_RESULT lzport_socket_receive(uint32_t handle, uint8_t *data, uint32_t len_exp,
+NET_RESULT lzport_socket_send(uint32_t handle, uint8_t *data, uint32_t len, uint32_t timeout_ms);
+NET_RESULT lzport_socket_receive(uint32_t handle, uint8_t *data, uint32_t len_exp,
 								uint32_t timeout_ms, uint32_t *len_rec);
 
 #if (1 == FREERTOS_AVAILABLE)
-LZ_RESULT lzport_esp8266_init_queue(void);
-LZ_RESULT lzport_esp8266_queue_send(char ch, uint32_t *higher_prio_task_woken);
+NET_RESULT lzport_esp8266_init_queue(void);
+NET_RESULT lzport_esp8266_queue_send(char ch, uint32_t *higher_prio_task_woken);
 #endif
 
 #endif /* lzport_ESP_SOCKET_NEW_H_ */

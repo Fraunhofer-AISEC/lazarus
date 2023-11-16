@@ -30,6 +30,7 @@
 #include "lzport_debug_output.h"
 #include "dicepp.h"
 #include "trustzone_config.h"
+#include "mpu_config.h"
 
 typedef void (*funcptr_s_t)(void);
 
@@ -41,20 +42,20 @@ void lzport_dicepp_board_init(void)
 	BOARD_BootClockFROHF96M();
 }
 
+// The uC starts in secure mode with all memory being secure. Before we switch to lz_core, we
+// have to configure the TrustZone, MPU and Secure AHB Controller in order to allow non-secure
+// software to run in non-secure areas only
 void lzport_init_tee(void)
 {
-	// The uC starts in secure mode with all memory being secure. Before we switch to lz_core, we
-	// have to configure the TrustZone and Secure AHB Controller in order to allow non-secure
-	// software to run in non-secure areas
-#if (1 != DEV_DISABLE_TZ)
-	dbgprint(DBG_INFO, "INFO: Configuring and enabling TrustZone\n");
+	INFO("Configuring and enabling secure MPU\n");
+	init_s_mpu();
+
+	INFO("Configuring and enabling TrustZone\n");
 	init_trustzone();
-#endif
-#if (1 != DEV_DISABLE_SAHBC)
-	dbgprint(DBG_INFO, "INFO: Configuring and enabling Secure AHB Controller\n");
+
+	INFO("Configuring and enabling Secure AHB Controller\n");
 	init_secure_ahb_controller();
 	print_secure_ahb_controller_status();
-#endif
 }
 
 void lzport_dicepp_switch_to_lz_core(void)
@@ -69,14 +70,14 @@ void lzport_dicepp_switch_to_lz_core(void)
 	 * binaries */
 	__TZ_set_MSP_NS((uint32_t)LZ_SRAM_STACK_TOP_NS);
 
-	dbgprint(DBG_INFO, "INFO: Switching to unprivileged mode for Lazarus Core\n");
+	INFO("Switching to non-privileged mode for Lazarus Core\n");
 
 	// Force memory writes before continuing
 	__DSB();
 	// Flush and refill pipeline with updated permissions
 	__ISB();
 
-	// Switch to secure non-privileged mode (tier 2) for Lazarus Core
+	// Switch to secure non-privileged mode (tier 2) for Lazarus Core TODO SET PSP_S?
 	__set_CONTROL(__get_CONTROL() | (0x1 << CONTROL_nPRIV_Pos));
 
 	/* Jump to next binary */

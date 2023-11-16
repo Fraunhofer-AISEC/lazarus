@@ -20,6 +20,6 @@
 #ifndef lzport_DICEPP_H_
 #define lzport_DICEPP_H_
 
-void lzport_read_cdi(uint8_t *data, uint32_t len);
+int lzport_read_cdi(uint8_t *data, uint32_t len);
 
 #endif /* lzport_DICEPP_H_ */

@@ -21,6 +21,7 @@
 #include "fsl_usart.h"
 
 #include "lz_config.h"
+#include "lz_error.h"
 #include "lzport_usart.h"
 #include "lzport_debug_output.h"
 
@@ -41,7 +42,7 @@ void lzport_usart_init_esp(void)
 	lzport_usart_buffer_init(&lzport_usart_tx_fifo_esp);
 #if (1 == FREERTOS_AVAILABLE)
 	if (lzport_esp8266_init_queue() != LZ_SUCCESS) {
-		dbgprint(DBG_ERR, "ERROR: Failed to initialize ESP queue\n");
+		ERROR("Failed to initialize ESP queue\n");
 		for (;;)
 			;
 	}
@@ -106,16 +107,16 @@ void ESP_USART_IRQHandler(void)
 #if (1 == FREERTOS_AVAILABLE)
 		uint32_t higher_prio_task_woken = 0;
 		if (lzport_esp8266_queue_send(byte, &higher_prio_task_woken) != LZ_SUCCESS) {
-			dbgprint(DBG_ERR, "ERROR: Failed to send to queue from ESP USART\n");
+			ERROR("Failed to send to queue from ESP USART\n");
 		}
 		portYIELD_FROM_ISR(higher_prio_task_woken);
 #else
 		lzport_usart_buffer_write(&lzport_usart_rx_fifo_esp, byte);
 #endif
 	} else if (kUSART_RxError & USART_GetStatusFlags(ESP_USART)) {
-		dbgprint(DBG_ERR, "ERROR: ESP USART. Looping forever\n");
-		for (;;)
-			;
+		ERROR("ESP USART Error. System RESET\n");
+		// TODO re-initialize connection / reset network
+		NVIC_SystemReset();
 	} else if (kUSART_TxFifoNotFullFlag & USART_GetStatusFlags(ESP_USART)) {
 		if (!lzport_usart_buffer_is_empty(&lzport_usart_tx_fifo_esp)) {
 			uint8_t ch;
