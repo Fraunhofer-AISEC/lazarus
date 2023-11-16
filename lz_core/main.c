@@ -8,14 +8,18 @@
 #include "lz_core.h"
 #include "lz_update.h"
 #include "lz_awdt.h"
+#include "lzport_gpio.h"
 
 int main(void)
 {
 	lzport_core_board_init();
 
+	lzport_gpio_rts_init();
+	lzport_gpio_set_rts(false);
+
 	lzport_init_debug();
 	if (!lzport_flash_init()) {
-		dbgprint(DBG_ERR, "Failed to initialize flash\n");
+		ERROR("Failed to initialize flash\n");
 		lz_error_handler();
 	}
 	lz_print_img_info("Lazarus Core", &lz_core_hdr);

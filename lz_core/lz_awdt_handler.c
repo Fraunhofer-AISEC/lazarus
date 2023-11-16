@@ -26,6 +26,7 @@
 #include "lz_common.h"
 #include "lz_awdt.h"
 #include "lz_core.h"
+#include "lz_msg_decode.h"
 
 #define MAX_STRING_LENGTH 0x400
 
@@ -38,10 +39,10 @@ bool lz_awdt_last_reset_awdt(void)
 
 LZ_RESULT lz_awdt_init(uint32_t time_s)
 {
-	dbgprint(DBG_AWDT, "INFO: AWDT - Initializing random number generator\n");
+	VERB("AWDT - Initializing random number generator\n");
 	lzport_rng_init();
 
-	dbgprint(DBG_AWDT, "INFO: AWDT - Initialializing Done!\n");
+	VERB("AWDT - Initialializing Done!\n");
 	lzport_wdt_init(time_s);
 
 	return LZ_SUCCESS;
@@ -49,58 +50,75 @@ LZ_RESULT lz_awdt_init(uint32_t time_s)
 
 __attribute__((cmse_nonsecure_entry)) LZ_RESULT lz_awdt_get_nonce_nse(uint8_t *nonce)
 {
-	dbgprint(DBG_AWDT, "INFO: AWDT - Generating Nonce..\n");
+	VERB("AWDT - Generating Nonce..\n");
 
 	/* Check whether string is located in non-secure memory */
 	if (cmse_check_address_range((void *)nonce, LEN_NONCE, CMSE_NONSECURE | CMSE_MPU_READ) ==
 		NULL) {
-		dbgprint(DBG_ERR, "\nAWDT Error: Nonce input buffer is not located in normal world!\n");
+		ERROR("\nAWDT Error: Nonce input buffer is not located in normal world!\n");
 		return LZ_ERROR;
 	}
 
 	if (lzport_rng_get_random_data(nonce, LEN_NONCE) != 0) {
-		dbgprint(DBG_ERR, "AWDT ERROR: Could not generate nonce\n");
+		ERROR("AWDT ERROR: Could not generate nonce\n");
 		return LZ_ERROR;
 	}
 
-	dbgprint(DBG_AWDT, "INFO: AWDT - Nonce = ");
+	VERB("AWDT - Nonce = ");
 	for (uint8_t i = 0; i < LEN_NONCE; i++) {
-		dbgprint(DBG_AWDT, "%02X ", nonce[i]);
+		VERB("%02X ", nonce[i]);
 	}
-	dbgprint(DBG_AWDT, "\n");
-	dbgprint(DBG_AWDT, "INFO: AWDT - Successfully generated nonce!\n");
+	VERB("\n");
+	VERB("AWDT - Successfully generated nonce!\n");
 
 	memcpy(active_nonce, nonce, LEN_NONCE);
 
 	return LZ_SUCCESS;
 }
 
-__attribute__((cmse_nonsecure_entry)) LZ_RESULT lz_awdt_put_ticket_nse(lz_auth_hdr_t *ticket_hdr,
-																	   uint32_t time_ms)
+static LZ_RESULT decode_and_check_awdt_message(uint8_t *buffer, size_t buffer_size,
+											   uint32_t *time_ms)
 {
-	dbgprint(DBG_AWDT, "INFO: AWDT -Reloading with ticket_hdr\n");
-	dbgprint(DBG_AWDT, "INFO: AWDT -Checking Address Range\n");
-
-	/* Check whether string is located in non-secure memory */
-	if (cmse_check_address_range((void *)ticket_hdr, sizeof(lz_auth_hdr_t),
-								 CMSE_NONSECURE | CMSE_MPU_READ) == NULL) {
-		dbgprint(DBG_ERR, "ERROR: AWDT - Input buffer is not located in normal world!\n");
+	uint8_t nonce[LEN_NONCE];
+	if (lz_msg_decode_awdt_refresh(buffer, buffer_size, time_ms, nonce) != LZ_SUCCESS) {
+		ERROR("Failed to decode Awdt refresh response\n");
 		return LZ_ERROR;
 	}
 
-	dbgprint(DBG_AWDT, "INFO: AWDT - Importing ECC Signature..\n");
+	INFO("Got AWDT refresh message with time_ms=%d\n", (int)*time_ms);
 
-	if (lz_core_verify_staging_elem_hdr(ticket_hdr, (uint8_t *)&time_ms, active_nonce) ==
-		LZ_SUCCESS) {
-		dbgprint(DBG_AWDT, "INFO: AWDT - Signature successfully verified. Reloading Watchdog.."
-						   "\n");
+	/* Nonce must match with input provided nonce */
+	if (memcmp(nonce, active_nonce, sizeof(nonce))) {
+		ERROR("Staging element's nonce incorrect\n");
+		return LZ_ERROR;
+	}
+
+	return LZ_SUCCESS;
+}
+
+__attribute__((cmse_nonsecure_entry)) LZ_RESULT lz_awdt_put_ticket_nse(uint8_t *buffer,
+																	   size_t buffer_size)
+{
+	VERB("AWDT -Reloading with ticket_hdr\n");
+	VERB("AWDT -Checking Address Range\n");
+
+	/* Check whether string is located in non-secure memory */
+	if (cmse_check_address_range((void *)buffer, buffer_size, CMSE_NONSECURE | CMSE_MPU_READ) ==
+		NULL) {
+		ERROR("AWDT - Input buffer is not located in normal world!\n");
+		return LZ_ERROR;
+	}
+
+	uint32_t time_ms;
+	if (decode_and_check_awdt_message(buffer, buffer_size, &time_ms) == LZ_SUCCESS) {
+		VERB("AWDT - Signature successfully verified. Reloading Watchdog.."
+			 "\n");
 
 		lzport_wdt_reload(time_ms / 1000);
 
-		dbgprint(DBG_AWDT, "INFO: AWDT - Reload Timer with new timeout: %dms!\n", time_ms);
+		VERB("AWDT - Reload Timer with new timeout: %dms!\n", time_ms);
 	} else {
-		dbgprint(DBG_ERR, "ERROR: AWDT - Failed to verify signature. AWDT NOT RELOADED\n");
-		return LZ_ERROR;
+		ERROR("AWDT - Failed to verify signature. AWDT NOT RELOADED\n");
 	}
 
 	// Zero out nonce to avoid replay attacks

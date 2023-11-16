@@ -28,7 +28,6 @@ GROUP (
 
 MEMORY
 {
-  LZ_CORE_IRQ (rx) : ORIGIN = _LZ_CORE_IRQ_START, LENGTH = _LZ_CORE_IRQ_SIZE
   LZ_CORE_HDR (rw) : ORIGIN = _LZ_CORE_HEADER_START, LENGTH = _LZ_CORE_HEADER_SIZE
   LZ_CORE_CODE (rx) : ORIGIN = _LZ_CORE_CODE_START, LENGTH = _LZ_CORE_CODE_SIZE
   SG_veneer_table (rx) : ORIGIN = _LZ_CORE_NSC_START, LENGTH = _LZ_CORE_NSC_SIZE
@@ -48,23 +47,6 @@ ENTRY(ResetISR)
 
 SECTIONS
 {
-	.text_lz_core_irq : ALIGN(4)
-    {
-       FILL(0xff)
-        *(.text_Flash2) /* for compatibility with previous releases */
-        *(.text_Flash_IRQ) /* for compatibility with previous releases */
-        *(.text.$Flash2)
-        *(.text.$Flash_IRQ)
-        *(.text_Flash2.*) /* for compatibility with previous releases */
-        *(.text_Flash_IRQ.*) /* for compatibility with previous releases */
-        *(.text.$Flash2.*)
-        *(.text.$Flash_IRQ.*)
-        *(.rodata.$Flash2)
-        *(.rodata.$Flash_IRQ)
-        *(.rodata.$Flash2.*)
-        *(.rodata.$Flash_IRQ.*)
-     } > LZ_CORE_IRQ
-
     /* Place TrustZone Secure Gateway veneers in 'SG_veneer_table' memory */
     .gnu.sgstubs : ALIGN (32)
     {

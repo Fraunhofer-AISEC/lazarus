@@ -20,7 +20,7 @@
 #ifndef LZ_UPDATE_H_
 #define LZ_UPDATE_H_
 
-LZ_RESULT lz_apply_updates(void);
+LZ_RESULT lz_apply_updates(const uint8_t expected_nonce[LEN_NONCE]);
 LZ_RESULT lz_update_img_meta_data(void);
 LZ_RESULT lz_std_updates_pending(void);
 LZ_RESULT lz_verified_core_update_pending(void);

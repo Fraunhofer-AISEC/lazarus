@@ -24,6 +24,7 @@
 #include "mbedtls/ecdsa.h"
 #include "ecc.h"
 #include "hmac.h"
+#include "ecc.h"
 #include "ecdsa.h"
 #include "x509.h"
 #include "sha256.h"
@@ -35,6 +36,7 @@
 #include "lz_core.h"
 #include "lz_update.h"
 #include "lz_awdt.h"
+#include "lz_msg_decode.h"
 
 __attribute__((section(".CP_CODE"))) volatile const uint8_t lz_cpatcher_code[LZ_CPATCHER_CODE_SIZE];
 __attribute__((section(".UD_CODE"))) volatile const uint8_t lz_udownloader_code[LZ_UD_CODE_SIZE];
@@ -42,13 +44,14 @@ __attribute__((section(".APP_CODE"))) volatile const uint8_t app_code[LZ_APP_COD
 
 static lz_core_boot_params_t *lz_core_boot_params = (lz_core_boot_params_t *)&lz_img_boot_params;
 
-static LZ_RESULT lz_get_staging_elem_content(hdr_type_t elem_type, uint8_t **content);
 static LZ_RESULT lz_core_get_next_layer_addrs(boot_mode_t boot_mode,
 											  const lz_img_hdr_t **boot_image_hdr,
 											  const uint8_t **boot_image_code,
 											  const lz_img_meta_t **img_meta);
 static LZ_RESULT lz_core_derive_dev_auth(uint8_t *dev_auth, uint32_t dev_auth_length,
 										 ecc_keypair_t *lz_dev_id);
+
+static LZ_RESULT lz_has_valid_boot_ticket(void);
 
 boot_mode_t lz_core_run(void)
 {
@@ -57,15 +60,17 @@ boot_mode_t lz_core_run(void)
 	boot_mode_t boot_mode;
 	uint8_t next_layer_digest[SHA256_DIGEST_LENGTH];
 
+	hexdump(lz_core_boot_params->info.dev_uuid, LEN_UUID_V4_BIN, "Device UUID");
+
 	// Check whether DICEpp passed valid boot parameters
 	if (!lz_core_boot_params_valid()) {
-		dbgprint(DBG_ERR, "PANIC: Lazarus corrupted boot parameters.\n");
+		ERROR("PANIC: Lazarus corrupted boot parameters.\n");
 		lz_error_handler();
 	}
 
 	// Derive DeviceID keypair based on CDI_prime provided via boot parameters
 	if (lz_core_derive_device_id(&lz_dev_id_keypair) != LZ_SUCCESS) {
-		dbgprint(DBG_ERR, "ERROR: Failed to derive DeviceID key pair\n");
+		ERROR("Failed to derive DeviceID key pair\n");
 		lz_error_handler();
 	}
 
@@ -73,31 +78,31 @@ boot_mode_t lz_core_run(void)
 	initial_boot = lz_core_is_initial_boot();
 
 	if (initial_boot) {
-		dbgprint(DBG_INFO, "INFO: Initial boot of Lazarus, erase Lazarus Data Store "
-						   "and Staging Area\n");
+		INFO("Initial boot of Lazarus, erase Lazarus Data Store "
+			 "and Staging Area\n");
 
 		// Erase the Lazarus data store and the staging area. This is necessary on the NXP
 		// in order to be able to write to it
 		if (lz_core_erase_lz_data_store() != LZ_SUCCESS) {
-			dbgprint(DBG_ERR, "ERROR: Failed to erase Lazarus data store\n");
+			ERROR("Failed to erase Lazarus data store\n");
 			lz_error_handler();
 		}
 		if (lz_core_erase_staging_area() != LZ_SUCCESS) {
-			dbgprint(DBG_ERR, "ERROR: Failed to erase staging area\n");
+			ERROR("Failed to erase staging area\n");
 			lz_error_handler();
 		}
 
 		// DICEpp provides static_symm at first boot. Store it in flash to be read by
 		// the hub during provisioning. Afterwards, static_symm is wiped
 		if (lz_core_store_static_symm() != LZ_SUCCESS) {
-			dbgprint(DBG_ERR, "ERROR: Lazarus Core could not store static_symm for later "
-							  "encrypting and signing.\n");
+			ERROR("Lazarus Core could not store static_symm for later "
+				  "encrypting and signing.\n");
 			lz_error_handler();
 		}
 
 		// On initial boot, the image meta data must be stored for the first time
 		if (lz_update_img_meta_data() != LZ_SUCCESS) {
-			dbgprint(DBG_ERR, "ERROR: Failed to update image meta data\n");
+			ERROR("Failed to update image meta data\n");
 			lz_error_handler();
 		}
 	} else {
@@ -107,27 +112,23 @@ boot_mode_t lz_core_run(void)
 		// could be implemented here if online provisioning shall be supported in the
 		// future
 		if (lz_core_wipe_static_symm() != LZ_SUCCESS) {
-			dbgprint(DBG_ERR, "ERROR: Failed to wipe static_symm\n");
+			ERROR("Failed to wipe static_symm\n");
 			lz_error_handler();
 		}
 	}
 
 	// Check whether we have a new Lazarus Core: either after an update, or because it runs for the
 	// very first time
-
 	bool lz_core_updated = lz_core_is_updated(&lz_dev_id_keypair);
-	// bool lz_core_updated = lz_core_is_updated(&device_id_pk, ecc_keypair_to_public(&lz_dev_id_keypair));
 
 	if (lz_core_updated) {
-		dbgprint(
-			DBG_INFO,
-			"INFO: New DeviceID public key, this Lazarus Core version runs for the first time.\n");
+		INFO("New DeviceID public key, this Lazarus Core version runs for the first time.\n");
 
 		// If so, create a new DeviceID CSR and store the new pubkey and CSR.
 		// This CSR is either signed via provisioning during the first time, or with the
 		// Lazarus update protocol
 		if (lz_core_create_device_id_csr(initial_boot, &lz_dev_id_keypair) != LZ_SUCCESS) {
-			dbgprint(DBG_ERR, "ERROR: Lazarus Core could not store DeviceID pubkey and CSR.\n");
+			ERROR("Lazarus Core could not store DeviceID pubkey and CSR.\n");
 			lz_error_handler();
 		}
 	}
@@ -135,12 +136,12 @@ boot_mode_t lz_core_run(void)
 	// The hub is responsible for flashing the signed binaries and the trust anchors structure onto
 	// the device if the device is not provisioned yet (happens via provisioning script)
 	if (!lz_core_is_provisioning_complete()) {
-		dbgprint(DBG_WARN, "WARN: Device is not provisioned yet. This normal during the very first "
-						   "boot. Blocking and waiting for the device to be provisioned..\n");
+		WARN("Device is not provisioned yet. This normal during the very first "
+			 "boot. Blocking and waiting for the device to be provisioned..\n");
 		for (;;)
 			;
 	} else {
-		dbgprint(DBG_INFO, "INFO: Device is provisioned\n");
+		INFO("Device is provisioned\n");
 	}
 
 	// Check if there are staging elements on the staging area. This might be tickets of updates.
@@ -153,17 +154,17 @@ boot_mode_t lz_core_run(void)
 		// Check for updates
 		if (lz_std_updates_pending() == LZ_SUCCESS) {
 			// Verify and apply updates
-			lz_apply_updates();
+			lz_apply_updates(lz_core_boot_params->info.cur_nonce);
 		}
 
 		if (lz_update_img_meta_data() != LZ_SUCCESS) {
-			dbgprint(DBG_ERR, "ERROR: Failed to update image meta data\n");
+			ERROR("Failed to update image meta data\n");
 			lz_error_handler();
 		}
 
 		if (lz_verified_core_update_pending() == LZ_SUCCESS) {
 			boot_mode = LZ_CPATCHER;
-		} else if (lz_has_valid_staging_element(BOOT_TICKET) == LZ_SUCCESS) {
+		} else if (lz_has_valid_boot_ticket() == LZ_SUCCESS) {
 			boot_mode = APP;
 		} else {
 			boot_mode = LZ_UDOWNLOADER;
@@ -173,10 +174,9 @@ boot_mode_t lz_core_run(void)
 	// Determine deferral time based on deferral ticket in staging area
 	uint32_t deferral_time;
 	if (lz_get_deferral_time(&deferral_time) != LZ_SUCCESS) {
-		dbgprint(DBG_WARN,
-				 "WARN: Could not find valid deferral ticket, using default value "
-				 "%ds.\n",
-				 DEFAULT_WDT_TIMOUT_s);
+		WARN("Could not find valid deferral ticket, using default value "
+			 "%ds.\n",
+			 DEFAULT_WDT_TIMOUT_s);
 		deferral_time = DEFAULT_WDT_TIMOUT_s;
 	}
 
@@ -186,14 +186,14 @@ boot_mode_t lz_core_run(void)
 	bool firmware_update_necessary = false;
 	if (lz_core_verify_next_layer(boot_mode, next_layer_digest) != LZ_SUCCESS) {
 		if (boot_mode == APP) {
-			dbgprint(DBG_ERR, "ERROR: Verification of App failed, require App update..\n");
+			ERROR("Verification of App failed, require App update..\n");
 
 			// Verification of the app failed, switch boot-mode to Update Downloader and
 			// indicate that a new firmware is required
 			boot_mode = LZ_UDOWNLOADER;
 			firmware_update_necessary = true;
 		} else {
-			dbgprint(DBG_ERR, "FATAL: Verification of UD or UM failed. This is not recoverable.\n");
+			ERROR("Verification of UD or UM failed. This is not recoverable.\n");
 			lz_error_handler();
 		}
 	}
@@ -201,25 +201,23 @@ boot_mode_t lz_core_run(void)
 	ecc_priv_key_pem_t pem;
 	ecc_priv_key_to_pem(&lz_dev_id_keypair, &pem);
 	uint8_t digest[SHA256_DIGEST_LENGTH];
-	if (sha256_two_parts(digest, next_layer_digest, sizeof(next_layer_digest), &pem,
-							sizeof(pem)) < 0) {
-		dbgprint(DBG_ERR, "ERROR: Failed to derive digest from next layer and DeviceID\n");
+	if (sha256_two_parts(digest, next_layer_digest, sizeof(next_layer_digest), &pem, sizeof(pem)) <
+		0) {
+		ERROR("Failed to derive digest from next layer and DeviceID\n");
 		return false;
 	}
 
 	// Create the volatile AliasID key pair based on measuring the next layer
 	ecc_keypair_t lz_alias_id_keypair;
 	if (lz_core_derive_alias_id_keypair(digest, &lz_alias_id_keypair) != LZ_SUCCESS) {
-		dbgprint(
-			DBG_ERR,
-			"ERROR: Failed to calculate and store alias credentials into next layer's parameters");
+		ERROR("Failed to calculate and store alias credentials into next layer's parameters");
 		return false;
 	}
 
 	// Create the boot parameters for the next layer depending on the boot mode
 	if (lz_core_provide_params_ram(boot_mode, lz_core_updated, firmware_update_necessary,
 								   &lz_alias_id_keypair, &lz_dev_id_keypair) != LZ_SUCCESS) {
-		dbgprint(DBG_ERR, "PANIC: Could not create boot parameters for next layer.\n");
+		ERROR("PANIC: Could not create boot parameters for next layer.\n");
 		lz_error_handler();
 	}
 
@@ -227,11 +225,11 @@ boot_mode_t lz_core_run(void)
 	// will have to fetch boot tickets always in time to prevent a device reset
 	lz_awdt_init(deferral_time);
 	if (lz_awdt_last_reset_awdt()) {
-		dbgprint(DBG_WARN, "WARN: Last device reset was through expired AWDT\n");
+		WARN("Last device reset was through expired AWDT\n");
 	}
 
-	// Attention: after the de-init, adding dbgprint will cause a HardFault
-	dbgprint(DBG_INFO, "INFO: Launching next layer...\n");
+	// Attention: after the de-init, debug output will cause a HardFault
+	INFO("Launching next layer...\n");
 
 	// Deinitialize peripherals
 	lzport_rng_deinit();
@@ -252,39 +250,16 @@ boot_mode_t lz_core_run(void)
  */
 LZ_RESULT lz_core_derive_device_id(ecc_keypair_t *device_id_keypair)
 {
-	dbgprint(DBG_INFO, "INFO: Generating DeviceID key pair\n");
+	INFO("Generating DeviceID key pair\n");
 	if (ecc_derive_keypair(device_id_keypair, lz_core_boot_params->info.cdi_prime,
-							  sizeof(lz_core_boot_params->info.cdi_prime))) {
-		dbgprint(DBG_ERR, "ERROR: Failed to derive DeviceID key pair (device_id_keypair)\n");
+						   sizeof(lz_core_boot_params->info.cdi_prime))) {
+		ERROR("Failed to derive DeviceID key pair (device_id_keypair)\n");
 		return LZ_ERROR;
 	}
 
-	dbgprint(DBG_INFO, "INFO: Done with generating mbedtls key\n");
+	INFO("Done with generating mbedtls key\n");
 
 	return LZ_SUCCESS;
-}
-
-// Looks for a valid deferral ticket on the staging area.
-// On success, the function returns true and writes the deferral time to <deferral_time>
-LZ_RESULT lz_get_deferral_time(uint32_t *deferral_time)
-{
-	LZ_RESULT result;
-
-	dbgprint(DBG_INFO, "INFO: Searching for deferral ticket on staging area\n");
-
-	if ((result = lz_has_valid_staging_element(DEFERRAL_TICKET)) != LZ_SUCCESS) {
-		goto exit;
-	}
-
-	if ((result = lz_get_staging_elem_content(DEFERRAL_TICKET, (uint8_t **)&deferral_time)) !=
-		LZ_SUCCESS) {
-		goto exit;
-	}
-
-	result = LZ_SUCCESS;
-
-exit:
-	return result;
 }
 
 LZ_RESULT lz_core_get_next_layer_addrs(boot_mode_t boot_mode, const lz_img_hdr_t **boot_image_hdr,
@@ -326,7 +301,7 @@ LZ_RESULT lz_core_get_next_layer_addrs(boot_mode_t boot_mode, const lz_img_hdr_t
 		}
 		break;
 	default:
-		dbgprint(DBG_ERR, "ERROR: Unknown boot mode.\n");
+		ERROR("Unknown boot mode.\n");
 		return LZ_ERROR;
 	}
 	return LZ_SUCCESS;
@@ -343,7 +318,7 @@ LZ_RESULT lz_core_verify_next_layer(boot_mode_t boot_mode, uint8_t *next_layer_d
 
 	if ((result = lz_core_get_next_layer_addrs(boot_mode, &boot_image_hdr, &boot_image_code,
 											   &img_meta)) != LZ_SUCCESS) {
-		dbgprint(DBG_ERR, "ERROR: Could not get header and code information of next layer.\n");
+		ERROR("Could not get header and code information of next layer.\n");
 		return result;
 	}
 
@@ -361,7 +336,7 @@ LZ_RESULT lz_core_wipe_static_symm(void)
 	// Check if static_symm is already wiped
 	if (lz_is_mem_zero((const void *)&lz_data_store.config_data.static_symm_info.static_symm,
 					   sizeof(lz_data_store.config_data.static_symm_info.static_symm))) {
-		dbgprint(DBG_INFO, "INFO: static_symm already wiped\n");
+		INFO("static_symm already wiped\n");
 		return LZ_SUCCESS;
 	}
 
@@ -378,11 +353,11 @@ LZ_RESULT lz_core_wipe_static_symm(void)
 	// Write config back to flash
 	if (!(lzport_flash_write((uint32_t)&lz_data_store.config_data, (uint8_t *)&config_data_cpy,
 							 sizeof(lz_data_store.config_data)))) {
-		dbgprint(DBG_ERR, "ERROR: Failed to wipe static_symm\n");
+		ERROR("Failed to wipe static_symm\n");
 		return LZ_ERROR;
 	}
 
-	dbgprint(DBG_INFO, "INFO: Successfully wiped static_symm\n");
+	INFO("Successfully wiped static_symm\n");
 
 	return LZ_SUCCESS;
 }
@@ -393,7 +368,7 @@ LZ_RESULT lz_core_derive_dev_auth(uint8_t *dev_auth, uint32_t dev_auth_length,
 	uint8_t digest_dev_auth[MAX_PUB_ECP_PEM_BYTES + LEN_UUID_V4_BIN];
 
 	if (dev_auth_length < SHA256_DIGEST_LENGTH) {
-		dbgprint(DBG_ERR, "ERROR: Provided dev_auth too small\n");
+		ERROR("Provided dev_auth too small\n");
 		return LZ_ERROR;
 	}
 
@@ -407,9 +382,9 @@ LZ_RESULT lz_core_derive_dev_auth(uint8_t *dev_auth, uint32_t dev_auth_length,
 
 	// Compute dev auth
 	if (hmac_sha256(dev_auth, digest_dev_auth, sizeof(digest_dev_auth),
-					   (uint8_t *)&(lz_core_boot_params->info.core_auth),
-					   sizeof(lz_core_boot_params->info.core_auth))) {
-		dbgprint(DBG_ERR, "ERROR: Creating dev_auth failed.\n");
+					(uint8_t *)&(lz_core_boot_params->info.core_auth),
+					sizeof(lz_core_boot_params->info.core_auth))) {
+		ERROR("Creating dev_auth failed.\n");
 		return LZ_ERROR;
 	}
 
@@ -419,14 +394,14 @@ LZ_RESULT lz_core_derive_dev_auth(uint8_t *dev_auth, uint32_t dev_auth_length,
 // Calculates the alias key pair and stores it in alias_creds
 LZ_RESULT lz_core_derive_alias_id_keypair(uint8_t *digest, ecc_keypair_t *lz_alias_id_keypair)
 {
-	dbgprint(DBG_INFO, "INFO: Generating Alias Identity\n");
+	INFO("Generating Alias Identity\n");
 
 	if (ecc_derive_keypair(lz_alias_id_keypair, digest, sizeof(digest))) {
-		dbgprint(DBG_ERR, "ERROR: Failed to derive alias id key pair (device_id_keypair)\n");
+		ERROR("Failed to derive alias id key pair (device_id_keypair)\n");
 		return LZ_ERROR;
 	}
 
-	dbgprint(DBG_INFO, "INFO: Successfully generated alias keypair\n");
+	INFO("Successfully generated alias keypair\n");
 
 	return LZ_SUCCESS;
 }
@@ -439,7 +414,7 @@ LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, ecc_keypair_t *alias_
 
 	// We require information from the header of the next layer to be loaded
 	if (lz_core_get_next_layer_addrs(boot_mode, &boot_image_hdr, NULL, NULL) != LZ_SUCCESS) {
-		dbgprint(DBG_ERR, "ERROR: Could not retrieve next layer's image header address.\n");
+		ERROR("Could not retrieve next layer's image header address.\n");
 		return LZ_ERROR;
 	}
 
@@ -457,8 +432,8 @@ LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, ecc_keypair_t *alias_
 	ecc_pub_key_pem_t alias_keypair_pem;
 	ecc_pub_key_to_pem(alias_keypair, &alias_keypair_pem);
 	if (x509_set_serial_number_cert(&info, (unsigned char *)&alias_keypair_pem,
-								  sizeof(alias_keypair_pem)) != 0) {
-		dbgprint(DBG_ERR, "ERROR: x509_set_serial_number_cert failed.\n");
+									sizeof(alias_keypair_pem)) != 0) {
+		ERROR("x509_set_serial_number_cert failed.\n");
 		return LZ_ERROR;
 	}
 	// Create the cert store with all certificates
@@ -478,7 +453,7 @@ LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, ecc_keypair_t *alias_
 	if ((lz_img_cert_store.info.cursor +
 		 lz_data_store.trust_anchors.info.certTable[INDEX_LZ_CERTSTORE_HUB].size) >
 		sizeof(lz_img_cert_store.certBag)) {
-		dbgprint(DBG_ERR, "ERROR: ImgCertStore overflow (INDEX_IMG_CERTSTORE_HUB).\n");
+		ERROR("ImgCertStore overflow (INDEX_IMG_CERTSTORE_HUB).\n");
 		return false;
 	}
 
@@ -502,7 +477,7 @@ LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, ecc_keypair_t *alias_
 	if ((lz_img_cert_store.info.cursor +
 		 lz_data_store.trust_anchors.info.certTable[INDEX_LZ_CERTSTORE_DEVICEID].size) >
 		sizeof(lz_img_cert_store.certBag)) {
-		dbgprint(DBG_ERR, "ERROR: ImgCertStore overflow (INDEX_IMG_CERTSTORE_DEVICEID).\n");
+		ERROR("ImgCertStore overflow (INDEX_IMG_CERTSTORE_DEVICEID).\n");
 		return LZ_ERROR;
 	}
 
@@ -525,9 +500,8 @@ LZ_RESULT lz_core_create_cert_store(boot_mode_t boot_mode, ecc_keypair_t *alias_
 			&info, alias_keypair, device_id_keypair,
 			(unsigned char *)&lz_img_cert_store.certBag[lz_img_cert_store.info.cursor],
 			rem_length) != 0) {
-		dbgprint(
-			DBG_ERR,
-			"ERROR: x509_write_cert_to_pem failed. ImgCertStore overflow likely (INDEX_IMG_CERTSTORE_ALIASID).\n");
+		ERROR(
+			"x509_write_cert_to_pem failed. ImgCertStore overflow likely (INDEX_IMG_CERTSTORE_ALIASID).\n");
 		return LZ_ERROR;
 	}
 	rem_length = strlen((const char *)&lz_img_cert_store.certBag[lz_img_cert_store.info.cursor]);
@@ -580,8 +554,7 @@ LZ_RESULT lz_core_provide_params_ram(boot_mode_t boot_mode, bool lz_core_updated
 		if (lz_core_derive_dev_auth(img_boot_params_info_cpy.dev_auth,
 									sizeof(img_boot_params_info_cpy.dev_auth),
 									lz_dev_id_keypair) != LZ_SUCCESS) {
-			dbgprint(DBG_ERR,
-					 "ERROR: Failed to calculate and store dev_auth into next layer's parameters");
+			ERROR("ERROR: Failed to calculate and store dev_auth into next layer's parameters");
 			return LZ_ERROR;
 		}
 
@@ -607,7 +580,7 @@ LZ_RESULT lz_core_provide_params_ram(boot_mode_t boot_mode, bool lz_core_updated
 	// Core's boot parameters
 	if (lz_core_create_cert_store(boot_mode, lz_alias_id_keypair, lz_dev_id_keypair) !=
 		LZ_SUCCESS) {
-		dbgprint(DBG_ERR, "ERROR: Failed to setup certificate store for next layer");
+		ERROR("Failed to setup certificate store for next layer");
 		return LZ_ERROR;
 	}
 
@@ -628,7 +601,7 @@ LZ_RESULT lz_core_create_device_id_csr(bool first_boot, ecc_keypair_t *device_id
 	// Create a trust anchors structure to RAM, rewrite and flash when finished
 	trust_anchors_t ta_copy = { 0 };
 
-	dbgprint(DBG_INFO, "INFO: Generating new DeviceID certificate.\n");
+	INFO("Generating new DeviceID certificate.\n");
 
 	if (!first_boot) {
 		// Write the contents of the existing trust anchors structure to the copy
@@ -647,8 +620,8 @@ LZ_RESULT lz_core_create_device_id_csr(bool first_boot, ecc_keypair_t *device_id
 	info.subject.org = "Lazarus";
 
 	if (x509_set_serial_number_csr(&info, (unsigned char *)&ta_copy.info.dev_pub_key,
-								 sizeof(ta_copy.info.dev_pub_key)) != 0) {
-		dbgprint(DBG_ERR, "ERROR: x509_set_serial_number_csr failed.\n");
+								   sizeof(ta_copy.info.dev_pub_key)) != 0) {
+		ERROR("x509_set_serial_number_csr failed.\n");
 		return LZ_ERROR;
 	}
 
@@ -660,8 +633,8 @@ LZ_RESULT lz_core_create_device_id_csr(bool first_boot, ecc_keypair_t *device_id
 		length = sizeof(ta_copy.certBag);
 	} else {
 		if (ta_copy.info.cursor == 0) {
-			dbgprint(DBG_ERR, "ERROR: Cursor is zero. Previous DeviceID CSR was not correctly "
-							  "stored.\n");
+			ERROR("Cursor is zero. Previous DeviceID CSR was not correctly "
+				  "stored.\n");
 			return LZ_ERROR;
 		}
 
@@ -675,8 +648,8 @@ LZ_RESULT lz_core_create_device_id_csr(bool first_boot, ecc_keypair_t *device_id
 	}
 
 	if (x509_write_csr_to_pem(&info, device_id_keypair, &ta_copy.certBag[ta_copy.info.cursor],
-							length) < 0) {
-		dbgprint(DBG_ERR, "ERROR: x509_write_csr_to_pem failed.\n");
+							  length) < 0) {
+		ERROR("x509_write_csr_to_pem failed (Output Buffer Length: %d)\n", length);
 		return LZ_ERROR;
 	}
 	length = strlen((char *)&ta_copy.certBag[ta_copy.info.cursor]);
@@ -688,10 +661,10 @@ LZ_RESULT lz_core_create_device_id_csr(bool first_boot, ecc_keypair_t *device_id
 	// Persist the new copy of the trust anchors structure in the Lazarus Data Store
 	if (!(lzport_flash_write((uint32_t)&lz_data_store.trust_anchors, (uint8_t *)&ta_copy,
 							 sizeof(lz_data_store.trust_anchors)))) {
-		dbgprint(DBG_ERR, "ERROR: Failed to flash DeviceID CSR\n");
+		ERROR("Failed to flash DeviceID CSR\n");
 		return LZ_ERROR;
 	}
-	dbgprint(DBG_ERR, "INFO: Successfully written csr to trust anchors.\n");
+	ERROR("INFO: Successfully written csr to trust anchors.\n");
 
 	return LZ_SUCCESS;
 }
@@ -714,7 +687,7 @@ LZ_RESULT lz_core_erase_staging_area(void)
 	uint8_t *p = (uint8_t *)&lz_staging_area;
 	for (int i = 0; i < LZ_STAGING_AREA_NUM_PAGES; i++) {
 		if (!lzport_flash_write((uint32_t)p, temp, 512)) {
-			dbgprint(DBG_ERR, "ERROR: Failed to erase staging area (page %d, addr %x)\n", i, p);
+			ERROR("Failed to erase staging area (page %d, addr %x)\n", i, p);
 			return LZ_ERROR;
 		}
 		p += 512;
@@ -732,7 +705,7 @@ bool lz_core_is_updated(ecc_keypair_t *lz_dev_id_keypair)
 		return 1;
 	}
 	int re = ecc_compare_public_key(ecc_keypair_to_public(&old_key),
-								   ecc_keypair_to_public(lz_dev_id_keypair));
+									ecc_keypair_to_public(lz_dev_id_keypair));
 	ecc_free_keypair(&old_key);
 
 	return re;
@@ -765,7 +738,7 @@ LZ_RESULT lz_core_store_static_symm(void)
 
 	if (!(lzport_flash_write((uint32_t)&lz_data_store.config_data, (uint8_t *)&cfg_data_cpy,
 							 sizeof(lz_data_store.config_data)))) {
-		dbgprint(DBG_ERR, "ERROR: lzport_flash_write failed.\n");
+		ERROR("lzport_flash_write failed.\n");
 		return LZ_ERROR;
 	}
 	return LZ_SUCCESS;
@@ -785,132 +758,31 @@ bool lz_core_is_provisioning_complete(void)
 			(lz_core_hdr.hdr.content.magic == LZ_MAGIC));
 }
 
-LZ_RESULT lz_has_staging_elem_type(hdr_type_t elem_type)
-{
-	lz_auth_hdr_t *staging_hdr = NULL;
-	return lz_get_staging_hdr(elem_type, &staging_hdr, lz_core_boot_params->info.cur_nonce);
-}
-
-LZ_RESULT lz_core_verify_staging_elem_hdr_sig(const lz_auth_hdr_t *hdr, uint8_t *payload)
-{
-	uint8_t digest[SHA256_DIGEST_LENGTH];
-
-	// Hash the staging element's payload
-	if (sha256(digest, payload, hdr->content.payload_size) != 0) {
-		dbgprint(DBG_ERR, "ERROR: sha256 failed.\n");
-		return LZ_ERROR;
-	}
-
-	// Verify the computed hash against the hash in the header
-	if (memcmp(digest, hdr->content.digest, sizeof(digest)) != 0) {
-		dbgprint(DBG_WARN, "ERROR: Staging element digest mismatch\n");
-		return LZ_ERROR;
-	}
-
-	if (ecdsa_verify_pub_pem(
-			(uint8_t *)&hdr->content, sizeof(hdr->content),
-			(ecc_pub_key_pem_t *)&lz_data_store.trust_anchors.info.management_pub_key,
-			&hdr->signature) != 0) {
-		dbgprint(DBG_ERR, "ERROR: GEN - Failed to verify staging element header signature\n");
-		return LZ_ERROR;
-	}
-
-	dbgprint(DBG_INFO, "INFO: Success! Staging element's signature valid.\n");
-
-	return LZ_SUCCESS;
-}
-
-LZ_RESULT lz_verify_staging_header(const lz_auth_hdr_t *staging_element_hdr, uint8_t *payload)
-{
-	if (lz_core_verify_staging_elem_hdr(staging_element_hdr, payload,
-										lz_core_boot_params->info.cur_nonce) != LZ_SUCCESS) {
-		dbgprint(DBG_ERR, "ERROR: Staging element header verification failed.");
-		return LZ_ERROR;
-	}
-
-	if ((staging_element_hdr->content.type == LZ_CORE_UPDATE) ||
-		(staging_element_hdr->content.type == LZ_UDOWNLOADER_UPDATE) ||
-		(staging_element_hdr->content.type == LZ_CPATCHER_UPDATE) ||
-		(staging_element_hdr->content.type == APP_UPDATE) ||
-		(staging_element_hdr->content.type == DEVICE_ID_REASSOC_RES) ||
-		(staging_element_hdr->content.type == CONFIG_UPDATE)) {
-		return LZ_SUCCESS;
-	}
-
-	return LZ_ERROR;
-}
-
-LZ_RESULT lz_core_verify_staging_elem_hdr(const lz_auth_hdr_t *hdr, uint8_t *payload,
-										  uint8_t *nonce)
-{
-	// Check sanity of header
-	if (hdr->content.magic != LZ_MAGIC) {
-		dbgprint(DBG_ERR, "ERROR: Staging element header corrupted\n");
-		return LZ_ERROR;
-	}
-
-	// Payload must be larger than 0
-	if (hdr->content.payload_size == 0) {
-		dbgprint(DBG_ERR, "ERROR: Staging element size is 0\n");
-		return LZ_ERROR;
-	}
-
-	dbgprint(DBG_INFO, "INFO: Element %s with size %d bytes (0x%x bytes)\n",
-			 HDR_TYPE_STRING[hdr->content.type], hdr->content.payload_size,
-			 hdr->content.payload_size);
-
-	dbgprint(DBG_VERB, "Payload digest: ");
-	for (uint32_t i = 0; i < SHA256_DIGEST_LENGTH; i++) {
-		dbgprint(DBG_VERB, "%02x ", hdr->content.digest[i]);
-	}
-
-	// Nonce must match with input provided nonce
-	if (memcmp(&(hdr->content.nonce), nonce, sizeof(hdr->content.nonce))) {
-		dbgprint(DBG_ERR, "ERROR: Staging element's nonce incorrect\n");
-		return LZ_ERROR;
-	}
-
-	// Verify the signature of the staging element header
-	if (lz_core_verify_staging_elem_hdr_sig(hdr, payload) != LZ_SUCCESS) {
-		dbgprint(DBG_ERR, "ERROR: Staging element header verification failed.\n");
-		return LZ_ERROR;
-	}
-
-	dbgprint(DBG_INFO, "INFO: Element successfully verified (Nonce, digest and signature)\n");
-
-	return LZ_SUCCESS;
-}
-
 LZ_RESULT lz_core_verify_image(const lz_img_hdr_t *image_hdr, const uint8_t *image_code,
 							   const lz_img_meta_t *image_meta, uint8_t *image_digest_out)
 {
 	uint8_t digest[SHA256_DIGEST_LENGTH];
 
 	if (image_hdr->hdr.content.magic != LZ_MAGIC) {
-		dbgprint(DBG_ERR, "ERROR: Image header invalid (MAGIC)\n");
-		return LZ_ERROR;
-	}
-
-	if (!(image_code == (uint8_t *)(((uint32_t)image_hdr) + (image_hdr->hdr.content.hdr_size)))) {
-		dbgprint(DBG_ERR, "ERROR: Unexpected boot image start address.\n");
+		hexdump((uint8_t *)&image_hdr->hdr.content.magic, sizeof(image_hdr->hdr.content.magic),
+				"ERROR: Image header invalid (MAGIC)\n");
 		return LZ_ERROR;
 	}
 
 	// Compute the digest of the next layer's image
 	if (sha256(digest, image_code, image_hdr->hdr.content.size) != 0) {
-		dbgprint(DBG_ERR, "ERROR: sha256 failed.\n");
+		ERROR("sha256 failed.\n");
 		return LZ_ERROR;
 	}
 
 	// Compare it with the digest stored in the header
 	if (memcmp(digest, image_hdr->hdr.content.digest, sizeof(digest)) != 0) {
-		dbgprint(DBG_ERR,
-				 "ERROR: Next layer digest mismatch. Layer %s, size %d, version %d, "
-				 "issue time %s\n",
-				 image_hdr->hdr.content.name, image_hdr->hdr.content.size,
-				 image_hdr->hdr.content.version,
-				 asctime(gmtime((time_t *)&(image_hdr->hdr.content.issue_time))));
-		dbgprint_data((uint8_t *)image_hdr->hdr.content.digest, SHA256_DIGEST_LENGTH, "Digest");
+		ERROR("Next layer digest mismatch. Layer %s, size %d, version %d, "
+			  "issue time %s\n",
+			  image_hdr->hdr.content.name, image_hdr->hdr.content.size,
+			  image_hdr->hdr.content.version,
+			  asctime(gmtime((time_t *)&(image_hdr->hdr.content.issue_time))));
+		hexdump((uint8_t *)image_hdr->hdr.content.digest, SHA256_DIGEST_LENGTH, "Digest");
 		return LZ_ERROR;
 	}
 
@@ -918,41 +790,40 @@ LZ_RESULT lz_core_verify_image(const lz_img_hdr_t *image_hdr, const uint8_t *ima
 			(uint8_t *)&image_hdr->hdr.content, sizeof(image_hdr->hdr.content),
 			(ecc_pub_key_pem_t *)&lz_data_store.trust_anchors.info.code_auth_pub_key,
 			&image_hdr->hdr.signature) != 0) {
-		dbgprint(DBG_ERR, "ERROR: Failed to verify image signature with code signing key\n");
+		ERROR("Failed to verify image signature with code signing key\n");
 		return LZ_ERROR;
 	}
 
-	dbgprint(DBG_INFO, "INFO: Successfully verified image signature with code auth key.\n");
-	dbgprint(DBG_INFO, "INFO: Checking image's version numbers.\n");
+	INFO("Successfully verified image signature with code auth key.\n");
+	INFO("Checking image's version numbers.\n");
 
 	// Detect rollback attacks. The first time an image is deployed onto the device,
 	// Lazarus Core persists its metadata, so it has to be present at this point in time.
 	if (image_meta->magic != LZ_MAGIC) {
-		dbgprint(DBG_ERR, "ERROR: Stored image info is invalid.");
+		ERROR("Stored image info is invalid.");
 		return false;
 	}
 
-	dbgprint(DBG_INFO, "INFO: Verifying meta data of image %s\n", image_hdr->hdr.content.name);
+	INFO("Verifying meta data of image %s\n", image_hdr->hdr.content.name);
 
 	char *date_last_issued = asctime(gmtime((time_t *)&(image_meta->last_issue_time)));
 	date_last_issued[24] = '\0';
-	dbgprint(DBG_INFO, "INFO: Expected: Version of min. %d.%d, issued min. (UTC): %s.\n",
-			 image_meta->lastVersion >> 16, image_meta->lastVersion & 0x0000ffff, date_last_issued);
+	INFO("Expected: Version of min. %d.%d, issued min. (UTC): %s.\n", image_meta->lastVersion >> 16,
+		 image_meta->lastVersion & 0x0000ffff, date_last_issued);
 
 	char *date = asctime(gmtime((time_t *)&image_hdr->hdr.content.issue_time));
 	date[24] = '\0';
-	dbgprint(DBG_INFO, "INFO: Actual: Version %d.%d, issued (UTC): %s.\n",
-			 image_hdr->hdr.content.version >> 16, image_hdr->hdr.content.version & 0x0000ffff,
-			 date);
+	INFO("Actual: Version %d.%d, issued (UTC): %s.\n", image_hdr->hdr.content.version >> 16,
+		 image_hdr->hdr.content.version & 0x0000ffff, date);
 
 	// Check against stored metadata
 	if (image_meta->lastVersion > image_hdr->hdr.content.version ||
 		image_meta->last_issue_time > image_hdr->hdr.content.issue_time) {
-		dbgprint(DBG_ERR, "ERROR: Failed to verify image because of version roll-back\n");
+		ERROR("Failed to verify image because of version roll-back\n");
 		return LZ_ERROR;
 	}
 
-	dbgprint(DBG_INFO, "INFO: Image version and issue time check succeeded.\n");
+	INFO("Image version and issue time check succeeded.\n");
 
 	// Write the digest to the out parameter in case a pointer was provided
 	if (image_digest_out) {
@@ -962,27 +833,82 @@ LZ_RESULT lz_core_verify_image(const lz_img_hdr_t *image_hdr, const uint8_t *ima
 	return LZ_SUCCESS;
 }
 
-LZ_RESULT lz_has_valid_staging_element(hdr_type_t hdr_type)
+static const uint8_t *lz_get_payload_from_staging_hdr(const lz_staging_hdr_t *hdr)
 {
-	lz_auth_hdr_t *staging_hdr = NULL;
+	// The payload is stored right behind the staging header
+	return (uint8_t *)(&hdr[1]);
+}
 
-	// Search for a header of the specified type
-	LZ_RESULT result =
-		lz_get_staging_hdr(hdr_type, &staging_hdr, lz_core_boot_params->info.cur_nonce);
+// Looks for a valid deferral ticket on the staging area.
+// On success, the function returns true and writes the deferral time to <deferral_time>
+LZ_RESULT lz_get_deferral_time(uint32_t *deferral_time)
+{
+	lz_staging_hdr_t *staging_hdr = (lz_staging_hdr_t *)&lz_staging_area.content;
 
-	// And verify it
-	if (result == LZ_SUCCESS) {
-		dbgprint(DBG_INFO, "INFO: Found requested staging element %s, verifying it...\n",
-				 HDR_TYPE_STRING[hdr_type]);
+	INFO("Searching for deferral ticket on staging area\n");
 
-		if (lz_core_verify_staging_elem_hdr(staging_hdr,
-											(((uint8_t *)staging_hdr) + sizeof(lz_auth_hdr_t)),
-											lz_core_boot_params->info.cur_nonce) != LZ_SUCCESS) {
-			result = LZ_ERROR;
+	do {
+		if (staging_hdr->type == DEFERRAL_TICKET) {
+			INFO("Found deferral ticket in staging area. Check if it is valid...\n");
+			const uint8_t *payload = lz_get_payload_from_staging_hdr(staging_hdr);
+			uint32_t payload_len = staging_hdr->payload_size;
+
+			if (lz_check_staging_payload_size(staging_hdr, payload_len) != LZ_SUCCESS) {
+				ERROR("Element in staging area corrupted (area size limit exceeded)\n");
+				return LZ_ERROR;
+			}
+
+			uint8_t nonce[LEN_NONCE];
+			if (lz_msg_decode_awdt_refresh(payload, payload_len, deferral_time, nonce) ==
+				LZ_SUCCESS) {
+				if (memcmp(nonce, lz_core_boot_params->info.cur_nonce, LEN_NONCE) == 0) {
+					INFO("Found valid deferral ticket in staging area\n");
+					return LZ_SUCCESS;
+				} else {
+					ERROR("Nonce of deferral ticket message does not match. Ignoring it.\n");
+				}
+			} else {
+				ERROR("Deferral ticket message is invalid. Ignoring it.\n");
+			}
 		}
-	}
+	} while (lz_get_next_staging_hdr(&staging_hdr) == LZ_SUCCESS);
 
-	return result;
+	return LZ_ERROR;
+}
+
+static LZ_RESULT lz_has_valid_boot_ticket(void)
+{
+	lz_staging_hdr_t *staging_hdr = (lz_staging_hdr_t *)&lz_staging_area.content;
+
+	INFO("Try to find valid boot ticket in staging area...\n");
+
+	do {
+		if (staging_hdr->type == BOOT_TICKET) {
+			INFO("Found boot ticket in staging area. Check if it is valid...\n");
+			const uint8_t *payload = lz_get_payload_from_staging_hdr(staging_hdr);
+			uint32_t payload_len = staging_hdr->payload_size;
+
+			if (lz_check_staging_payload_size(staging_hdr, payload_len) != LZ_SUCCESS) {
+				ERROR("Element in staging area corrupted (area size limit exceeded)\n");
+				return LZ_ERROR;
+			}
+
+			uint8_t nonce[LEN_NONCE];
+			if (lz_msg_decode_refresh_boot_ticket(payload, payload_len, nonce) == LZ_SUCCESS) {
+				if (memcmp(nonce, lz_core_boot_params->info.cur_nonce, LEN_NONCE) == 0) {
+					INFO("Found valid boot ticket in staging area\n");
+					return LZ_SUCCESS;
+				} else {
+					WARN("Nonce of boot ticket message does not match. Ignoring it.\n");
+				}
+			} else {
+				ERROR("Boot ticket message is invalid. Ignoring it.\n");
+			}
+		}
+	} while (lz_get_next_staging_hdr(&staging_hdr) == LZ_SUCCESS);
+
+	WARN("Did not find valid boot ticket in staging area.\n");
+	return LZ_ERROR;
 }
 
 void lz_get_curr_nonce(uint8_t *nonce)
@@ -995,38 +921,24 @@ uint32_t lz_get_num_staging_elems(void)
 	uint32_t staging_area_size = sizeof(lz_staging_area.content);
 	uint32_t cursor = 0;
 	uint8_t num_elements = 0;
-	lz_auth_hdr_t *hdr;
+	lz_staging_hdr_t *hdr;
 
 	// Cursor holds the current position in the staging area
 	while (cursor < staging_area_size) {
-		hdr = (lz_auth_hdr_t *)(((uint32_t)&lz_staging_area.content) + cursor);
+		hdr = (lz_staging_hdr_t *)(((uint32_t)&lz_staging_area.content) + cursor);
 
 		// Check whether header is sane
-		if (hdr->content.magic != LZ_MAGIC) {
-			dbgprint(DBG_INFO, "INFO: Staging area contains %d elements\n", num_elements,
-					 hdr->content.magic);
+		if (hdr->magic != LZ_MAGIC) {
+			INFO("Staging area contains %d elements\n", num_elements, hdr->magic);
 			goto exit;
 		}
 
 		num_elements++;
 
 		// Move the cursor to the next header
-		cursor += (sizeof(lz_auth_hdr_t) + hdr->content.payload_size);
+		cursor += (sizeof(lz_staging_hdr_t) + hdr->payload_size);
 	}
 
 exit:
 	return num_elements;
-}
-
-static LZ_RESULT lz_get_staging_elem_content(hdr_type_t elem_type, uint8_t **content)
-{
-	lz_auth_hdr_t *hdr = NULL;
-
-	if (lz_get_staging_hdr(elem_type, &hdr, lz_core_boot_params->info.cur_nonce) == LZ_SUCCESS) {
-		*content = (((uint8_t *)hdr) + sizeof(lz_auth_hdr_t));
-		return LZ_SUCCESS;
-	} else {
-		*content = NULL;
-		return LZ_NOT_FOUND;
-	}
 }

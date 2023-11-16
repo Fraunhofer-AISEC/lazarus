@@ -38,12 +38,6 @@ bool lz_core_is_updated(ecc_keypair_t *lz_pub);
 
 LZ_RESULT lz_get_deferral_time(uint32_t *deferral_time);
 
-LZ_RESULT lz_has_staging_elem_type(hdr_type_t elem_type);
-
-LZ_RESULT lz_verify_staging_header(const lz_auth_hdr_t *staging_element_hdr, uint8_t *payload);
-
-LZ_RESULT lz_has_valid_staging_element(hdr_type_t hdr_type);
-
 void lz_get_curr_nonce(uint8_t *nonce);
 
 LZ_RESULT lz_core_verify_next_layer(boot_mode_t boot_mode, uint8_t *next_layer_digest);
@@ -74,11 +68,6 @@ LZ_RESULT lz_core_wipe_static_symm(void);
  */
 LZ_RESULT lz_core_verify_image(const lz_img_hdr_t *image_hdr, const uint8_t *image_code,
 							   const lz_img_meta_t *image_meta, uint8_t *image_digest_out);
-
-LZ_RESULT lz_core_verify_staging_elem_hdr_sig(const lz_auth_hdr_t *hdr, uint8_t *payload);
-
-LZ_RESULT lz_core_verify_staging_elem_hdr(const lz_auth_hdr_t *hdr, uint8_t *payload,
-										  uint8_t *nonce);
 
 LZ_RESULT lz_core_derive_alias_id_keypair(uint8_t *digest, ecc_keypair_t *lz_alias_id_keypair);
 
