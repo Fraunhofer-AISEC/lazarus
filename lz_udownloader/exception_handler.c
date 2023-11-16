@@ -36,20 +36,20 @@ void UFSR_Evaluate(SCB_Type *scb);
 void HardFault_Handler(void)
 {
 	/* Handling SAU related secure faults */
-	dbgprint(DBG_ERR, "\nEntering non-secure HardFault from UDownloader\n");
+	ERROR("\nEntering non-secure HardFault from UDownloader\n");
 
 	if (SCB->CFSR & SCB_CFSR_MEMFAULTSR_Msk) {
-		dbgprint(DBG_ERR, "CFSR MemManage fault\n");
+		ERROR("CFSR MemManage fault\n");
 
 		MFSR_Evaluate(SCB);
 	}
 	if (SCB->CFSR & SCB_CFSR_USGFAULTSR_Msk) {
-		dbgprint(DBG_ERR, "CFSR Usage Fault\n");
+		ERROR("CFSR Usage Fault\n");
 
 		UFSR_Evaluate(SCB);
 	}
 	if (SCB->CFSR & SCB_CFSR_BUSFAULTSR_Msk) {
-		dbgprint(DBG_ERR, "CFSR Bus Fault\n");
+		ERROR("CFSR Bus Fault\n");
 
 		BFSR_Evaluate(SCB);
 	}
@@ -65,25 +65,24 @@ void BFSR_Evaluate(SCB_Type *scb)
 {
 	if (scb->CFSR & SCB_CFSR_BFARVALID_Msk) {
 		/* BFARVALID: BFAR contain valid address that caused secure violation */
-		dbgprint(DBG_ERR, "Secure bus violation at address 0x%X.\n", SCB->BFAR);
+		ERROR("Secure bus violation at address 0x%X.\n", SCB->BFAR);
 	}
 	if (scb->CFSR & SCB_CFSR_LSPERR_Msk) {
-		dbgprint(DBG_ERR, "SCB->BFSR: Lazy state preservation error.");
+		ERROR("SCB->BFSR: Lazy state preservation error.");
 	}
 	if (scb->CFSR & SCB_CFSR_STKERR_Msk) {
-		dbgprint(DBG_ERR, "SCB->BFSR: Stack error.");
+		ERROR("SCB->BFSR: Stack error.");
 	}
 	if (scb->CFSR & SCB_CFSR_UNSTKERR_Msk) {
-		dbgprint(DBG_ERR, "SCB->BFSR: Unstacking Error");
+		ERROR("SCB->BFSR: Unstacking Error");
 	}
 	if (scb->CFSR & SCB_CFSR_PRECISERR_Msk) {
 		/* PRECISERR: Instruction bus error on an instruction prefetch */
-		dbgprint(DBG_ERR, "SCB->BFSR: PRECISERR fault: Precise data access error.\n");
+		ERROR("SCB->BFSR: PRECISERR fault: Precise data access error.\n");
 	}
 	if (scb->CFSR & SCB_CFSR_IBUSERR_Msk) {
 		/* IBUSERR: Instruction bus error on an instruction prefetch */
-		dbgprint(DBG_ERR,
-				 "SCB->BFSR: IBUSERR fault: Instruction bus error on an instruction prefetch.\n");
+		ERROR("SCB->BFSR: IBUSERR fault: Instruction bus error on an instruction prefetch.\n");
 	}
 }
 
@@ -94,24 +93,23 @@ bool MFSR_Evaluate(SCB_Type *scb)
 {
 	bool exec_continue = false;
 	if (scb->CFSR & SCB_CFSR_MMARVALID_Msk) {
-		dbgprint(DBG_ERR, "SCB->MMFSR: MemManage MPU Access violation at address 0x%x\n",
-				 SCB->MMFAR);
+		ERROR("SCB->MMFSR: MemManage MPU Access violation at address 0x%x\n", SCB->MMFAR);
 		exec_continue = true;
 	}
 	if (scb->CFSR & SCB_CFSR_MLSPERR_Msk) {
-		dbgprint(DBG_ERR, "SCB->MMFSR: MemManage lazy state preservation error flag\n");
+		ERROR("SCB->MMFSR: MemManage lazy state preservation error flag\n");
 	}
 	if (scb->CFSR & SCB_CFSR_MSTKERR_Msk) {
-		dbgprint(DBG_ERR, "SCB->MMFSR: MemManage stacking error flag\n");
+		ERROR("SCB->MMFSR: MemManage stacking error flag\n");
 	}
 	if (scb->CFSR & SCB_CFSR_MUNSTKERR_Msk) {
-		dbgprint(DBG_ERR, "SCB->MMFSR: MemManage unstacking error flag\n");
+		ERROR("SCB->MMFSR: MemManage unstacking error flag\n");
 	}
 	if (scb->CFSR & SCB_CFSR_DACCVIOL_Msk) {
-		dbgprint(DBG_ERR, "SCB->MMFSR: MemManage Data access violation flag\n");
+		ERROR("SCB->MMFSR: MemManage Data access violation flag\n");
 	}
 	if (scb->CFSR & SCB_CFSR_IACCVIOL_Msk) {
-		dbgprint(DBG_ERR, "SCB->MMFSR: MemManage Instruction access violation\n");
+		ERROR("SCB->MMFSR: MemManage Instruction access violation\n");
 	}
 	return exec_continue;
 }
@@ -119,24 +117,24 @@ bool MFSR_Evaluate(SCB_Type *scb)
 void UFSR_Evaluate(SCB_Type *scb)
 {
 	if (scb->CFSR & SCB_CFSR_DIVBYZERO_Msk) {
-		dbgprint(DBG_ERR, "SCB->UFSR: Div By Zero Fault \n");
+		ERROR("SCB->UFSR: Div By Zero Fault \n");
 	}
 	if (scb->CFSR & SCB_CFSR_UNALIGNED_Msk) {
-		dbgprint(DBG_ERR, "SCB->UFSR: Unaligned Access Fault\n");
+		ERROR("SCB->UFSR: Unaligned Access Fault\n");
 	}
 	if (scb->CFSR & SCB_CFSR_STKOF_Msk) {
-		dbgprint(DBG_ERR, "SCB->UFSR: Stack Overflow Fault\n");
+		ERROR("SCB->UFSR: Stack Overflow Fault\n");
 	}
 	if (scb->CFSR & SCB_CFSR_NOCP_Msk) {
-		dbgprint(DBG_ERR, "SCB->UFSR: No Co-processor Fault\n");
+		ERROR("SCB->UFSR: No Co-processor Fault\n");
 	}
 	if (scb->CFSR & SCB_CFSR_INVPC_Msk) {
-		dbgprint(DBG_ERR, "SCB->UFSR: Invalid PC Fault\n");
+		ERROR("SCB->UFSR: Invalid PC Fault\n");
 	}
 	if (scb->CFSR & SCB_CFSR_INVSTATE_Msk) {
-		dbgprint(DBG_ERR, "SCB->UFSR: Invalid State Fault\n");
+		ERROR("SCB->UFSR: Invalid State Fault\n");
 	}
 	if (scb->CFSR & SCB_CFSR_UNDEFINSTR_Msk) {
-		dbgprint(DBG_ERR, "SCB->UFSR: Undefined Instruction Flag\n");
+		ERROR("SCB->UFSR: Undefined Instruction Flag\n");
 	}
 }

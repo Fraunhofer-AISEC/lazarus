@@ -24,12 +24,15 @@ int main(void)
 	lzport_gpio_set_rts(false);
 	lzport_rng_init();
 
-	lz_udownloader_run();
+	LZ_RESULT res = lz_udownloader_run();
+	if (res != LZ_SUCCESS) {
+		ERROR("Running UD not successful\n");
+	}
 
 	// Deinitialize peripherals
 	lzport_deinit_systick();
 
-	dbgprint(DBG_INFO, "INFO: UD functionality terminated. Rebooting..\n");
+	INFO("UD functionality terminated. Rebooting..\n");
 
 	NVIC_SystemReset();
 

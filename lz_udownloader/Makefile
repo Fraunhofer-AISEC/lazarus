@@ -28,8 +28,10 @@ SRC_DIRS := ./ \
 			../thirdparty/lpc55s69_sdk/component \
 			../thirdparty/lpc55s69_sdk/utilities \
 			../thirdparty/mbedtls/library \
+			../thirdparty/protobuf-c \
 			../lz_common/lz_common \
 			../lz_common/lz_crypto \
+			../lz_common/lz_msg \
 			../lz_common/lz_net \
 			../port/lpc55s69/lz_udownloader/board_init \
 			../port/lpc55s69/peripherals/lzport_gpio \
@@ -42,17 +44,19 @@ SRC_DIRS := ./ \
 			../port/lpc55s69/peripherals/lzport_systick_delay \
 			../port/lpc55s69/peripherals/lzport_syscalls \
 
+PROTOBUF_DIR := ../lz_common/protobuf
 
-
-EXCLUDE_DIRS :=
+EXCLUDE_DIRS := $(BUILD_DIR)
 
 # All include directories
 INCLUDES = 	./ \
 			../lz_common \
 			../lz_common/lz_common \
 			../lz_common/lz_crypto \
+			../lz_common/lz_msg \
 			../lz_common/lz_net \
 			../lz_common/lz_trustzone_handler \
+			../lz_common/protobuf \
 			../thirdparty/mbedtls/include \
 			../thirdparty/mbedtls/port/ksdk \
 			../thirdparty/mbedtls/library \
@@ -63,6 +67,7 @@ INCLUDES = 	./ \
 			../thirdparty/lpc55s69_sdk/component/serial_manager \
 			../thirdparty/lpc55s69_sdk/component/lists \
 			../thirdparty/lpc55s69_sdk/component/uart \
+			../thirdparty/protobuf-c \
 			../port/lpc55s69/peripherals/lzport_memory \
 			../port/lpc55s69/peripherals/lzport_debug_output \
 			../port/lpc55s69/peripherals/lzport_rng \
@@ -70,6 +75,7 @@ INCLUDES = 	./ \
 			../port/lpc55s69/peripherals/lzport_net \
 			../port/lpc55s69/peripherals/lzport_systick_delay \
 			../port/lpc55s69/peripherals/lzport_usart \
+			../port/lpc55s69/peripherals/lzport_flash \
 			../port/lpc55s69/lz_udownloader/board_init \
 
 
@@ -94,7 +100,7 @@ DEFINES = CPU_LPC55S69JBD100 \
 CFLAGS = -O1
 
 # Warning level
-CFLAGS += -Wall
+CFLAGS += -Wall -Werror
 
 # Needed for trustzone secure projects (lz_udownloader is non-secure)
 # CFLAGS += -mcmse
@@ -125,6 +131,13 @@ EXCLUDE-DIRS := $(addsuffix /%,$(EXCLUDE_DIRS))
 SRC-FILES-TMP := $(shell find $(SRC_DIRS) -name '*.c' )
 SRC-FILES := $(filter-out $(filter $(EXCLUDE-DIRS),$(SRC-FILES-TMP)),$(SRC-FILES-TMP))
 
+# Automatically find all protobuf files and add their corresponding source
+# files to the build.
+PROTOBUF-PATHS := $(shell find $(PROTOBUF_DIR) -name '*.proto')
+PROTOBUF-FILES := $(notdir $(PROTOBUF-PATHS))
+PROTOBUF-SOURCES := $(PROTOBUF-FILES:%.proto=$(PROTOBUF_DIR)/%.pb-c.c)
+SRC-FILES += $(PROTOBUF-SOURCES)
+
 # Generates .o files based on the found source files (adding $(PROJECT_NAME),
 # to have $(PROJECT_NAME) and lz_common object files in the build folder)
 OBJ-FILES := $(SRC-FILES:%.c=$(BUILD_DIR)/$(PROJECT_NAME)/%.o)
@@ -142,11 +155,18 @@ CFLAGS += $(addprefix -D,$(DEFINES))
 INCLUDE-DIRS = $(addprefix -I,$(INCLUDES))
 
 # Default target
-all: post-build
+all: post-build | generate-protobuf
 
-compile: $(OBJ-FILES)
+generate-protobuf:
+	for path in $(PROTOBUF_DIR) ; do \
+		make -C $$path ; \
+	done
 
-link: compile
+$(PROTOBUF-SOURCES): | generate-protobuf
+
+compile: $(OBJ-FILES) | generate-protobuf
+
+link: compile generate-protobuf
 	@echo 'Linking binary ...'
 	$(CC) $(OBJ-FILES) $(LDFLAGS)
 	@echo 'Linking done'
@@ -154,6 +174,7 @@ link: compile
 post-build: link increase_build_no
 	@echo 'Post build ...'
 	-arm-none-eabi-size "$(BUILD_DIR)/$(PROJECT_NAME).axf" ; arm-none-eabi-objcopy -v -O binary "$(BUILD_DIR)/$(PROJECT_NAME).axf" "$(BUILD_DIR)/$(PROJECT_NAME).bin" && python3 ../lz_hub/lz_sign_binary.py "$(BUILD_DIR)/$(PROJECT_NAME)".bin $(BUILD_NO_FILE) "$(BUILD_DIR)/$(PROJECT_NAME)"_signed.bin ../lz_hub/certificates/
+	cp $(BUILD_DIR)/$(PROJECT_NAME).axf $(BUILD_DIR)/../$(PROJECT_NAME).axf
 	@echo 'Post build done'
 
 # Increases the build number in the corresponding file
@@ -167,14 +188,14 @@ generate_build_no:
 
 # Describes how an .o file should be generated (adding $(PROJECT_NAME), to have
 # $(PROJECT_NAME) and lz_common object files in the build folder)
-$(BUILD_DIR)/$(PROJECT_NAME)/%.o: %.c
+$(BUILD_DIR)/$(PROJECT_NAME)/%.o: %.c | generate-protobuf
 	mkdir -p $(dir $@)
 	@echo 'Building file: $<'
 	$(CC) $(CFLAGS) $(INCLUDE-DIRS) -c $< -o $@
 	@echo 'Finished building: $<'
 
 # Phony rule
-.Phony: all compile link post-build increase_build_no generate_build_no clean
+.Phony: all compile link post-build increase_build_no generate_build_no clean generate-protobuf
 
 # Cleans up project
 clean:

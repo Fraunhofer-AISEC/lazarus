@@ -20,7 +20,7 @@
 #ifndef _LZ_UDOWNLOADER_H_
 #define _LZ_UDOWNLOADER_H_
 
-void lz_udownloader_run(void);
+LZ_RESULT lz_udownloader_run(void);
 void lz_print_cert_store(void);
 LZ_RESULT lz_reassociate_device(void);
 
