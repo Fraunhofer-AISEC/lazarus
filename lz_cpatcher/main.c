@@ -3,6 +3,7 @@
 #include "lzport_flash.h"
 #include "lzport_debug_output.h"
 #include "lz_cpatcher.h"
+#include "board_init.h"
 
 int main(void)
 {
