@@ -37,6 +37,7 @@ SRC_DIRS := ./ \
 			../port/lpc55s69/peripherals/lzport_rng \
 			../port/lpc55s69/peripherals/lzport_dice \
 			../port/lpc55s69/peripherals/lzport_trustzone \
+			../port/lpc55s69/peripherals/lzport_mpu \
 
 EXCLUDE_DIRS :=
 
@@ -49,6 +50,7 @@ INCLUDES = 	./ \
 			../port/lpc55s69/peripherals/lzport_rng \
 			../port/lpc55s69/peripherals/lzport_dice \
 			../port/lpc55s69/peripherals/lzport_trustzone \
+			../port/lpc55s69/peripherals/lzport_mpu \
 			../lz_common \
 			../lz_common/lz_common \
 			../lz_common/lz_crypto \
@@ -84,7 +86,7 @@ DEFINES = CPU_LPC55S69JBD100 \
 CFLAGS = -O1
 
 # Warning level
-CFLAGS += -Wall
+CFLAGS += -Wall -Werror
 
 # Needed for trustzone secure projects (lz_dicepp is secure)
 CFLAGS += -mcmse
@@ -147,6 +149,7 @@ link: compile
 post-build: link increase_build_no
 	@echo 'Post build ...'
 	-arm-none-eabi-size "$(BUILD_DIR)/$(PROJECT_NAME).axf" ; arm-none-eabi-objcopy -v -O binary "$(BUILD_DIR)/$(PROJECT_NAME).axf" "$(BUILD_DIR)/$(PROJECT_NAME).bin" && python3 ../lz_hub/lz_sign_binary.py "$(BUILD_DIR)/$(PROJECT_NAME)".bin $(BUILD_NO_FILE) "$(BUILD_DIR)/$(PROJECT_NAME)"_signed.bin ../lz_hub/certificates/
+	cp $(BUILD_DIR)/$(PROJECT_NAME).axf $(BUILD_DIR)/../$(PROJECT_NAME).axf
 	@echo 'Post build done'
 
 # Increases the build number in the corresponding file

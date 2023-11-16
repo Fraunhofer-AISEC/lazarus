@@ -42,43 +42,50 @@ void dicepp_run(void)
 	first_boot = dicepp_is_initial_boot();
 
 	if (first_boot) {
-		dbgprint(DBG_WARN, "WARNING: LZ_MAGIC not set. This is normal if this is the first boot\n");
+		WARN("LZ_MAGIC not set. This is normal if this is the first boot\n");
 		// Provision the DICEpp data store if this is the first launch
 		if (dicepp_create_initial_boot_data() != LZ_SUCCESS) {
-			dbgprint(DBG_ERR, "ERROR: Creating initial DICEpp data failed.\n");
+			ERROR("Creating initial DICEpp data failed.\n");
 			lz_error_handler();
 		}
 	} else {
 		// Otherwise, just refresh the nonce in the DICEpp data store
 		if (dicepp_refresh_nonces() != LZ_SUCCESS) {
-			dbgprint(DBG_ERR, "ERROR: Could not renew nonces.\n");
+			ERROR("Could not renew nonces.\n");
 			lz_error_handler();
 		}
 	}
 
 	if (dicepp_create_secret_data(&dicepp_secret_data) != LZ_SUCCESS) {
-		dbgprint(DBG_ERR, "ERROR: Failed to create secret data (cdi, static_symm, ...)\n");
+		ERROR("Failed to create secret data (cdi, static_symm, ...)\n");
 		lz_error_handler();
 	}
 
+	VERB("Determining Boot Mode\n");
+
 	dicepp_determine_boot_mode(first_boot, &req_boot_mode);
+
+	VERB("Boot Mode = %d\n", req_boot_mode);
 
 	uint8_t cdi_prime[SHA256_DIGEST_LENGTH];
 	uint8_t lz_core_digest[SHA256_DIGEST_LENGTH];
 	if (dicepp_calculate_cdi_prime(cdi_prime, lz_core_digest, &dicepp_secret_data) != LZ_SUCCESS) {
-		dbgprint(DBG_ERR, "ERROR: Failed to create CDIprime\n");
+		ERROR("Failed to create CDIprime\n");
 		lz_error_handler();
 	}
 
 	uint8_t core_auth[SHA256_DIGEST_LENGTH];
 	if (dicepp_calculate_core_auth(core_auth, lz_core_digest, &dicepp_secret_data) != LZ_SUCCESS) {
-		dbgprint(DBG_ERR, "ERROR: Failed to calculate core_auth\n");
+		ERROR("Failed to calculate core_auth\n");
 		lz_error_handler();
 	}
 
 	// Write startup parameters for Lazarus Core to RAM
 	dicepp_provide_params_ram(first_boot, &req_boot_mode, &dicepp_secret_data, cdi_prime,
 							  core_auth);
+
+	// Wipe secrets
+	secure_zero_memory(&dicepp_secret_data, sizeof(dicepp_secret_data));
 }
 
 /**
@@ -92,16 +99,15 @@ bool dicepp_is_initial_boot(void)
 
 LZ_RESULT dicepp_create_secret_data(dicepp_secret_data_t *dicepp_secret_data)
 {
-	dbgprint(DBG_INFO, "INFO: Deriving static_symm from CDI and dev_uuid..\n");
+	INFO("Deriving static_symm from CDI and dev_uuid..\n");
 
 	// Read CDI
 	lzport_read_cdi(dicepp_secret_data->cdi, sizeof(dicepp_secret_data->cdi));
 
 	// Create static_symm
-	if (hmac_sha256(dicepp_secret_data->static_symm,
-					   (const void *)dicepp_data_store.info.dev_uuid, LEN_UUID_V4_BIN,
-					   dicepp_secret_data->cdi, SHA256_DIGEST_LENGTH) != 0) {
-		dbgprint(DBG_ERR, "ERROR: Creating static_symm failed.\n");
+	if (hmac_sha256(dicepp_secret_data->static_symm, (const void *)dicepp_data_store.info.dev_uuid,
+					LEN_UUID_V4_BIN, dicepp_secret_data->cdi, SHA256_DIGEST_LENGTH) != 0) {
+		ERROR("Creating static_symm failed.\n");
 		return LZ_ERROR;
 	}
 
@@ -114,7 +120,7 @@ LZ_RESULT dicepp_create_initial_boot_data(void)
 {
 	dicepp_data_store_t dicepp_data_store_tmp = { 0 };
 
-	dbgprint(DBG_INFO, "INFO: First boot - Generating initial data (magic val, UUID, nonces)\n");
+	INFO("First boot - Generating initial data (magic val, UUID, nonces)\n");
 
 	// identifier to recognize first boot
 	dicepp_data_store_tmp.info.magic = LZ_MAGIC;
@@ -123,16 +129,16 @@ LZ_RESULT dicepp_create_initial_boot_data(void)
 	lzport_rng_get_random_data(dicepp_data_store_tmp.info.next_nonce,
 							   sizeof(dicepp_data_store.info.next_nonce));
 
-	// Create dev_uuid
+	// Retrieve dev_uuid
 	if (lzport_retrieve_uuid(dicepp_data_store_tmp.info.dev_uuid) != LZ_SUCCESS) {
-		dbgprint(DBG_ERR, "ERROR: Failed to create UUID\n");
+		ERROR("Failed to create UUID\n");
 		return LZ_ERROR;
 	}
 
 	// Write to flash page
 	if (!(lzport_flash_write((uint32_t)&dicepp_data_store, (uint8_t *)&dicepp_data_store_tmp,
 							 sizeof(dicepp_data_store)))) {
-		dbgprint(DBG_ERR, "ERROR: Failed to flash initial boot data\n");
+		ERROR("Failed to flash initial boot data\n");
 		return LZ_ERROR;
 	}
 
@@ -145,15 +151,15 @@ LZ_RESULT dicepp_calculate_cdi_prime(uint8_t cdi_prime[SHA256_DIGEST_LENGTH],
 {
 	// Hash Lazarus Core to calculate CDI_prime
 	if (sha256(lz_core_digest, (const void *)lz_core_core,
-				  (LZ_CORE_CODE_SIZE + LZ_CORE_NSC_SIZE)) != 0) {
-		dbgprint(DBG_ERR, "ERROR: Failed to hash Lazarus Core code area\n");
+			   (LZ_CORE_CODE_SIZE + LZ_CORE_NSC_SIZE)) != 0) {
+		ERROR("Failed to hash Lazarus Core code area\n");
 		return LZ_ERROR;
 	}
 
 	// Calculate CDI_prime based on CDI and Lazarus Core's hash, and store it
 	if (hmac_sha256(cdi_prime, lz_core_digest, SHA256_DIGEST_LENGTH,
-					   (uint8_t *)dicepp_secret_data->cdi, SHA256_DIGEST_LENGTH) != 0) {
-		dbgprint(DBG_ERR, "ERROR: Failed to create CDIprime\n");
+					(uint8_t *)dicepp_secret_data->cdi, SHA256_DIGEST_LENGTH) != 0) {
+		ERROR("Failed to create CDIprime\n");
 		return LZ_ERROR;
 	}
 
@@ -173,8 +179,8 @@ LZ_RESULT dicepp_calculate_core_auth(uint8_t core_auth[SHA256_DIGEST_LENGTH],
 
 	// Calculate core_auth based on Lazarus Core's hash || dev_uuid and static_symm, and store it
 	if (hmac_sha256(core_auth, digest_core_auth, sizeof(digest_core_auth),
-					   (uint8_t *)dicepp_secret_data->static_symm, SYM_KEY_LENGTH) != 0) {
-		dbgprint(DBG_ERR, "ERROR: Failed to derive core auth\n");
+					(uint8_t *)dicepp_secret_data->static_symm, SYM_KEY_LENGTH) != 0) {
+		ERROR("Failed to derive core auth\n");
 		return LZ_ERROR;
 	}
 	return LZ_SUCCESS;
@@ -260,11 +266,11 @@ LZ_RESULT dicepp_refresh_nonces(void)
 	lzport_rng_get_random_data(dicepp_data_store_cpy.info.next_nonce,
 							   sizeof(dicepp_data_store_cpy.info.next_nonce));
 
-	dbgprint_data(dicepp_data_store_cpy.info.next_nonce, LEN_NONCE, "Next Nonce");
+	hexdump(dicepp_data_store_cpy.info.next_nonce, LEN_NONCE, "Next Nonce");
 
 	if (!lzport_flash_write((uint32_t)&dicepp_data_store, (uint8_t *)&dicepp_data_store_cpy,
 							sizeof(dicepp_data_store))) {
-		dbgprint(DBG_ERR, "ERROR: Failed to write nonces to flash\n");
+		ERROR("Failed to write nonces to flash\n");
 		return LZ_ERROR;
 	}
 

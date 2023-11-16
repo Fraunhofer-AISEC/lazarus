@@ -28,10 +28,10 @@
 #define DBG_WARN (0x2U)
 #define DBG_INFO (0x4U)
 #define DBG_VERB (0x8U)
-#define DBG_NW (0x10U)
-#define DBG_SAHBC (0x20U)
 
 // Set the desired debug output here (The definitions from above can be OR'ed)
 #define LZ_DBG_LEVEL (DBG_ERR | DBG_WARN | DBG_INFO)
+
+#define DICE_SECURE_BOOT_ENABLED 0
 
 #endif /* LZ_CONFIG_H */
