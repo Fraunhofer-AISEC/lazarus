@@ -33,6 +33,30 @@
 #include "lz_awdt.h"
 #include "lz_net.h"
 #include "net.h"
+#include "update.h"
+#include "user_input.h"
+#include "board_init.h"
+#include "sensor.h"
+
+// Some tasks are using the network, which is handled by the "net" task.
+// However, the net task must be initialized to be able to handle requests.
+// The net task will wake up all the tasks in the array here, when network is
+// finally available.
+static TaskHandle_t wakeup_tasks[] = {
+	NULL, // AWDT task
+	NULL, // Update task
+	NULL, // Sensor task
+	NULL, // User input task
+	NULL, // sentinel
+};
+
+static TaskHandle_t tasks[] = {
+	NULL, // AWDT task
+	NULL, // Update task
+	NULL, // Sensor task
+	NULL, // User input task
+	NULL, // sentinel
+};
 
 int main(void)
 {
@@ -43,11 +67,22 @@ int main(void)
 	lzport_rng_init();
 	lzport_gpio_rts_init();
 	lzport_gpio_set_rts(false);
+
 	lz_print_img_info("Demo App", &lz_app_hdr);
 	lzport_usart_init_esp();
 
-	xTaskCreate(net_task, "NET ", configMINIMAL_STACK_SIZE * 10, NULL, 5, NULL);
-	xTaskCreate(lz_awdt_task, "ADT ", configMINIMAL_STACK_SIZE * 5, NULL, 4, NULL);
+	xTaskCreate(lz_awdt_task, "ADT ", configMINIMAL_STACK_SIZE * 5, NULL, 5, &tasks[0]);
+	xTaskCreate(lz_update_task, "UPD ", configMINIMAL_STACK_SIZE * 5, NULL, 4, &tasks[1]);
+	xTaskCreate(user_input_task, "UI ", configMINIMAL_STACK_SIZE * 3, (void *)tasks, 1, &tasks[3]);
+	xTaskCreate(sensor_task, "SENSOR", configMINIMAL_STACK_SIZE * 5, NULL, 2, &tasks[4]);
+
+	wakeup_tasks[0] = tasks[0];
+	wakeup_tasks[1] = tasks[1];
+	wakeup_tasks[2] = tasks[4];
+	wakeup_tasks[3] = tasks[3];
+
+	xTaskCreate(net_task, "NET ", configMINIMAL_STACK_SIZE * 10, (void *)wakeup_tasks, 6,
+				&tasks[2]);
 
 	vTaskStartScheduler();
 
@@ -57,7 +92,7 @@ int main(void)
 
 void freertos_assert_called(const char *file, uint32_t line)
 {
-	dbgprint(DBG_ERR, "ERROR: FreeRTOS assert called: File %s, line %d\n", file, line);
+	ERROR("FreeRTOS assert called: File %s, line %d\n", file, line);
 	for (;;)
 		;
 }

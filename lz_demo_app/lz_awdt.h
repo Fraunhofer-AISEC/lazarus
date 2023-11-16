@@ -21,10 +21,9 @@
 #define LZ_TASK_AWDT_H_
 
 #define DEFERRAL_TICKET_TIME_MS 60000
-#define DEFERRAL_TICKET_TASK_WAIT_MS 30000
+#define DEFERRAL_TICKET_TASK_WAIT_MS 19000
 #define DEFERRAL_TICKET_FETCHING_MULT 10
 
 void lz_awdt_task(void *params);
-TaskHandle_t get_task_awdt_handle(void);
 
 #endif /* LZ_TASK_AWDT_H_ */

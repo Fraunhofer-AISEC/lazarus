@@ -17,10 +17,6 @@
  * limitations under the License.
  */
 
-#include "stdint.h"
-#include "stdbool.h"
-#include "stdio.h"
-
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -29,34 +25,21 @@
 #include "lzport_debug_output.h"
 #include "lzport_gpio.h"
 #include "lz_common.h"
-#include "lz_net.h"
+#include "net.h"
 #include "lz_awdt.h"
-
-static TaskHandle_t task_awdt_handle = NULL;
 
 void lz_awdt_task(void *params)
 {
-	task_awdt_handle = xTaskGetCurrentTaskHandle();
-
 	// Wait until network connection is established
 	ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(portMAX_DELAY));
 
-	TickType_t last_wake_time = xTaskGetTickCount();
-
 	// Periodically fetch new deferral tickets to avoid a system reset
 	for (;;) {
+		INFO("Queuing deferral ticket with a time of %ds..\n", DEFERRAL_TICKET_TIME_MS / 1000);
 
-		dbgprint(DBG_INFO, "INFO: Fetching deferral ticket with a time of %ds..\n",
-					DEFERRAL_TICKET_TIME_MS / 1000);
+		net_refresh_awdt(DEFERRAL_TICKET_TIME_MS);
 
-		LZ_RESULT result = lz_net_refresh_awdt(DEFERRAL_TICKET_TIME_MS);
-
-		dbgprint(DBG_INFO, "INFO: Waiting for %dms\n", DEFERRAL_TICKET_TASK_WAIT_MS);
-		vTaskDelayUntil(&last_wake_time, pdMS_TO_TICKS(DEFERRAL_TICKET_TASK_WAIT_MS));
+		INFO("Waiting for %dms\n", DEFERRAL_TICKET_TASK_WAIT_MS);
+		vTaskDelay(pdMS_TO_TICKS(DEFERRAL_TICKET_TASK_WAIT_MS));
 	}
-}
-
-TaskHandle_t get_task_awdt_handle(void)
-{
-	return task_awdt_handle;
 }

@@ -30,6 +30,7 @@ MEMORY
 {
   APP_HDR (rx) : ORIGIN = _APP_HEADER_START, LENGTH = _APP_HEADER_SIZE
   APP_CODE (rx) : ORIGIN = _APP_CODE_START, LENGTH = _APP_CODE_SIZE /* 158K bytes (alias Flash) */
+  APP_VULN (rx) : ORIGIN = _APP_VULN_START, LENGTH = _APP_VULN_SIZE
   LZ_DATA_STORE (rx) : ORIGIN = _LZ_DATA_STORAGE_START, LENGTH = _LZ_DATA_STORAGE_SIZE /* 8K bytes (alias Flash4) */
   STAGING_AREA (rx) : ORIGIN = _LZ_STAGING_AREA_START, LENGTH = _LZ_STAGING_AREA_SIZE /* 160K bytes (alias Flash5) */
   SRAM (rwx) : ORIGIN = _LZ_SRAM_NON_SECURE_START, LENGTH =  _LZ_SRAM_NON_SECURE_SIZE /* 216K bytes (alias RAM) */
@@ -89,6 +90,14 @@ SECTIONS
     __exidx_end = .;
 
     _etext = .;
+
+    .app_vuln (NOLOAD) :
+    {
+    	. = ALIGN(4);
+    	KEEP(*(.APP_VULN))
+    	*(.APP_VULN)
+    	. = ALIGN(4);
+    } > APP_VULN
 
     .app_hdr (NOLOAD) :
     {
