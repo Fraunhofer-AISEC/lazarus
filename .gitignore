@@ -64,3 +64,10 @@ __pycache__/
 .db
 **/.settings/
 *.launch
+lz_hub/lz_merged.bin
+port/**/*.xml
+port/**/*.dtd
+
+# Protobuf generated files
+*.pb-c.c
+*.pb-c.h
