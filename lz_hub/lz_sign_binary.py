@@ -45,37 +45,24 @@ def main():
     code_auth_sk_ecdsa = ecdsa.SigningKey.from_der(code_auth_sk_tmp, hashfunc=hashlib.sha256)
 
     # Create signed code files
-    return create_signed_code_file(args.in_file, args.buildno_file, code_auth_sk_ecdsa, args.out_file, args.c, args.e)
+    return create_signed_code_file(args.in_file, args.buildno_file, code_auth_sk_ecdsa, args.out_file)
 
-def create_signed_code_file(code_file_name, build_file_name, code_auth_sk_ecdsa, out_file, is_core, is_erased):
+def create_signed_code_file(code_file_name, build_file_name, code_auth_sk_ecdsa, out_file):
 
-    # Check if build number file exists, if not, create it
-    if not os.path.isfile(build_file_name):
-        build_no = 0
-        try:
-            with open(build_file_name, "w") as build_file:
-                build_file.write(str(build_no))
-        except Exception as e:
-            print("Error: failed to open build file %s for writing with error %s" %(os.path.abspath(build_file_name), str(e)))
-            return 1
-    else:
-        # Read build number from include/buildno.h
-        try:
-            with open(build_file_name, "r") as build_file:
-                build_no = int(build_file.read())
-        except Exception as e:
-            print("Error: failed to open build file %s with error %s" %(os.path.abspath(build_file_name), str(e)))
-            return 1
+    # Read build number from <project>/build_no
+    try:
+        with open(build_file_name, "r") as build_file:
+            build_no = int(build_file.read())
+    except Exception as e:
+        print("Error: failed to open build file %s with error %s" %(os.path.abspath(build_file_name), str(e)))
+        return 1
 
-        # Increment build number (optional)
-        build_no = build_no + 1
-
-        try:
-            with open(build_file_name, "w") as build_file:
-                build_file.write(str(build_no))
-        except Exception as e:
-            print("Error: failed to open build file %s for writing with error %s" %(os.path.abspath(build_file_name), str(e)))
-            return 1
+    try:
+        with open(build_file_name, "w") as build_file:
+            build_file.write(str(build_no))
+    except Exception as e:
+        print("Error: failed to open build file %s for writing with error %s" %(os.path.abspath(build_file_name), str(e)))
+        return 1
 
     # Hash the code file
     try:
@@ -133,15 +120,9 @@ def create_signed_code_file(code_file_name, build_file_name, code_auth_sk_ecdsa,
     size_fill = 0x800 - len(hdr)
     hdr = hdr + bytearray(size_fill)
 
-    # Create final binary, consisting of header and code file. The lazarus core bianry has a
-    # different format and therefore must be flashed differently. If the flash was erased,
+    # Create final binary, consisting of header and code file. If the flash was erased,
     # the Dice++ Datastore is included in the lazarus core binary
-    if is_core and is_erased:
-        out_code_file_content = bytearray(bytearray(0x7800) + code_file_content[0x0:0x800] + hdr + code_file_content[0x1000:])
-    elif is_core:
-        out_code_file_content = bytearray(code_file_content[0x0:0x800] + hdr + code_file_content[0x1000:])
-    else:
-        out_code_file_content = bytearray(hdr + code_file_content)
+    out_code_file_content = bytearray(hdr + code_file_content)
 
     try:
         with open(out_file, "wb") as out_code_file:
@@ -162,8 +143,6 @@ def parse_arguments():
     parser.add_argument("buildno_file", help="The file containing the build number")
     parser.add_argument("out_file", help="Name of the signed output binary")
     parser.add_argument("cert_path", help="The path where the backend and the code authentification certificates are located")
-    parser.add_argument("-c", action='store_true', help="flag to indicate that binary is lazarus core")
-    parser.add_argument("-e", action='store_true', help="flag to indicate that flash was erased and datastore needs to be included")
 
     args = parser.parse_args()
     args.cert_path = args.cert_path.rstrip("/")

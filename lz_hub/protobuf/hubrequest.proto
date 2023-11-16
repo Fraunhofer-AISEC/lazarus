@@ -1,0 +1,55 @@
+syntax = "proto2";
+
+import "bootticket_request.proto";
+
+message AwdtRefresh {
+	required uint32 timeMs = 4;
+}
+
+message ReassociateDevice {
+	required bytes uuid = 1;
+	required bytes auth = 2;
+	required bytes deviceIdCert = 3;
+}
+
+message FirmwareUpdate {
+	required string type = 1;
+}
+
+message AliasIdCert {
+	required bytes certificate = 1;
+}
+
+message SensorData {
+	required uint32 index = 1;
+	required float temperature = 2;
+	required float humidity = 3;
+}
+
+message CheckForUpdate {
+	repeated string components = 1;
+}
+
+message UserInput {
+}
+
+message HubRequestMessage {
+	optional bytes nonce = 1;
+	required uint32 magic = 2;
+	oneof payload {
+		AwdtRefresh awdt = 3;
+		AliasIdCert aliasid = 4;
+		RefreshBootTicket bootTicket = 5;
+		ReassociateDevice reassocDevice = 6;
+		FirmwareUpdate fwUpdate = 7;
+		SensorData sensorData = 8;
+		CheckForUpdate checkForUpdate = 9;
+		UserInput userInput = 10;
+	}
+}
+
+message SignedHubRequestMessage {
+	required bytes uuid = 1;
+	required bytes payload = 2;
+	required bytes signature = 3;
+}

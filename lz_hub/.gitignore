@@ -14,3 +14,5 @@ __pycache__/
 /trust_anchors_signed.bin
 /trust_anchors.bin
 /lz_hubs.db
+/updates
+/fit_config_hash

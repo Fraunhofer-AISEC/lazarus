@@ -19,7 +19,8 @@ import time
 
 import lz_hub_db
 from lz_hub_element_type import ELEMENT_TYPE
-from lz_hub_dev_update import get_update_file_unsigned
+from lz_hub_device import get_device
+from lz_fitimage import get_config_hash_file_name
 import open_ssl_wrapper as osw
 import uuid as u
 
@@ -72,6 +73,10 @@ class device_certbag:
         try:
             db = lz_hub_db.connect()
             lz_hub_db.update_alias_id_cert(db, self.uuid, alias_id_buf)
+            # The AliasID is always the first message a device sends when it is
+            # reconnected. Therefore, this is a good point to reset the
+            # 'update_in_progress' flag
+            lz_hub_db.set_update_in_progress(db, self.uuid, 0)
             lz_hub_db.close(db)
         except Exception as e:
             print("ERROR: could not store AliasID certificate: %s" %str(e))
@@ -146,21 +151,15 @@ class device_certbag:
             print("ERROR: Could not retrieve static_symm")
             return None
 
-        # Read lz_core binary
-        lz_core = get_update_file_unsigned(ELEMENT_TYPE.LZ_CORE_UPDATE)
-        if lz_core is None:
-            print("ERROR: Could not read lazarus core binary for dev_auth calculation")
-            return None
+        lz_core_digest = get_device(self.uuid).core_digest()
 
-        # Paper: Software Version M_x. This is the hashed current lz_core binary
-        lz_core_digest = sha256(lz_core)
         core_auth_digest = lz_core_digest + self.uuid
 
         # core_auth = HMAC(core_auth_digest, static_symm)
         core_auth = hmac_sha256(core_auth_digest, static_symm)
 
         # dev_auth_digest = DeviceID | dev_uuid
-        dev_auth_digest = device_id_public + (LEN_PUB_KEY_PEM-len(device_id_public) * b"\x00") + self.uuid
+        dev_auth_digest = device_id_public + ((LEN_PUB_KEY_PEM-len(device_id_public)) * b"\x00") + self.uuid
 
         # dev_auth = HMAC(dev_auth_digest, core_auth)
         dev_auth = hmac_sha256(dev_auth_digest, core_auth)

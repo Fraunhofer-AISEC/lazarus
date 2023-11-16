@@ -1,4 +1,7 @@
+#!/usr/bin/env python3
+
 import sys
+sys.path.append('protobuf')
 import ecdsa
 import open_ssl_wrapper as osw
 import os
@@ -6,14 +9,18 @@ import argparse
 import struct
 import wifi_credentials
 import lz_hub_db
+import image_header
 from OpenSSL import crypto
 from dataclasses import astuple, dataclass
-
+from lz_hub_element_type import ELEMENT_TYPE
+from lz_hub_device import get_device
 
 
 MAGICVAL                            = (0x41495345)
 MAX_PUB_ECP_DER_BYTES               = 162
 MAX_PUB_ECP_PEM_BYTES               = 279
+
+IMG_HEADER_LEN = 0x800
 
 # Dataclasses for trust anchors and config data (see lz_common.h for c structs)
 @dataclass
@@ -64,28 +71,63 @@ def main():
     hub_cert = osw.load_cert(project_path + "/lz_hub/certificates/hub_cert.pem")
     if hub_cert is None:
         print("Unable to load all certificates. Exit..")
-        return 0
+        return 1
     hub_sk = osw.load_privatekey(project_path + "/lz_hub/certificates/hub_sk.pem")
     if hub_sk is None:
         print("Unable to load all certificates. Exit..")
-        return 0
+        return 1
 
     # Read code signing certificate and private key
     code_auth_cert = osw.load_cert(project_path + "/lz_hub/certificates/code_auth_cert.pem")
     if code_auth_cert is None:
         print("Unable to load all certificates. Exit..")
-        return 0
+        return 1
     code_auth_sk = osw.load_privatekey(project_path + "/lz_hub/certificates/code_auth_sk.pem")
     if code_auth_sk is None:
         print("Unable to load all certificates. Exit..")
-        return 0
+        return 1
 
     wifi_params = wifi_credentials.load(project_path + "/lz_hub/wifi_credentials")
     if wifi_params is None:
-        return 0
+        return 1
 
     # Read, provision and flash back the trust anchors
     return issue_device_trust_anchors(project_path, hub_cert, hub_sk, code_auth_cert, code_auth_sk, wifi_params)
+
+
+def write_single_version_to_db(db, uuid, name, element_type):
+    print("Write version of {} to db".format(name))
+    payload = get_device(uuid).get_update_file(element_type)
+    if payload is None:
+        print("failed to get payload of {} for determining the version".format(name))
+        return 1
+
+    img_header_bytes = payload[:IMG_HEADER_LEN]
+    img_header = image_header.ImageHeader(img_header_bytes)
+    version = img_header.version()
+    print(f"Version of {name} is: {version}")
+
+    if not lz_hub_db.insert_or_update_version(db, uuid, name, version):
+        print("Failed to insert version of {} into database".format(name))
+        return 1
+
+    return 0
+
+
+def write_versions_to_db(db, uuid):
+    component_mapping = {
+        "app": ELEMENT_TYPE.APP_UPDATE,
+        "core": ELEMENT_TYPE.LZ_CORE_UPDATE,
+        "udownloader": ELEMENT_TYPE.UD_UPDATE,
+        "cpatcher": ELEMENT_TYPE.CP_UPDATE,
+    }
+
+    for name, element_type in component_mapping.items():
+        if write_single_version_to_db(db, uuid, name, element_type):
+            print("Failed to write {} version to database".format(name))
+            return 1
+
+    return 0
 
 
 """
@@ -101,7 +143,7 @@ def issue_device_trust_anchors(project_path, hub_cert, hub_sk, code_auth_cert, c
             raw_data = bytearray(input_file.read())
     except Exception as e:
         print("Unable to read trust anchors file: %s. Exit.." % str(e))
-        return 0
+        return 1
 
     print("Unpacking trust anchors structure..")
     try:
@@ -111,7 +153,7 @@ def issue_device_trust_anchors(project_path, hub_cert, hub_sk, code_auth_cert, c
 
     except Exception as e:
         print("Unable to unpack trust anchors from raw-data: %s (length raw_data = %d). Exit.." % (str(e), len(raw_data)))
-        return 0
+        return 1
 
     # ----------------------------------------------------------------
     # ------------ Provision the trust anchors structures ------------
@@ -126,7 +168,7 @@ def issue_device_trust_anchors(project_path, hub_cert, hub_sk, code_auth_cert, c
     device_id_csr = osw.load_csr_from_buffer(device_id_csr_string)
     if device_id_csr is None:
         print("Unable to load DeviceID CSR. Exit..")
-        return 0
+        return 1
 
     print("Successfully loaded CSR")
 
@@ -144,7 +186,9 @@ def issue_device_trust_anchors(project_path, hub_cert, hub_sk, code_auth_cert, c
     print(f"Signed hub_cert: {device_id_cert_signed_raw}")
 
     trust_anchor.hub_cert_start = 0
+    trust_anchor.hub_cert_size = hub_cert_size
     trust_anchor.device_id_cert_start = hub_cert_size
+    trust_anchor.device_id_cert_size = device_id_cert_size
     trust_anchor.cursor = hub_cert_size + device_id_cert_size
 
     trust_anchor.cert_bag = hub_cert_raw + device_id_cert_signed_raw + bytearray(4096 - (hub_cert_size + device_id_cert_size))
@@ -169,9 +213,15 @@ def issue_device_trust_anchors(project_path, hub_cert, hub_sk, code_auth_cert, c
     # ------------- Store device in database -------------------------
     # ----------------------------------------------------------------
     db = lz_hub_db.connect()
-    if not lz_hub_db.insert_device(db, config_data.dev_uuid, "testdevice", device_id_cert_signed_raw, config_data.static_symm):
+    if not lz_hub_db.insert_device(db, config_data.dev_uuid, "testdevice", "cortex_m", device_id_cert_signed_raw, config_data.static_symm):
         print("ERROR: Failed to store device in database. Exit..")
-        return 0
+        return 1
+
+    print("Write versions of binaries to database..")
+    if write_versions_to_db(db, config_data.dev_uuid):
+        print("ERROR: Failed to store device version in database. Exit..")
+        return 1
+    print(lz_hub_db.get_device_versions(db, config_data.dev_uuid))
     lz_hub_db.close(db)
 
 
@@ -180,7 +230,7 @@ def issue_device_trust_anchors(project_path, hub_cert, hub_sk, code_auth_cert, c
         data_store = struct.pack(TRUST_ANCHOR_FORMAT + CONFIG_DATA_FORMAT, *astuple(trust_anchor), *astuple(config_data))
     except Exception as e:
         print("Unable to pack trust anchors to raw-data: %s. Exit.." % str(e))
-        return 0
+        return 1
 
     # Store the trust anchors
     print("Writing trust anchors to trust_anchors_signed.bin..")
@@ -189,10 +239,10 @@ def issue_device_trust_anchors(project_path, hub_cert, hub_sk, code_auth_cert, c
             output_file.write(data_store)
     except Exception as e:
         print("Unable to write trust anchors to file: %s. Exit.." % str(e))
-        return 0
+        return 1
 
     print("Completed. Exit..")
-    return 2
+    return 0
 
 
 if __name__ == "__main__":

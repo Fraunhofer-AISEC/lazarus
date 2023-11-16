@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+message FirmwareInfoDicepp {
+
+}
+
+message FirmwareInfoTpm {
+	optional bytes ticket = 1;
+}
+
+message HubResponseRefreshBootTicket {
+	required bytes nonce = 1;
+	oneof firmwareInfo {
+		FirmwareInfoDicepp dicepp = 2;
+		FirmwareInfoTpm tpm = 3;
+	}
+}

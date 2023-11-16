@@ -1,6 +1,7 @@
 import sqlite3
 import os
 from sqlite3.dbapi2 import Connection
+from datetime import datetime
 
 LZ_HUB_DB_PATH          = './lz_hubs.db'
 TEST_CERTS_PATH         = './unit_test/test_certs/'
@@ -9,6 +10,7 @@ CREATE_STATEMENTS = {
     'devices': 'CREATE TABLE "devices" ('
         '`uuid`	BLOB, '
         '`name`	TEXT, '
+        '`class`	TEXT, '
         '`device_id_cert`	BLOB, '
         '`alias_id_cert`	BLOB, '
         '`awdt_period_s`	INTEGER, '
@@ -16,6 +18,11 @@ CREATE_STATEMENTS = {
         '`data_index`	INTEGER, '
         '`temperature`	REAL, '
         '`humidity`	REAL, '
+        '`awdt_timestamp` TEXT, '
+        '`user_input` TEXT, '
+        '`ip` TEXT, '
+        '`port` INTEGER, '
+        '`update_in_progress` INTEGER, '
        'PRIMARY KEY(`uuid`)'
     ')',
     'logging': 'CREATE TABLE "logging" ('
@@ -27,6 +34,21 @@ CREATE_STATEMENTS = {
     'static_symms': 'CREATE TABLE "static_symms" ('
         '`uuid`	TEXT, '
         '`static_symm`	BLOB '
+    ')',
+    'versions': 'CREATE TABLE "versions" ('
+        '`id`            INTEGER NOT NULL UNIQUE, '
+        '`device_uuid`   BLOB NOT NULL, '
+        '`component`     TEXT NOT NULL, '
+        '`version`       TEXT, '
+        'FOREIGN KEY(`device_uuid`) REFERENCES `devices`(`uuid`), '
+        'PRIMARY KEY(`id` AUTOINCREMENT) '
+    ')',
+    'certs': 'CREATE TABLE "certs" ('
+        '`id`	INTEGER,'
+        '`name`	INTEGER,'
+        '`cert`	TEXT,'
+        '`key`	TEXT,'
+        'PRIMARY KEY(`id` AUTOINCREMENT)'
     ')',
 }
 
@@ -60,7 +82,7 @@ def close(db):
         print("ERROR: Could not close lazarus database connect: Connection was not open")
 
 
-def insert_device(db, uuid, name, device_id_cert, static_symm):
+def insert_device(db, uuid, name, cls, device_id_cert, static_symm):
 
     # Check if device in devices table exists
     try:
@@ -79,8 +101,8 @@ def insert_device(db, uuid, name, device_id_cert, static_symm):
         print("Device already exists, update device in devices table")
         try:
             cursor = db.cursor()
-            sql = """UPDATE devices SET name=?, device_id_cert=? WHERE uuid=?"""
-            data = (name, device_id_cert, uuid)
+            sql = """UPDATE devices SET name=?, class=?, device_id_cert=? WHERE uuid=?"""
+            data = (name, cls, device_id_cert, uuid)
             cursor.execute(sql, data)
             db.commit()
         except sqlite3.Error as e:
@@ -91,8 +113,8 @@ def insert_device(db, uuid, name, device_id_cert, static_symm):
         print("Device does not exist. Create new db entry in devices table")
         try:
             cursor = db.cursor()
-            sql = "INSERT INTO devices (uuid, name, device_id_cert) VALUES (?, ?, ?)"
-            data = (uuid, name, device_id_cert)
+            sql = "INSERT INTO devices (uuid, name, class, device_id_cert) VALUES (?, ?, ?, ?)"
+            data = (uuid, name, cls, device_id_cert)
             cursor.execute(sql, data)
             db.commit()
         except sqlite3.Error as e:
@@ -150,6 +172,27 @@ def update_alias_id_cert(db, uuid, alias_id_cert):
         print("ERROR: Failed to insert data into lazarus db: %s" %(e.args))
         return
 
+def update_ip(db, uuid, ip, port):
+    try:
+        cursor = db.cursor()
+        sql = """UPDATE devices SET ip=?, port=? WHERE uuid=?"""
+        data = (ip, port, uuid)
+        cursor.execute(sql, data)
+        db.commit()
+    except sqlite3.Error as e:
+        print("ERROR: Failed to insert data into lazarus db: %s" %(e.args))
+        return
+
+def set_update_in_progress(db, uuid, update):
+    try:
+        cursor = db.cursor()
+        sql = """UPDATE devices SET update_in_progress=? WHERE uuid=?"""
+        data = (update, uuid)
+        cursor.execute(sql, data)
+        db.commit()
+    except sqlite3.Error as e:
+        print("ERROR: Failed to insert data into lazarus db: %s" %(e.args))
+        return
 
 def update_device_id_cert(db, uuid, device_id_cert):
     try:
@@ -166,8 +209,9 @@ def update_device_id_cert(db, uuid, device_id_cert):
 def update_awdt_period(db, uuid, awdt_period_s):
     try:
         cursor = db.cursor()
-        sql = """UPDATE devices SET awdt_period_s=? WHERE uuid=?"""
-        data = (awdt_period_s, uuid)
+        sql = """UPDATE devices SET awdt_period_s=?, awdt_timestamp=? WHERE uuid=?"""
+        timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")+"Z"
+        data = (awdt_period_s, timestamp, uuid)
         cursor.execute(sql, data)
         db.commit()
     except sqlite3.Error as e:
@@ -186,25 +230,48 @@ def update_data(db, uuid, status, index, temperature, humidity):
         print("ERROR: Failed to insert data into lazarus db: %s" %(e.args))
         return
 
+def get_user_input(db, uuid):
+    try:
+        cursor = db.cursor()
+        sql = "SELECT user_input FROM devices WHERE uuid=?"
+        data = (uuid, )
+        cursor.execute(sql, data)
+        rows = cursor.fetchone()
+        (user_input, ) = rows
+    except sqlite3.Error as e:
+        print("ERROR: Failed to retrieve data from lazarus db: %s" %(e.args))
+        return None
+    return user_input
+
+def clear_user_input(db, uuid):
+    try:
+        cursor = db.cursor()
+        sql = "UPDATE devices SET user_input=? WHERE uuid=?"
+        data = ("", uuid)
+        cursor.execute(sql, data)
+        db.commit()
+    except sqlite3.Error as e:
+        print("ERROR: Failed to update data in lazarus db: %s" %(e.args))
+        return None
 
 def get_device_info(db, uuid):
     try:
         cursor = db.cursor()
-        sql = "SELECT name, awdt_period_s, status, data_index, temperature, humidity FROM devices WHERE uuid=?"
+        sql = "SELECT name, class, awdt_period_s, status, data_index, temperature, humidity FROM devices WHERE uuid=?"
         data = (uuid, )
         cursor.execute(sql, data)
         rows = cursor.fetchone()
-        (name, awdt_period_s, status, index, temperature, humidity) = rows
+        (name, cls, awdt_period_s, status, index, temperature, humidity) = rows
     except sqlite3.Error as e:
         print("ERROR: Failed to retrieve data from lazarus db: %s" %(e.args))
         return None
-    return name, awdt_period_s, status, index, temperature, humidity
+    return name, cls, awdt_period_s, status, index, temperature, humidity
 
 
 def get_device_info_all(db):
     try:
         cursor = db.cursor()
-        sql = "SELECT uuid, name, device_id_cert, alias_id_cert, awdt_period_s, status, data_index, temperature, humidity FROM devices"
+        sql = "SELECT uuid, name, class, device_id_cert, alias_id_cert, awdt_period_s, status, data_index, temperature, humidity FROM devices"
         cursor.execute(sql)
         rows = cursor.fetchall()
     except sqlite3.Error as e:
@@ -257,12 +324,110 @@ def get_static_symm(db, uuid):
     return static_symm
 
 
-def set_hub_certs(db, hub_cert, hub_sk, code_auth_cert, code_auth_sk):
-    raise NotImplementedError
+def update_hub_cert(db, name, cert, sk):
+    # Determine if the cert entry was already written previously (and we
+    # need to make an update call later)
+    try:
+        cursor = db.cursor()
+        sql = "SELECT EXISTS(SELECT 1 FROM certs WHERE name=?)"
+        data = (name, )
+        cursor.execute(sql, data)
+        rows = cursor.fetchone()
+        entry_already_exists = rows[0]
+    except sqlite3.Error as e:
+        print("ERROR: Failed to query if cert exists in db: %s" %(e.args))
+        return False
+
+    try:
+        cursor = db.cursor()
+        sql = ""
+        data = ()
+        if entry_already_exists:
+            sql = "UPDATE certs SET cert=?, key=? WHERE name=?"
+            data = (cert, sk, name)
+        else:
+            sql = "INSERT INTO certs (name, cert, key) VALUES (?, ?, ?)"
+            data = (name, cert, sk)
+        cursor.execute(sql, data)
+        db.commit()
+        return True
+    except sqlite3.Error as e:
+        print("ERROR: Failed to insert data into lazarus db: %s" %(e.args))
+        return False
 
 
-def get_hub_certs(db, uuid):
-    raise NotImplementedError
+def get_hub_cert(db, name):
+    try:
+        cursor = db.cursor()
+        sql = "SELECT cert, key FROM certs WHERE name=?"
+        data = (name, )
+        cursor.execute(sql, data)
+        rows = cursor.fetchone()
+        (cert, key) = rows
+    except sqlite3.Error as e:
+        print("ERROR: Failed to retrieve data from db: %s" %(e.args))
+        return None, None
+    except Exception as e:
+        print("ERROR: Failed to retrieve data from db: %s" %str(e))
+        return None, None
+
+    return cert, key
+
+
+def insert_or_update_version(db, uuid, component, version) -> bool:
+
+    # Determine if the version entry was already written previously (and we
+    # need to make an update call later)
+    try:
+        cursor = db.cursor()
+        sql = "SELECT EXISTS(SELECT 1 FROM versions WHERE device_uuid=? AND component=?)"
+        data = (uuid, component)
+        cursor.execute(sql, data)
+        rows = cursor.fetchone()
+        entry_already_exists = rows[0]
+    except sqlite3.Error as e:
+        print("ERROR: Failed to query if version exists in db: %s" %(e.args))
+        return False
+
+    try:
+        cursor = db.cursor()
+        sql = ""
+        data = ()
+        if entry_already_exists:
+            sql = "UPDATE versions SET version=? WHERE device_uuid=? AND component=?"
+            data = (version, uuid, component)
+        else:
+            sql = "INSERT INTO versions (device_uuid, component, version) VALUES (?, ?, ?)"
+            data = (uuid, component, version)
+        cursor.execute(sql, data)
+        db.commit()
+        return True
+    except sqlite3.Error as e:
+        print("ERROR: Failed to insert data into lazarus db: %s" %(e.args))
+        return False
+
+
+def get_device_versions(db, uuid) -> dict:
+    try:
+        cursor = db.cursor()
+        sql = "SELECT component, version FROM versions WHERE device_uuid = ?"
+        data = (uuid, )
+        cursor.execute(sql, data)
+        rows = cursor.fetchall()
+    except sqlite3.Error as e:
+        print("ERROR: Failed to retrieve data from lazarus db: %s" %(e.args))
+        return None, None
+    except Exception as e:
+        print("ERROR: Failed to retrieve data from lazarus db: %s" %str(e))
+        return None, None
+
+    # Collect all versions as a dictionary
+    versions = dict()
+    for row in rows:
+        component = row[0]
+        version = row[1]
+        versions[component] = version
+    return versions
 
 
 ############################
@@ -293,20 +458,21 @@ def test():
         return None
     awdt_period_s = 1000
     name = "testdevice1"
+    cls = "cortex_m"
     index = 1
     temperature = 26.5
     humidity = 0.89
     status = 2
 
-    insert_device(db, uuid, name, device_id_cert, static_symm)
+    insert_device(db, uuid, name, cls, device_id_cert, static_symm)
 
     update_alias_id_cert(db, uuid, alias_id_cert)
     update_device_id_cert(db, uuid, device_id_cert)
     update_awdt_period(db, uuid, awdt_period_s)
     update_data(db, uuid, status, index, temperature, humidity)
 
-    name, awdt_period_s, status, index, temperature, humidity = get_device_info(db, uuid)
-    print("%s = %s: period=%d, status=%d, index=%d, temp=%f, humidity=%f" %(uuid, name, awdt_period_s, status, index, temperature, humidity))
+    name, cls, awdt_period_s, status, index, temperature, humidity = get_device_info(db, uuid)
+    print("%s = %s (%s): period=%d, status=%d, index=%d, temp=%f, humidity=%f" %(uuid, name, cls, awdt_period_s, status, index, temperature, humidity))
 
     device_id_cert, alias_id_cert = get_device_certs(db, uuid)
     print(device_id_cert)
@@ -320,8 +486,8 @@ def test():
     # Get All Funktionen
     rows = get_device_info_all(db)
     for row in rows:
-        (uuid, name, device_id_cert, alias_id_cert, awdt_period_s, status, index, temperature, humidity) = row
-        print("%s = %s: " %(uuid, name), end='')
+        (uuid, name, cls, device_id_cert, alias_id_cert, awdt_period_s, status, index, temperature, humidity) = row
+        print("%s = %s (%s): " %(uuid, name, cls), end='')
         if awdt_period_s:
             print("period=%d " %(awdt_period_s), end='' )
         if status:

@@ -2,7 +2,7 @@ set remotetimeout 100000
 set mem inaccessible-by-default off
 set arm force-mode thumb
 
-target extended-remote | crt_emu_cm_redlink --vendor NXP -p LPC55S69 --bootromstall 0x50000040 -CoreIndex=0 -x . --flash-dir /usr/local/mcuxpressoide/ide/binaries/Flash --flash-hashing --PreconnectScript LS_preconnect_LPC55xx.scp
+target extended-remote | crt_emu_cm_redlink --vendor NXP -p LPC55S69 --bootromstall 0x50000040 -CoreIndex=0 -x ./lpc55s69-flash/data --flash-dir /usr/local/mcuxpressoide/ide/binaries/Flash --flash-hashing --PreconnectScript LS_preconnect_LPC55xx.scp
 
 mon ondisconnect cont
 

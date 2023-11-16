@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.append('protobuf')
 import socket
 import ecdsa
 import struct
+import traceback
 from enum import IntEnum
 import hashlib
 from OpenSSL import crypto
@@ -12,11 +15,17 @@ import os
 import wifi_credentials
 from lz_hub_device_certbag import device_certbag
 from lz_hub_certbag import hub_certbag
-from lz_hub_dev_update import get_update_file
-from lz_hub_element_type import ELEMENT_TYPE
+from lz_hub_device import get_device
 import lz_hub_db
 from ecdsa.util import sigencode_der, sigdecode_der
 import uuid as u
+import hubrequest_pb2
+import hubresponse_pb2
+import bootticket_request_pb2
+import bootticket_response_pb2
+import google.protobuf.message
+import time
+from threading import Thread
 
 MAX_DEFERRAL_TIME       = 1000*60*60
 
@@ -41,10 +50,36 @@ LEN_HDR = LEN_SIGNED_AREA + LEN_SIGNATURE
 MAGICVAL                = (0x41495345)
 
 
+class HubException(Exception):
+    pass
+
+
+def receive_loop(conn, hub_cb):
+    while True:
+        # Receive data
+        try:
+            data = conn.recv(1024)
+        except Exception as e:
+            print("HUB: ERROR - %s" %str(e))
+            break
+        if not data:
+            break
+
+        handle_request(conn, data, hub_cb)
+
+        print("Packet evaluated. Waiting for new data..")
+        print("----------------------------------------")
+        print("")
+    conn.close()
+
 def main():
     global wifi_credentials_file_name
     print("-------------------------- Backend server v0.1 -----------------------------")
     cert_path, wifi_credentials_file_name = parse_arguments()
+
+    # Connect to database and create all non-existing tables
+    db = lz_hub_db.connect()
+    db.close()
 
     # Load wifi-credentials from file.
     wifi_params = wifi_credentials.load(wifi_credentials_file_name)
@@ -61,244 +96,217 @@ def main():
     print("Waiting for connections..")
 
     # Establish connection
-    while True:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            try:
-                s.bind((wifi_params['ip'], wifi_params['port']))
-            except Exception as e:
-                print("ERROR: Failed to bind socket to %s:%s - %s" %(wifi_params['ip'],
-                    wifi_params['port'], str(e)))
-                break
-            s.listen()
-            conn, addr = s.accept()
-            with conn:
-                print('Connected by', addr)
-                while True:
-                    # Receive data
-                    try:
-                        data = conn.recv(1024)
-                    except Exception as e:
-                        print("HUB: ERROR - %s" %str(e))
-                        break
-                    if not data:
-                        break
-
-                    handle_request(conn, data, hub_cb)
-
-                    print("Packet evaluated. Waiting for new data..")
-                    print("----------------------------------------")
-                    print("")
-
-
-def handle_request(conn, data, hub_cb):
-
-    # Pre-unpack the element-type to see if it is an authenticated or unauthenticated packet
-    try:
-        element_type = struct.unpack('I', data[:4])[0]
-        print("Received packet type %s, length = %d" %(ELEMENT_TYPE(element_type), len(data)))
-    except Exception as e:
-        print("Invalid packet type: %s. Abort" %str(e))
-        return
-
-    # DeviceID re-association is a special case
-    if element_type == ELEMENT_TYPE.DEVICE_ID_REASSOC_REQ:
-        handle_device_id_reassociation(conn, data, hub_cb)
-    # An AliasID update or a CMD is unauthenticated
-    elif element_type == ELEMENT_TYPE.ALIAS_ID or element_type == ELEMENT_TYPE.CMD:
-        handle_unauthenticated_reqest(conn, data, hub_cb)
-    # All other packets are authenticated
-    else:
-        handle_authenticated_reqest(conn, data, hub_cb)
-
-
-def handle_unauthenticated_reqest(conn, data, hub_cb):
-
-    print("Processing UNAUTHENTICATED packet..")
-    len_hdr = 8+LEN_DEV_UUID
-    try:
-        element_type, payload_size, uuid = struct.unpack("II16s", data[:len_hdr])
-        payload = struct.unpack("%ds" %payload_size, data[len_hdr:])[0]
-    except Exception as e:
-        print("Error unpacking data: %s" %str(e))
-        conn.sendall(struct.pack('II16sI', ELEMENT_TYPE.CMD, 4, uuid, TCP_CMD_NAK))
-        return
-
-    if element_type == ELEMENT_TYPE.ALIAS_ID:
-        print(str(u.UUID(bytes=uuid)))
-        handle_alias_id_cert_update(conn, uuid, payload, hub_cb)
-    elif element_type == ELEMENT_TYPE.CMD:
-        handle_cmd(conn, uuid, payload)
-    else:
-        print("unknown command")
-
-    return
-
-
-def handle_cmd(conn, uuid,  payload):
-    print("Received Command")
-
-    if payload == TCP_CMD_REQ_BACKEND_PK:
-        print("TCP_CMD TCP_CMD_REQ_BACKEND_PK")
-        # TODO
-        # The key format requests 0x4 as the first byte
-        # first_byte = 0x4
-        # backend_pk_str = ecdsa.VerifyingKey.to_string(hub_pk_ecdsa)
-
-        # TODO send back key in correct authenticated format
-    if payload == TCP_CMD_ACK:
-        print("TCP_CMD_ACK")
-    elif payload == TCP_CMD_NAK:
-        print("TCP_CMD_NAK")
-    elif payload == TCP_CMD_TEST:
-        print("TCP_CMD_TEST")
-    else:
-        print("TCP_CMD_UNKNOWN")
-
-
-def handle_authenticated_reqest(conn, data, hub_cb):
-
-    print("Processing AUTHENTICATED packet..")
-
-    try:
-        signed_area, signature = struct.unpack("%ds%ds" %(LEN_SIGNED_AREA, LEN_SIGNATURE), data[:LEN_HDR])
-        sig_len = int.from_bytes(signature[-4:], "little")
-        signature = signature[:sig_len]
-        element_type, payload_size, uuid, magic, nonce, digest = struct.unpack("II16sI32s32s", signed_area)
-        payload = struct.unpack("%ds" %payload_size, data[LEN_HDR:])[0]
-    except Exception as e:
-        print("Error unpacking data: %s" %str(e))
-        return
-
-    # Load certificates from database
-    device_cb = device_certbag(uuid)
-    trusted_certs = [hub_cb.hub_cert, device_cb.device_id_cert]
-    if not osw.verify_cert(trusted_certs, device_cb.alias_id_cert):
-        print("ERROR: Certificate chain could not be verified")
-        conn.sendall(struct.pack('II16sI', ELEMENT_TYPE.CMD, 4, uuid, TCP_CMD_NAK))
-        return
-
-    try:
-        print("Verifying request with AliasID public key..")
-        alias_id_pk_ecdsa = ecdsa.VerifyingKey.from_pem(osw.dump_publickey(device_cb.alias_id_cert.get_pubkey()))
-        ret = alias_id_pk_ecdsa.verify(signature, signed_area, hashfunc=hashlib.sha256, sigdecode=sigdecode_der)
-        if ret == True:
-            print("Good signature!")
-        else:
-            print("ERROR: Bad signature. Drop packet")
-            conn.sendall(struct.pack('II16sI', ELEMENT_TYPE.CMD, 4, uuid, TCP_CMD_NAK))
-            return
-    except Exception as e:
-        print("ERROR: Could not verify signature: %s. Drop packet" %(str(e)))
-        conn.sendall(struct.pack('II16sI', ELEMENT_TYPE.CMD, 4, uuid, TCP_CMD_NAK))
-        return
-
-    # Verify payload
-    calculated_digest = hashlib.sha256(payload).digest()
-    if calculated_digest != digest:
-        print(f"ERROR: digest mismatch - {calculated_digest} vs. {digest}")
-        conn.sendall(struct.pack('II16sI', ELEMENT_TYPE.CMD, 4, uuid, TCP_CMD_NAK))
-        return
-
-    print("Digest verification successful")
-
-    # Handle request according to type
-    if ((element_type == ELEMENT_TYPE.APP_UPDATE) or
-        (element_type == ELEMENT_TYPE.UD_UPDATE) or
-        (element_type == ELEMENT_TYPE.CP_UPDATE) or
-        (element_type == ELEMENT_TYPE.LZ_CORE_UPDATE)):
-
-        payload = get_update_file(element_type)
-        if payload is None:
-            print("ERROR: Failed to retrieve firmware update file on hub")
-            conn.sendall(struct.pack('II16sI', ELEMENT_TYPE.CMD, 4, uuid, TCP_CMD_NAK))
-            return
-
-    elif element_type == ELEMENT_TYPE.BOOT_TICKET:
-
-        payload = struct.pack("I", magic)
-
-    elif element_type == ELEMENT_TYPE.DEFERRAL_TICKET:
-
-        time_ms = get_deferral_time(struct.unpack("I", payload)[0])
-        payload = struct.pack("I", time_ms)
-
-    elif element_type == ELEMENT_TYPE.CONFIG_UPDATE:
-
-        payload = get_nw_config()
-        if payload is None:
-            print("ERROR: Failed to retrieve firmware update file on hub")
-            conn.sendall(struct.pack('II16sI', ELEMENT_TYPE.CMD, 4, uuid, TCP_CMD_NAK))
-            return
-
-    elif element_type == ELEMENT_TYPE.SENSOR_DATA:
-
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
-            index, temp, humidity = struct.unpack("Iff", payload)
+            s.bind((wifi_params['ip'], wifi_params['port']))
         except Exception as e:
-            print("ERROR: Failed to unpack sensor data - %s" %str(e))
-            conn.sendall(struct.pack('II16sI', ELEMENT_TYPE.CMD, 4, uuid, TCP_CMD_NAK))
+            print("ERROR: Failed to bind socket to %s:%s - %s" %(wifi_params['ip'],
+                wifi_params['port'], str(e)))
             return
-        print("INFO: UUID = %s" %str(u.UUID(bytes=uuid)))
-        print("INFO: INDEX %d = TEMP: %f°C, HUMIDITY: %fpct" %(index, temp, humidity))
-        db = lz_hub_db.connect()
+        s.listen(10)
+        while True:
+            conn, addr = s.accept()
+
+            print('Connected by', addr)
+            thread = Thread(target = receive_loop, args = (conn, hub_cb))
+            thread.start()
+
+
+def handle_framing(message):
+    if len(message) < 2:
+        raise HubException("Invalid framing (Received less than 2 bytes)")
+
+    num_bytes = int.from_bytes(message[:2], "big")
+    expected_bytes = len(message) - 2
+
+    if expected_bytes != num_bytes:
+        raise HubException("Invalid framing. Header announced {} bytes, but got {} bytes"
+                           .format(num_bytes, expected_bytes))
+
+    return message[2:]
+
+
+def has_signature(request):
+    # All messages are signed except of the Alias ID and reassociate request
+    payload = request.WhichOneof('payload')
+    return payload != 'aliasid' and payload != 'reassocDevice'
+
+
+def handle_protobuf_message(conn, message, hub_cb):
+
+    signed_request = hubrequest_pb2.SignedHubRequestMessage()
+    request = hubrequest_pb2.HubRequestMessage()
+    try:
+        message = handle_framing(message)
+        signed_request.ParseFromString(message)
+        request.ParseFromString(signed_request.payload)
+    except HubException as e:
+        print("ERROR: Failed to parse incoming protobuf message: %s." %str(e))
+        return
+    except google.protobuf.message.DecodeError:
+        print("ERROR: Failed to parse incoming protobuf message: Invalid format.")
+        return
+
+    # Signed Request: uuid | payload{ nonce | magic | payload } | signature
+    uuid = signed_request.uuid
+    signature = signed_request.signature
+    payload = signed_request.payload
+
+    # Update IP address in database
+    update_ip(conn, uuid)
+
+    print("Request type is %s" %(request.WhichOneof('payload')))
+
+    if has_signature(request):
+        signature_ok = check_signature(hub_cb, uuid, signature, payload)
+        if not signature_ok:
+            print("ERROR: Could not verify signature of incoming message type %s" %request.WhichOneof('payload'))
+            return
+
+    print("Protobuf type is " + str(request.WhichOneof('payload')))
+    try:
+        if request.WhichOneof('payload') == 'aliasid':
+            handle_alias_id(conn, uuid, request, hub_cb)
+        elif request.WhichOneof('payload') == 'bootTicket':
+            handle_boot_ticket(conn, uuid, request, hub_cb)
+        elif request.WhichOneof('payload') == 'awdt':
+            handle_deferral_ticket(conn, uuid, request, hub_cb)
+        elif request.WhichOneof('payload') == 'sensorData':
+            handle_sensor_data(conn, uuid, request, hub_cb)
+        elif request.WhichOneof('payload') == 'fwUpdate':
+            handle_fw_update(conn, uuid, request, hub_cb)
+        elif request.WhichOneof('payload') == 'reassocDevice':
+            handle_reassoc_device(conn, uuid, request, hub_cb)
+        elif request.WhichOneof('payload') == 'checkForUpdate':
+            handle_check_for_update(conn, uuid, request, hub_cb)
+        elif request.WhichOneof('payload') == 'userInput':
+            handle_check_for_user_input(conn, uuid, request, hub_cb)
+        else:
+            raise HubException("Type of protobuf message is unknown")
+    except HubException as e:
+        print("ERROR:", str(e))
+        print("Send back NAK response...")
+        send_signed_nak_response(conn, hub_cb)
+
+
+def handle_alias_id(conn, uuid, request, hub_cb):
+
+    certificate = request.aliasid.certificate
+    handle_alias_id_cert_update(conn, uuid, certificate, hub_cb)
+
+
+def handle_boot_ticket(conn, uuid, request, hub_cb):
+
+    print("Processing BOOT_TICKET packet..")
+
+    response = get_device(uuid).get_boot_ticket_response(request.nonce, hub_cb)
+
+    print("Send back Response..")
+    type = hubresponse_pb2.SignedHubResponse.Type.BOOTTICKET
+    send_signed_response(conn, type, response, hub_cb)
+
+
+def update_ip(conn, uuid):
+
+    ip, port = conn.getpeername()
+
+    db = lz_hub_db.connect()
+    if db:
+        lz_hub_db.update_ip(db, uuid, ip, port)
+        lz_hub_db.close(db)
+
+
+def handle_deferral_ticket(conn, uuid, request, hub_cb):
+    print("Processing DEFERRAL_TICKET packet..")
+
+    response = hubresponse_pb2.HubResponseAwdtRefresh()
+    response.nonce = request.nonce
+    response.timeMs = request.awdt.timeMs
+
+    db = lz_hub_db.connect()
+    if db:
+        lz_hub_db.update_awdt_period(db, uuid, response.timeMs / 1000)
+        lz_hub_db.close(db)
+
+    print("Send back Response..")
+    type = hubresponse_pb2.SignedHubResponse.Type.AWDT
+    send_signed_response(conn, type, response, hub_cb)
+
+
+def handle_sensor_data(conn, uuid, request, hub_cb):
+    print("Processing SENSOR_DATA packet..")
+
+    temp = request.sensorData.temperature
+    index = request.sensorData.index
+    humidity = request.sensorData.humidity
+
+    print("INFO: UUID = %s" %str(u.UUID(bytes=uuid)))
+    print("INFO: INDEX %d = TEMP: %f°C, HUMIDITY: %fpct" %(index, temp, humidity))
+    db = lz_hub_db.connect()
+    if db:
         lz_hub_db.update_data(db, uuid, 1, index, temp, humidity)
         lz_hub_db.close(db)
 
-        payload = payload = struct.pack("I", TCP_CMD_ACK)
-
-    else:
-        print("ERROR: Received unknown packet: %d" %element_type)
-        print("Full packet: ")
-        print(data)
-        print("Abort")
-        conn.sendall(struct.pack('II16sI', ELEMENT_TYPE.CMD, 4, uuid, TCP_CMD_NAK))
-        return
-
-    send_element(conn, magic, nonce, element_type, uuid, payload, hub_cb)
+        print("Send back Response..")
+        response = hubresponse_pb2.HubResponseSensorData()
+        type = hubresponse_pb2.SignedHubResponse.Type.SENSORDATA
+        send_signed_response(conn, type, response, hub_cb)
 
 
-def handle_device_id_reassociation(conn, data, hub_cb):
+def get_update_payload(uuid, update_type):
+    if update_type == "config":
+        return get_nw_config()
 
-    print("Processing AUTHENTICATED packet..")
+    payload = get_device(uuid).get_update_payload(update_type)
+    if payload is None:
+        raise HubException("Failed to retrieve firmware update file on hub")
 
-    try:
-        signed_area, signature = struct.unpack("%ds%ds" %(LEN_SIGNED_AREA, LEN_SIGNATURE), data[:LEN_HDR])
-        element_type, payload_size, uuid, magic, nonce, digest = struct.unpack("II16sI32s32s", signed_area)
-        payload = struct.unpack("%ds" %payload_size, data[LEN_HDR:])[0]
-    except Exception as e:
-        print("Error unpacking data: %s" %str(e))
-        return
+    return payload
 
-    # DO NOT verify the signature here, as we have a new DeviceID which must first be
-    # validated using dev_auth
 
-    # Verify payload
-    calculated_digest = hashlib.sha256(payload).digest()
-    if calculated_digest != digest:
-        print("ERROR digest mismatch")
-        conn.sendall(struct.pack('II16sI', ELEMENT_TYPE.CMD, 4, uuid, TCP_CMD_NAK))
-        return
+def handle_fw_update(conn, uuid, request, hub_cb):
+    print("Processing FW_UPDATE packet..")
 
-    print("Digest verification successful")
+    # Signal that update is in progress now
+    db = lz_hub_db.connect()
+    if db:
+        lz_hub_db.set_update_in_progress(db, uuid, 1)
+        lz_hub_db.close(db)
 
-    # payload = enc(dev_uuid | dev_auth | DeviceID CSR)^hub_pub
-    payload_decrypted = ecdh_decrypt(payload, hub_cb.hub_sk)
+    component = request.fwUpdate.type
+    payload = get_update_payload(uuid, component)
 
-    device_id_csr_len = len(payload) - LEN_DEV_AUTH - LEN_DEV_UUID
+    print("Send back Response..")
+    response = hubresponse_pb2.HubResponseUpdate()
+    response.nonce = request.nonce
+    response.payloadNumBytes = len(payload)
+    type = hubresponse_pb2.SignedHubResponse.Type.FWUPDATE
+    send_signed_response_with_payload(conn, type, response, payload, hub_cb)
 
-    # TODO not necessary to pack in dev_uuid anymore
-    (dev_uuid,
-    dev_auth,
-    csr_buffer) = struct.unpack('%ds%ds%ds' %(LEN_DEV_UUID, LEN_DEV_AUTH, device_id_csr_len),
-        payload_decrypted)
+    # Determine version of sent payload and write to database
+    _, version, _ = get_device(uuid).get_update_version(component)
+    print(f"Version of \"{component}\" binary is {version}. Write version to database..")
+    db = lz_hub_db.connect()
+    if db:
+        lz_hub_db.insert_or_update_version(db, uuid, request.fwUpdate.type, version)
+        lz_hub_db.close(db)
+
+    print("Finished FW_UPDATE process")
+
+
+def handle_reassoc_device(conn, uuid, request, hub_cb):
+    print("Processing REASSOCIATE packet..")
+
+    uuid = request.reassocDevice.uuid
+    auth = request.reassocDevice.auth
+    dev_id_cert = request.reassocDevice.deviceIdCert
 
     device_cb = device_certbag(uuid)
-    if not device_cb.reassociate_device_id_cert(csr_buffer, dev_auth, hub_cb.hub_cert, hub_cb.hub_sk):
+    if not device_cb.reassociate_device_id_cert(dev_id_cert, auth, hub_cb.hub_cert, hub_cb.hub_sk):
         print("ERROR: Unable to update and reassociate DeviceID certificate.")
         print("Cert: %s" %csr_buffer)
-        conn.sendall(struct.pack('II16sI', ELEMENT_TYPE.CMD, 4, uuid, TCP_CMD_NAK))
-        return
+        raise HubException("Device reassociation failed")
 
     # NOW the signature of the packet can be verified with the new device ID
     # TODO implement this
@@ -306,30 +314,86 @@ def handle_device_id_reassociation(conn, data, hub_cb):
     # Send back the trust anchors structure
     device_id_cert = osw.dump_cert(device_cb.device_id_cert)
     if device_id_cert is None:
-        print("ERROR: Could not convert certificate to raw format")
-        return
+        raise HubException("Could not convert certificate to raw format")
 
+    print("Creating trust anchor structure")
+    trust_anchor = create_trust_anchor(device_id_cert)
+
+    print("Send back Response..")
+    response = hubresponse_pb2.HubResponseUpdate()
+    response.nonce = request.nonce
+    response.payloadNumBytes = len(trust_anchor)
+    type = hubresponse_pb2.SignedHubResponse.Type.REASSOC
+    send_signed_response_with_payload(conn, type, response, trust_anchor, hub_cb)
+
+
+def handle_check_for_update(conn, uuid, request, hub_cb):
+
+    print("Processing CHECK_FOR_UPDATE packet..")
+
+    response = hubresponse_pb2.HubResponseCheckForUpdate()
+    response.nonce = request.nonce
+
+    for component in request.checkForUpdate.components:
+        print("Determine newest version of {}".format(component))
+        payload = get_update_payload(uuid, component)
+        name, newestVersion, issueTime = get_device(uuid).get_update_version(component)
+
+        version_info = response.components.add()
+        version_info.name = name
+        version_info.newestVersion = newestVersion
+        version_info.issueTime = issueTime
+
+    print("Send back Response..")
+    type = hubresponse_pb2.SignedHubResponse.Type.CHECKFORUPDATE
+    send_signed_response(conn, type, response, hub_cb)
+
+def handle_check_for_user_input(conn, uuid, request, hub_cb):
+
+    print("Processing USER_INPUT packet")
+
+    response = hubresponse_pb2.HubResponseUserInput()
+
+    # Access database to check for new requests
+    db = lz_hub_db.connect()
+    if db:
+        user_input = lz_hub_db.get_user_input(db, uuid)
+        if user_input != "":
+            lz_hub_db.clear_user_input(db, uuid)
+            print("Got new user input: %s" %user_input)
+            response.available = True
+        else:
+            print("No user input available")
+            response.available = False
+
+        lz_hub_db.close(db)
+        response.userInput = bytes(user_input, 'utf-8')
+
+    # Send back response
+    print("Send back Response..")
+    type = hubresponse_pb2.SignedHubResponse.Type.USERINPUT
+    send_signed_response(conn, type, response, hub_cb)
+
+
+def create_trust_anchor(device_id_cert):
     magic = MAGICVAL
-    flags = 0
-    # device_id_pub_key = bytearray(LEN_PUB_KEY)
-    # code_auth_pub_key = bytearray(LEN_PUB_KEY)
-    # hub_pub_key = bytearray(LEN_PUB_KEY)
     hub_cert_start = 0
     hub_cert_size = 0
     device_id_cert_start = 0
     device_id_cert_size = len(device_id_cert)
     cursor = hub_cert_start + hub_cert_size + device_id_cert_size
-    cert_bag = device_id_cert + bytearray(4076 - device_id_cert_size)
+    cert_bag = device_id_cert + bytearray(3240 - device_id_cert_size)
+    device_id_pub_key = bytearray(279)
+    code_auth_pub_key = bytearray(279)
+    hub_pub_key = bytearray(279)
 
     try:
         payload = struct.pack(
-            # 'II76s76s76sHHHHI3848s',  # (TRUST_ANCHORS = 4096 Bytes)
-            'IIHHHHI4076s',  # (TRUST_ANCHORS = 4096 Bytes)
+            'I279s279s279sHHHHI3240s',  # (TRUST_ANCHORS = 4096 Bytes)
             magic,
-            flags,
-            # device_id_pub_key,
-            # code_auth_pub_key,
-            # hub_pub_key,
+            device_id_pub_key,
+            code_auth_pub_key,
+            hub_pub_key,
             hub_cert_start,
             hub_cert_size,
             device_id_cert_start,
@@ -340,7 +404,41 @@ def handle_device_id_reassociation(conn, data, hub_cb):
         print("Unable to pack trust anchors to raw-data: %s. Exit.." %str(e))
         return 0
 
-    send_element(conn, MAGICVAL, nonce, ELEMENT_TYPE.DEVICE_ID_REASSOC_RES, uuid, payload, hub_cb)
+    return payload
+
+
+def check_signature(hub_cb, uuid, signature, payload):
+
+    # Load certificates from database
+    device_cb = device_certbag(uuid)
+    trusted_certs = [hub_cb.hub_cert, device_cb.device_id_cert]
+    if not osw.verify_cert(trusted_certs, device_cb.alias_id_cert):
+        print("ERROR: Certificate chain could not be verified")
+        return False
+
+    try:
+        print("Verifying request with AliasID public key..")
+        alias_id_pk_ecdsa = ecdsa.VerifyingKey.from_pem(osw.dump_publickey(device_cb.alias_id_cert.get_pubkey()))
+        ret = alias_id_pk_ecdsa.verify(signature, payload, hashfunc=hashlib.sha256, sigdecode=sigdecode_der)
+        if ret:
+            print("Good signature!")
+        else:
+            print("ERROR: Bad signature. Drop packet")
+            return False
+    except Exception as e:
+        print("ERROR: Could not verify signature: %s. Drop packet" %(str(e)))
+        return False
+
+    print("Digest verification successful")
+    return True
+
+
+def handle_request(conn, data, hub_cb):
+    try:
+        handle_protobuf_message(conn, data, hub_cb)
+    except Exception as e:
+        print("Unhandled exception while processing incoming message")
+        print(traceback.format_exc())
 
 
 def get_deferral_time(time_ms):
@@ -374,10 +472,10 @@ def get_nw_config():
      # Create the trust anchors c structure
     try:
         config_data = struct.pack(
-            '64s140sI128s64s32s48sI3612s',
+            '64s52sI128s64s32s48sI3700s',
             # IMG_META_DATA (64s = 64 Bytes)
             img_meta_data,
-            # DEV_SYM_INFO (140s = 140 Bytes)
+            # DEV_SYM_INFO (52s = 52 Bytes)
             dev_symm,
             # NW_DATA_INFO (I128s64s32s48sI = 278 Bytes)
             magic_nw_data,
@@ -394,60 +492,66 @@ def get_nw_config():
     return config_data
 
 
-def send_element(conn, magic, nonce, element_type, uuid, payload, hub_cb):
-
-    # Calculate digest and size of payload
-    payload_size = len(payload)
-    digest = hashlib.sha256(payload).digest()
-
-    # Create element header
-    try:
-        hdr_data = struct.pack('II16sI32s32s',  element_type,
-                                                payload_size,
-                                                uuid,
-                                                magic,
-                                                nonce,
-                                                digest,
-                                                )
-    except Exception as e:
-        print("ERROR: failed to create header: %s" %str(e))
-        return
-
-    # Append signature to header
-    hdr_sig = hub_cb.hub_sk_ecdsa.sign(hdr_data, hashfunc=hashlib.sha256, sigencode=sigencode_der)
-    if len(hdr_sig) > LEN_SIGNATURE:
-        print(f"ERROR: signature too long ({len(hdr_sig)} > {LEN_SIGNATURE})")
-        return
-    print(f"Length of the signature: {len(hdr_sig)}")
-    # We now need to make the signature to a byte block of length 84
-    hdr_sig = hdr_sig + (b"\x00" * (LEN_SIGNATURE - len(hdr_sig) - 4)) + int.to_bytes(len(hdr_sig), 4, "little")
-
-
-
-    print_tcp_element_info(payload_size, nonce, element_type, digest, hdr_sig)
-
-    data = hdr_data + hdr_sig + payload
-
-    print("Sending %s (total %d bytes, payload %d bytes)"
-        %(ELEMENT_TYPE(element_type), len(data), len(payload)))
-    try:
-        conn.sendall(data)
-    except Exception as e:
-        print("ERROR: failed to send data: %s" %str(e))
-        return
+def prepend_frame_header(message):
+    payload_len = len(message)
+    header = payload_len.to_bytes(2, byteorder='big')
+    return header + message
 
 
 def handle_alias_id_cert_update(conn, uuid, cert_buffer, hub_cb):
 
+    response = hubresponse_pb2.HubResponseAliasId()
+
     print("INFO: Updating AliasID for UUID %s" %str(u.UUID(bytes=uuid)))
     device_cb = device_certbag(uuid)
-    if not device_cb.update_alias_id_cert(cert_buffer, hub_cb.hub_cert):
-        print("ERROR: Unable to update AliasID certificate.")
-        conn.sendall(struct.pack('II16sI', ELEMENT_TYPE.CMD, 4, uuid, TCP_CMD_NAK))
-        return
+    if device_cb.update_alias_id_cert(cert_buffer, hub_cb.hub_cert):
+        print("Send back ACK response...")
+        type = hubresponse_pb2.SignedHubResponse.Type.ALIASID
+        send_signed_response(conn, type, response, hub_cb)
+    else:
+        raise HubException("Unable to update AliasID certificate")
 
-    print("Send back Response ACK..")
-    conn.sendall(struct.pack('II16sI', ELEMENT_TYPE.CMD, 4, uuid, TCP_CMD_ACK))
+
+def send_signed_response_with_payload(conn, type, response, payload, hub_cb):
+    send_signed_response(conn, type, response, hub_cb)
+
+    time.sleep(2.5)
+    try:
+        conn.sendall(payload)
+    except Exception as e:
+        raise HubException("Failed to send response payload ({})".format(e))
+
+
+def send_signed_response(conn, type, response_payload, hub_cb):
+    signed_response = hubresponse_pb2.SignedHubResponse()
+    signed_response.status = hubresponse_pb2.SignedHubResponse.Status.ACK
+    signed_response.payload = response_payload.SerializeToString()
+    signed_response.type = type
+
+    # Append signature to header
+    signed_response.signature = hub_cb.hub_sk_ecdsa.sign(
+        signed_response.payload,
+        hashfunc=hashlib.sha256,
+        sigencode=sigencode_der)
+
+    response_bytes = signed_response.SerializeToString()
+    response_bytes = prepend_frame_header(response_bytes)
+    try:
+        conn.sendall(response_bytes)
+    except Exception as e:
+        raise HubException("Failed to send response message ({})".format(e))
+
+
+def send_signed_nak_response(conn, hub_cb):
+    signed_response = hubresponse_pb2.SignedHubResponse()
+    signed_response.status = hubresponse_pb2.SignedHubResponse.Status.NAK
+
+    response_bytes = signed_response.SerializeToString()
+    response_bytes = prepend_frame_header(response_bytes)
+    try:
+        conn.sendall(response_bytes)
+    except Exception as e:
+        raise HubException("Failed to send NAK response message ({})".format(e))
 
 
 # TODO at the moment just a dummy Implement this
@@ -456,16 +560,6 @@ def ecdh_decrypt(payload, hub_cb):
 
 
 ### Helper methods ###
-
-
-def print_tcp_element_info(payload_size, nonce, element_type, digest, signature):
-
-    print("Payload size:    %d (0x%x) bytes" %(payload_size, payload_size))
-    print("Nonce:           %s" %("".join("{:02x}".format(x) for x in nonce)))
-    print("Type:            %s" %ELEMENT_TYPE(element_type)) # TODO readable
-    print("Digest:          %s" %("".join("{:02x}".format(x) for x in digest)))
-    print("Signature:       %s" %("".join("{:02x}".format(x) for x in signature)))
-
 
 def parse_arguments():
 
