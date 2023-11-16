@@ -20,6 +20,8 @@
 #ifndef LZ_COMMON_LZ_ERROR_H_
 #define LZ_COMMON_LZ_ERROR_H_
 
+#include <stdint.h>
+
 /*******************************************
  * Error Handling
  *******************************************/
@@ -32,10 +34,9 @@ typedef uint32_t LZ_RESULT;
 #define LZ_ERROR_BAD_FORMAT 0xFFFFFFFD
 #define LZ_ERROR_INVALID_HDR 0xFFFFFFFC
 #define LZ_TIMEOUT 0xFFFFFFFB
-#define LZ_ERROR_WIFI 0xFFFFFFFA
-#define LZ_ERROR_WIFI_BUSY 0xFFFFFFF9
-#define LZ_ERROR_WIFI_ALREADY_CONNECTED 0xFFFFFFF8
+#define LZ_ERROR_NET 0xFFFFFFFA
 
 #define LZ_NOT_FOUND 0xFFFFFF0F
+#define LZ_SKIP_ELEMENT 0xFFFFFF0E
 
 #endif /* LZ_COMMON_LZ_ERROR_H_ */

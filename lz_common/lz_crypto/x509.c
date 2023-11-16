@@ -45,19 +45,19 @@ static size_t x509_get_dn_length(const x509_dn_info *info)
 static int x509_dn_to_string(const x509_dn_info *info, char *buf, size_t buf_size)
 {
 	if (buf_size < x509_get_dn_length(info)) {
-		dbgprint(DBG_INFO, "ERROR: Buffer too small for csr info.\n");
+		INFO("ERROR: Buffer too small for csr info.\n");
 		return -1;
 	}
 	int n = snprintf(buf, buf_size, "CN=%s,O=%s,C=%s", info->common_name, info->org, info->country);
 	if ((n >= (int)buf_size) || n < 0) {
-		dbgprint(DBG_INFO, "ERROR: Could not successfully write to buffer.\n");
+		INFO("ERROR: Could not successfully write to buffer.\n");
 		return -1;
 	}
 	return n;
 }
 
 int x509_write_csr_to_pem(const x509_csr_info *info, ecc_keypair_t *keypair, unsigned char *buf,
-						size_t buf_size)
+						  size_t buf_size)
 {
 	mbedtls_x509write_csr req;
 	mbedtls_x509write_csr_init(&req);
@@ -81,7 +81,7 @@ int x509_write_csr_to_pem(const x509_csr_info *info, ecc_keypair_t *keypair, uns
 
 	// Writing to the buffer
 	CHECK(mbedtls_x509write_csr_pem(&req, buf, buf_size, crypto_rand, NULL),
-		  "Error while writing CSR as DER");
+		  "Error while writing CSR as PEM");
 
 clean:
 	free(dn_buf);
@@ -90,7 +90,7 @@ clean:
 }
 
 int x509_write_cert_to_pem(const x509_cert_info *info, ecc_keypair_t *subject_keys,
-						 ecc_keypair_t *issuer_keys, unsigned char *buf, size_t buf_size)
+						   ecc_keypair_t *issuer_keys, unsigned char *buf, size_t buf_size)
 {
 	mbedtls_x509write_cert cert;
 	mbedtls_x509write_crt_init(&cert);
@@ -127,6 +127,9 @@ int x509_write_cert_to_pem(const x509_cert_info *info, ecc_keypair_t *subject_ke
 		  "Failed setting the key usage in cert");
 	mbedtls_x509write_crt_set_version(&cert, MBEDTLS_X509_CRT_VERSION_3);
 	mbedtls_x509write_crt_set_md_alg(&cert, MBEDTLS_MD_SHA256);
+
+	CHECK(mbedtls_x509write_crt_set_subject_key_identifier(&cert),
+		  "Failed setting the subject key identifier");
 
 	CHECK(mbedtls_x509write_crt_set_authority_key_identifier(&cert),
 		  "Failed setting the authority key identifier");

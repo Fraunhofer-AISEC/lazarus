@@ -17,13 +17,19 @@
  * limitations under the License.
  */
 
-#ifndef LZ_AWDT_H_
-#define LZ_AWDT_H_
+#ifndef LZ_QUERY_VERSION_HANDLER_H_
+#define LZ_QUERY_VERSION_HANDLER_H_
 
-#include <stddef.h>
 #include <stdint.h>
+#include "lz_common.h"
+#include "lz_error.h"
 
-LZ_RESULT lz_awdt_get_nonce_nse(uint8_t *nonce);
-LZ_RESULT lz_awdt_put_ticket_nse(uint8_t *buffer, size_t buffer_size);
+struct lz_query_version_info {
+	uint32_t version;
+};
 
-#endif /* LZ_AWDT_H_ */
+LZ_RESULT lz_query_version_nse(
+		hdr_type_t type,
+		struct lz_query_version_info *version_info);
+
+#endif /* LZ_QUERY_VERSION_HANDLER_H_ */

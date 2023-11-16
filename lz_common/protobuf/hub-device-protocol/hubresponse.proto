@@ -1,0 +1,57 @@
+syntax = "proto2";
+
+message HubResponseAliasId {
+}
+
+message HubResponseAwdtRefresh {
+	required uint32 timeMs = 1;
+	required bytes nonce = 2;
+}
+
+message HubResponseSensorData {
+}
+
+message HubResponseUpdate {
+	required uint32 payloadNumBytes = 1;
+	required bytes nonce = 2;
+}
+
+message HubResponseCheckForUpdate {
+	message VersionInfo {
+		required string name = 1;
+		required string newestVersion = 2;
+		required uint64 issueTime = 3;
+	}
+
+	required bytes nonce = 1;
+	repeated VersionInfo components = 2;
+}
+
+message HubResponseUserInput {
+	required bool available = 1;
+	required bytes userInput = 2;
+}
+
+message SignedHubResponse {
+	optional bytes payload = 1;
+	optional bytes signature = 2;
+
+	enum Status {
+		ACK = 0;
+		NAK = 1;
+	}
+
+	enum Type {
+		AWDT = 0;
+		ALIASID = 1;
+		BOOTTICKET = 2;
+		REASSOC = 3;
+		FWUPDATE = 4;
+		SENSORDATA = 5;
+		CHECKFORUPDATE = 6;
+		USERINPUT = 7;
+	}
+
+	required Status status = 3;
+	optional Type type = 4;
+}

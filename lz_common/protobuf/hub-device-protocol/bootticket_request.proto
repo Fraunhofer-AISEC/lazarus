@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+message AttestationInfoDicepp {
+
+}
+
+message AttestationInfoTpm {
+	// TODO: add fields, e.g.
+	// required uint32 tpm14 = 1;
+}
+
+message RefreshBootTicket {
+	oneof attestationInfo {
+		AttestationInfoDicepp dicepp = 1;
+		AttestationInfoTpm tpm = 2;
+	}
+}

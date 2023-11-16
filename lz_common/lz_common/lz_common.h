@@ -31,8 +31,6 @@
  * Definitions
  *******************************************/
 
-#define FLASH_PAGE_SIZE 512
-
 #define LEN_NONCE (32)
 #define LEN_UUID_V4_BIN (16)
 #define LEN_BINARY_NAME (32)
@@ -45,7 +43,7 @@
 #define INDEX_IMG_CERTSTORE_HUB (2)
 
 /** Default AWDT timeout in case of missing ticket */
-#define DEFAULT_WDT_TIMOUT_s (60 * 60)
+#define DEFAULT_WDT_TIMOUT_s 30
 
 /** Magic value for all Lazarus structures */
 #define LZ_MAGIC (0x41495345)
@@ -117,37 +115,19 @@ typedef struct {
  *******************************************/
 
 /**
- * Generic header for unauthenticated communication with the backend. The header is prepended
- * to packets that do not require authentication, such as some uncritical ACK's or where
- * authentication is neither possible nor necessary, such as the sending of the AliasID
- * certificate (as long as the backend does not have the AliasID certificate, it cannot
- * verify lazarus signatures anyway)
+ * Header for all elements in staging area. This header is prepended to all
+ * ticket requests, firmware or lazarus updates and certificate updates. The
+ * payload contains a message (which may be for example a protobuf message of
+ * size msg_size). After the message optional payload data may be appended
+ * (e.g. the actual update image data).
  */
 typedef struct {
-	hdr_type_t type;			   // Type of the packet
-	uint32_t payload_size;		   // Size of the payload
-	uint8_t uuid[LEN_UUID_V4_BIN]; // Identification of the device
-} hdr_t;
-
-/**
- * Generic header for all lazarus authenticated network packets and also to staging elements.
- * This header is prepended to all ticket requests, firmware or lazarus updates and certificate
- * updates. For tickets, the header already contains all essential information such as
- * nonce and signature. The payload is only a dummy in case of boot tickets or the AWDT reset
- * time in case of deferral tickets.
- */
-typedef struct {
-	struct {
-		hdr_type_t type;					  // Type of the packet
-		uint32_t payload_size;				  // Size of the payload
-		uint8_t uuid[LEN_UUID_V4_BIN];		  // Identification of the device
-		uint32_t magic;						  // Indicates that a sane header is written
-		uint8_t nonce[LEN_NONCE];			  // Nonce used for signing the header
-		uint8_t digest[SHA256_DIGEST_LENGTH]; // Hash of the payload
-	} content;
-	// Signature over all elements of the header
-	ecc_signature_t signature;
-} lz_auth_hdr_t;
+	hdr_type_t type;					  // Type of the packet
+	uint32_t payload_size;				  // Size of the payload
+	uint32_t magic;						  // Indicates that a sane header is written
+	uint8_t nonce[LEN_NONCE];			  // Nonce used for signing the header
+	uint32_t msg_size; // Size of the wrapped message at the start of the payload
+} lz_staging_hdr_t;
 
 /*******************************************
  * Image Header
@@ -349,15 +329,16 @@ extern volatile lz_img_hdr_t lz_app_hdr;
 void lz_get_uuid(uint8_t uuid[LEN_UUID_V4_BIN]);
 LZ_RESULT lz_set_boot_mode_request(boot_mode_t boot_mode_param);
 LZ_RESULT lz_has_valid_boot_params(void);
-LZ_RESULT lz_get_next_staging_hdr(lz_auth_hdr_t **hdr);
-LZ_RESULT lz_get_staging_hdr(hdr_type_t hdr_type, lz_auth_hdr_t **return_hdr, uint8_t *nonce);
+LZ_RESULT lz_get_next_staging_hdr(lz_staging_hdr_t **hdr);
+LZ_RESULT lz_get_staging_hdr(hdr_type_t hdr_type, lz_staging_hdr_t **return_hdr);
+LZ_RESULT lz_check_staging_payload_size(lz_staging_hdr_t *hdr, unsigned payload_size);
 bool lz_dev_reassociation_necessary(void);
 bool lz_firmware_update_necessary(void);
+const uint8_t *lz_next_nonce(void);
+const ecc_priv_key_pem_t *lz_alias_id_keypair_priv(void);
 bool lz_is_mem_zero(const void *dataPtr, uint32_t dataSize);
-bool lz_check_update_size(lz_auth_hdr_t *staging_elem_hdr);
+bool lz_check_update_size(hdr_type_t type, unsigned image_len);
 void lz_error_handler(void);
-LZ_RESULT
-lz_flash_staging_element(uint8_t *buf, uint32_t buf_size, uint32_t total_size, uint32_t pending);
 void lz_print_img_info(const char *img_name, volatile lz_img_hdr_t *img_hdr);
 
 /**

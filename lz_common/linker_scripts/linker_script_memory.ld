@@ -18,38 +18,37 @@
  */
 
 
-/* Define constants for each memory region according to re_hw_memory.h
- * If something is changed here, it has to be changed in re_hw_memory as well!
+/* Define constants for each memory region according to lzport_memory.h
+ * If something is changed here, it has to be changed in lzport_memory.h as well!
  */
 _LZ_DICEPP_CODE_START        	= 0x10000000;
 _LZ_DICEPP_CODE_SIZE         	= 0x00008000;
 _LZ_DICEPP_DATA_START        	= 0x10008000;
 _LZ_DICEPP_DATA_SIZE         	= 0x00000800;
 
-_LZ_CORE_IRQ_START				= 0x1000F800;
-_LZ_CORE_IRQ_SIZE				= 0x00000800;
-
 _LZ_CORE_HEADER_START        	= 0x10010000;
 _LZ_CORE_HEADER_SIZE         	= 0x00000800;
 _LZ_CORE_CODE_START          	= 0x10010800;
-_LZ_CORE_CODE_SIZE           	= 0x00017400;
-_LZ_CORE_NSC_START           	= 0x10027C00;
+_LZ_CORE_CODE_SIZE           	= 0x0001B400;
+_LZ_CORE_NSC_START           	= 0x1002BC00;
 _LZ_CORE_NSC_SIZE            	= 0x00000400;
 
-_LZ_CPATCHER_HEADER_START       = 0x10028000;
+_LZ_CPATCHER_HEADER_START       = 0x1002C000;
 _LZ_CPATCHER_HEADER_SIZE        = 0x00000800;
-_LZ_CPATCHER_CODE_START         = 0x10028800;
+_LZ_CPATCHER_CODE_START         = 0x1002C800;
 _LZ_CPATCHER_CODE_SIZE          = 0x0000F800;
 
-_LZ_UDOWNLOADER_HEADER_START	= 0x00038000;
+_LZ_UDOWNLOADER_HEADER_START	= 0x0003C000;
 _LZ_UDOWNLOADER_HEADER_SIZE     = 0x00000800;
-_LZ_UDOWNLOADER_CODE_START      = 0x00038800;
-_LZ_UDOWNLOADER_CODE_SIZE       = 0x0000F800;
+_LZ_UDOWNLOADER_CODE_START      = 0x0003C800;
+_LZ_UDOWNLOADER_CODE_SIZE       = 0x00013800;
 
-_APP_HEADER_START         		= 0x00048000;
+_APP_HEADER_START         		= 0x00050000;
 _APP_HEADER_SIZE          		= 0x00000800;
-_APP_CODE_START           		= 0x00048800;
-_APP_CODE_SIZE            		= 0x00027800;
+_APP_CODE_START           		= 0x00050800;
+_APP_CODE_SIZE            		= 0x0001F400;
+_APP_VULN_START                 = 0x0006FC00;
+_APP_VULN_SIZE                  = 0x00000400;
 
 _LZ_DATA_STORAGE_START       	= 0x00070000;
 _LZ_DATA_STORAGE_SIZE        	= 0x00002000;

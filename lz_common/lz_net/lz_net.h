@@ -20,12 +20,30 @@
 #ifndef LZ_NET_LZ_NET_H_
 #define LZ_NET_LZ_NET_H_
 
+#include <stdint.h>
+#include <time.h>
+#include "lz_common.h"
+
+#define LZ_NET_MAX_COMPONENTS 8
+
+typedef struct lz_net_sensor_data {
+	uint32_t index;
+	float temperature;
+	float humidity;
+} lz_net_sensor_data_t;
+
 /**
  * Initialize the network connection
  */
 LZ_RESULT lz_net_init(void);
 
-LZ_RESULT lz_net_send_data(uint8_t *data, uint32_t data_size);
+LZ_RESULT lz_net_open(void);
+
+LZ_RESULT lz_net_close(void);
+
+LZ_RESULT lz_net_close_reboot(void);
+
+LZ_RESULT lz_net_send_data(struct lz_net_sensor_data sensor_data);
 
 /**
  * Send the alias id certificate to the backend
@@ -65,11 +83,20 @@ LZ_RESULT lz_net_reassociate_device(uint8_t *dev_uuid, uint8_t *dev_auth, uint8_
  */
 LZ_RESULT lz_net_fw_update(hdr_type_t update_type);
 
-LZ_RESULT lz_request_element(hdr_t *request_hdr, uint8_t *request_payload, hdr_t *response_hdr,
-							 uint8_t *response_payload, uint32_t response_payload_size);
+struct lz_net_version_info {
+	char name[20];
+	char newest_version[10];
+	time_t issue_time;
+};
 
-LZ_RESULT lz_request_auth_element(lz_auth_hdr_t *request_header, uint8_t *request_payload,
-								  lz_auth_hdr_t *response_hdr, uint8_t *response_payload,
-								  uint32_t reponse_payload_size);
+struct lz_net_check_for_update_result {
+	struct lz_net_version_info components[LZ_NET_MAX_COMPONENTS];
+};
+
+LZ_RESULT lz_net_check_for_update(hdr_type_t update_types[],
+								  unsigned num_update_types,
+								  struct lz_net_check_for_update_result *result);
+
+LZ_RESULT lz_net_request_user_input(void);
 
 #endif /* RE_NET_RE_NET_H_ */

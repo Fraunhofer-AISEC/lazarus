@@ -17,13 +17,30 @@
  * limitations under the License.
  */
 
-#ifndef LZ_AWDT_H_
-#define LZ_AWDT_H_
+#ifndef LZ_NET_LZ_MSG_FRAME_H_
+#define LZ_NET_LZ_MSG_FRAME_H_
 
 #include <stddef.h>
-#include <stdint.h>
+#include "lz_error.h"
 
-LZ_RESULT lz_awdt_get_nonce_nse(uint8_t *nonce);
-LZ_RESULT lz_awdt_put_ticket_nse(uint8_t *buffer, size_t buffer_size);
+struct lz_msg_istream {
+	LZ_RESULT (*callback)(struct lz_msg_istream *stream, uint8_t *buffer, size_t length);
+	void *arg;
+};
 
-#endif /* LZ_AWDT_H_ */
+LZ_RESULT lz_msg_frame_read_size(
+		struct lz_msg_istream *stream,
+		unsigned *frame_size);
+
+LZ_RESULT lz_msg_frame_read_to_buffer(
+		struct lz_msg_istream *stream,
+		uint8_t *buffer,
+		unsigned frame_length);
+
+LZ_RESULT lz_msg_frame_write_header(
+		uint8_t *buffer,
+		size_t payload_size);
+
+size_t lz_msg_frame_header_size(void);
+
+#endif /* LZ_NET_LZ_MSG_FRAME_H_ */

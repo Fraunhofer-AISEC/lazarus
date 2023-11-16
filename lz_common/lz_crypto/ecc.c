@@ -39,7 +39,7 @@ int ecc_derive_keypair(ecc_keypair_t *keypair, const void *seed, size_t seed_siz
 	// Get hash algorithm
 	const mbedtls_md_info_t *md_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
 	if (md_info == NULL) {
-		dbgprint(DBG_INFO, "ERROR: Could not find hash algorithm\n");
+		INFO("ERROR: Could not find hash algorithm\n");
 		re = -1;
 		goto clean;
 	}

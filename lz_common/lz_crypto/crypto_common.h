@@ -57,7 +57,7 @@ typedef struct {
 #define CHECK(func, err)                                                                           \
 	do {                                                                                           \
 		if ((re = func) < 0) {                                                                     \
-			dbgprint(DBG_INFO, "ERROR: %s (code: -0x%04x)\n", err, (unsigned int)-re);             \
+			INFO("ERROR: %s (code: -0x%04x)\n", err, (unsigned int)-re);                           \
 			goto clean;                                                                            \
 		}                                                                                          \
 	} while (0);

@@ -32,20 +32,20 @@
 #define NONCE_LEN 12
 #define encrypted_len(plain_len) ((plain_len) + AUTHTAG_LEN)
 
-int chacha20_poly1305_encrypt(const unsigned char *input, uint32_t input_len,
-								 unsigned char *output, uint32_t output_len, uint8_t *nonce,
-								 size_t nonce_len, const uint8_t *aad, size_t aad_len, uint8_t *key)
+int chacha20_poly1305_encrypt(const unsigned char *input, uint32_t input_len, unsigned char *output,
+							  uint32_t output_len, uint8_t *nonce, size_t nonce_len,
+							  const uint8_t *aad, size_t aad_len, uint8_t *key)
 {
 	int res;
 	mbedtls_chachapoly_context ctx;
 
 	// Check lengths
 	if (encrypted_len(input_len) != output_len) {
-		dbgprint(DBG_ERR, "ERROR: Specified lengthts not correct (%d/%d)\n", input_len, output_len);
+		ERROR("Specified lengthts not correct (%d/%d)\n", input_len, output_len);
 		return -1;
 	}
 	if (nonce_len != NONCE_LEN) {
-		dbgprint(DBG_ERR, "ERROR: Specified nonce length not correct (must be 12)\n");
+		ERROR("Specified nonce length not correct (must be 12)\n");
 		return -1;
 	}
 
@@ -53,7 +53,7 @@ int chacha20_poly1305_encrypt(const unsigned char *input, uint32_t input_len,
 
 	res = mbedtls_chachapoly_setkey(&ctx, key);
 	if (res != 0) {
-		dbgprint(DBG_ERR, "ERROR: Failed to set chacha20-poly1305 key\r\n");
+		ERROR("Failed to set chacha20-poly1305 key\r\n");
 		return res;
 	}
 
@@ -61,7 +61,7 @@ int chacha20_poly1305_encrypt(const unsigned char *input, uint32_t input_len,
 	res = mbedtls_chachapoly_encrypt_and_tag(&ctx, input_len, nonce, aad, aad_len, input, output,
 											 output + input_len);
 	if (res != 0) {
-		dbgprint(DBG_ERR, "ERROR: Failed to encrypt with chacha20-poly1305\r\n");
+		ERROR("Failed to encrypt with chacha20-poly1305\r\n");
 		return res;
 	}
 
@@ -71,25 +71,25 @@ int chacha20_poly1305_encrypt(const unsigned char *input, uint32_t input_len,
 }
 
 int chacha20_poly1305_decrypt(const uint8_t *input, const uint32_t input_len, uint8_t *output,
-								 const uint32_t output_len, uint8_t *nonce, size_t nonce_len,
-								 const uint8_t *aad, size_t aad_len, uint8_t *key)
+							  const uint32_t output_len, uint8_t *nonce, size_t nonce_len,
+							  const uint8_t *aad, size_t aad_len, uint8_t *key)
 {
 	int res;
 	mbedtls_chachapoly_context ctx;
 
 	// Check lengths
 	if (input_len != encrypted_len(output_len)) {
-		dbgprint(DBG_ERR, "Specified lengthts not correct (%d/%d)\n", input_len, output_len);
+		ERROR("Specified lengthts not correct (%d/%d)\n", input_len, output_len);
 		return -1;
 	}
 	if (nonce_len != NONCE_LEN) {
-		dbgprint(DBG_ERR, "ERROR: Specified nonce length not correct (must be 12)\n");
+		ERROR("Specified nonce length not correct (must be 12)\n");
 		return -1;
 	}
 
 	res = mbedtls_chachapoly_setkey(&ctx, key);
 	if (res != 0) {
-		dbgprint(DBG_ERR, "ERROR: Failed to set chacha20-poly1305 key\r\n");
+		ERROR("Failed to set chacha20-poly1305 key\r\n");
 		return res;
 	}
 
@@ -97,7 +97,7 @@ int chacha20_poly1305_decrypt(const uint8_t *input, const uint32_t input_len, ui
 	res = mbedtls_chachapoly_auth_decrypt(&ctx, output_len, nonce, aad, aad_len, input + output_len,
 										  input, output);
 	if (res != 0) {
-		dbgprint(DBG_ERR, "ERROR: Failed to decrypt with chacha20-poly1305: -0x%x\r\n", -res);
+		ERROR("Failed to decrypt with chacha20-poly1305: -0x%x\r\n", -res);
 		return res;
 	}
 
