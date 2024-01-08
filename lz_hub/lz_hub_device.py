@@ -10,6 +10,7 @@ from lz_fitimage import get_config_hash_file_name
 from ecdsa.util import sigencode_der
 from datetime import datetime
 import cbor2
+from pycose.messages import Sign1Message
 import hubrequest_pb2
 import hubresponse_pb2
 import bootticket_request_pb2
@@ -224,10 +225,11 @@ class CortexADevice(Device):
         return fw
 
     def get_update_version(self, component):
-        payload = self.get_update_payload(component)
 
-        outer_cbor = cbor2.loads(payload)
-        inner_cbor = cbor2.loads(outer_cbor['payload'])
+        cose_payload = self.get_update_payload(component)
+        decoded = Sign1Message.decode(cose_payload)
+        inner_cbor = cbor2.loads(decoded.payload)
+
         issue_time = int(inner_cbor['fwVer'])
         version = datetime.fromtimestamp(issue_time).strftime("%Y-%m-%d %H:%M:%S")
         print(f"CortexADevice: Newest version for {component} is {version}.")
@@ -246,3 +248,15 @@ def get_device(uuid):
         return CortexADevice(uuid)
     else:
         raise Exception(f"Unsupported device class {_class}")
+
+
+#TODO real unit test framework
+##############################################
+############### TEST ONLY ####################
+##############################################
+
+def test():
+    #TODO: replace by a unit test device
+    A_device = CortexADevice(bytes.fromhex("66534fbd7c1fac24533bf9abdde379d6"))
+    component, version, issue_time = A_device.get_update_version("uboot_spl")
+    print(f"Update version: {component} version {version}, issued {issue_time}")

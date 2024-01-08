@@ -305,7 +305,7 @@ def handle_reassoc_device(conn, uuid, request, hub_cb):
     device_cb = device_certbag(uuid)
     if not device_cb.reassociate_device_id_cert(dev_id_cert, auth, hub_cb.hub_cert, hub_cb.hub_sk):
         print("ERROR: Unable to update and reassociate DeviceID certificate.")
-        print("Cert: %s" %csr_buffer)
+        print("Cert: %s" %dev_id_cert)
         raise HubException("Device reassociation failed")
 
     # NOW the signature of the packet can be verified with the new device ID

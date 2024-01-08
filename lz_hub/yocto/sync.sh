@@ -7,7 +7,7 @@ rsync -L ${base_addr}/ih_tools/fit_config_hash fit_config_hash
 mkdir -p updates && cd updates
 
 rsync -L ${base_addr}/fitImage-production-image-apalis-imx8-apalis-imx8 productionImage
-rsync -L ${base_addr}/downloader-image/fitImage-downloader-image-apalis-imx8-apalis-imx8 downloadImage
+rsync -L ${base_addr}/downloader-image/fitImage-downloader-image-apalis-imx8-apalis-imx8 downloaderImage
 rsync -L ${base_addr}/imx-boot imx-boot
 rsync -L ${base_addr}/u-boot-apalis-imx8.itb u-boot.itb
 
